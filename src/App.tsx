@@ -1,34 +1,57 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import MapScreen from './components/map/MapScreen';
+import StartScreen from './components/StartScreen';
 import CombatScreen from './components/combat/CombatScreen';
-import { GlobalStyle } from './styles/GlobalStyle';
+import { Model } from './types/models';
+
+interface GameState {
+  isStarted: boolean;
+  player1Warband?: Model[];
+  player2Warband?: Model[];
+}
 
 const AppContainer = styled.div`
+  width: 100%;
   min-height: 100vh;
-  background: #1a1a2e;
-  color: #fff;
-  font-family: 'Roboto', sans-serif;
-  overflow: hidden;
-`
-
-const Header = styled.header`
-  text-align: center;
-  padding: 20px;
-`
+  background-color: #1a202c;
+  color: #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
 
 function App() {
+  const [gameState, setGameState] = useState<GameState>({
+    isStarted: false
+  });
+
+  const handleStartGame = (player1Warband: Model[], player2Warband: Model[]) => {
+    setGameState({
+      isStarted: true,
+      player1Warband,
+      player2Warband
+    });
+  };
+
+  const handleCombatEnd = (winner: Model) => {
+    console.log('Combat ended - Winner:', winner);
+    setGameState({
+      isStarted: false
+    });
+  };
+
   return (
     <AppContainer>
-      <Header>
-        <h1>Grimheim Combat Simulator</h1>
-      </Header>
-      <Routes>
-        <Route path="/" element={<MapScreen />} />
-        <Route path="/combat" element={<CombatScreen />} />
-      </Routes>
-      <GlobalStyle />
+      {!gameState.isStarted ? (
+        <StartScreen onStartGame={handleStartGame} />
+      ) : (
+        <CombatScreen
+          player1Warband={gameState.player1Warband!}
+          player2Warband={gameState.player2Warband!}
+          onCombatEnd={handleCombatEnd}
+          isMelee={true}
+        />
+      )}
     </AppContainer>
   );
 }
