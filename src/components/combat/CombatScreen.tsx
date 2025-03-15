@@ -4,10 +4,11 @@ import { Model } from '../../types/models';
 import CombatLog from './CombatLog';
 import DiceDisplay from './DiceDisplay';
 import ModelCard from './ModelCard';
+import ModelSelection from './ModelSelection';
 
 interface CombatScreenProps {
-  player1Model: Model;
-  player2Model: Model;
+  player1Warband: Model[];
+  player2Warband: Model[];
   onCombatEnd: (winner: Model) => void;
   isMelee: boolean;
 }
@@ -38,24 +39,60 @@ const ActionArea = styled.div`
   gap: 20px;
 `;
 
+const SelectionPhase = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 2rem;
+`;
+
+const StartButton = styled.button<{ isEnabled: boolean }>`
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  background: ${props => props.isEnabled ? '#2c5282' : '#1a365d'};
+  border: 2px solid ${props => props.isEnabled ? '#4299e1' : '#2b6cb0'};
+  border-radius: 0.5rem;
+  color: white;
+  cursor: ${props => props.isEnabled ? 'pointer' : 'not-allowed'};
+  opacity: ${props => props.isEnabled ? '1' : '0.5'};
+  transition: all 0.2s;
+
+  &:hover {
+    background: ${props => props.isEnabled ? '#2a4365' : '#1a365d'};
+  }
+`;
+
 const CombatScreen: React.FC<CombatScreenProps> = ({
-  player1Model,
-  player2Model,
+  player1Warband,
+  player2Warband,
   onCombatEnd,
   isMelee
 }) => {
+  const [phase, setPhase] = useState<'selection' | 'combat'>('selection');
+  const [selectedModel1, setSelectedModel1] = useState<Model | undefined>();
+  const [selectedModel2, setSelectedModel2] = useState<Model | undefined>();
   const [currentPlayer, setCurrentPlayer] = useState<1 | 2>(1);
   const [combatLog, setCombatLog] = useState<string[]>([]);
-  const [player1Dice, setPlayer1Dice] = useState<Array<{ value: number; used: boolean }>>([
-    { value: Math.floor(Math.random() * 6) + 1, used: false },
-    { value: Math.floor(Math.random() * 6) + 1, used: false },
-    { value: Math.floor(Math.random() * 6) + 1, used: false }
-  ]);
-  const [player2Dice, setPlayer2Dice] = useState<Array<{ value: number; used: boolean }>>([
-    { value: Math.floor(Math.random() * 6) + 1, used: false },
-    { value: Math.floor(Math.random() * 6) + 1, used: false },
-    { value: Math.floor(Math.random() * 6) + 1, used: false }
-  ]);
+  const [player1Dice, setPlayer1Dice] = useState<Array<{ value: number; used: boolean }>>([]);
+  const [player2Dice, setPlayer2Dice] = useState<Array<{ value: number; used: boolean }>>([]);
+
+  const initializeDice = () => {
+    return [
+      { value: Math.floor(Math.random() * 6) + 1, used: false },
+      { value: Math.floor(Math.random() * 6) + 1, used: false },
+      { value: Math.floor(Math.random() * 6) + 1, used: false }
+    ];
+  };
+
+  const startCombat = () => {
+    if (selectedModel1 && selectedModel2) {
+      setPhase('combat');
+      setPlayer1Dice(initializeDice());
+      setPlayer2Dice(initializeDice());
+      addToCombatLog('Kampf beginnt!');
+      addToCombatLog(`${selectedModel1.name} gegen ${selectedModel2.name}`);
+    }
+  };
 
   const addToCombatLog = (message: string) => {
     setCombatLog(prev => [...prev, message]);
@@ -72,9 +109,9 @@ const CombatScreen: React.FC<CombatScreenProps> = ({
     if (!hasUsableDice(currentDice)) {
       if (hasUsableDice(opponentDice)) {
         setCurrentPlayer(currentPlayer === 1 ? 2 : 1);
-        addToCombatLog(`Turn switches to Player ${currentPlayer === 1 ? 2 : 1}`);
+        addToCombatLog(`Zug wechselt zu Spieler ${currentPlayer === 1 ? 2 : 1}`);
       } else {
-        addToCombatLog('Combat phase ends - no usable dice remaining');
+        addToCombatLog('Kampfphase endet - keine verwendbaren Würfel mehr übrig');
         // Handle end of combat phase here
       }
     }
@@ -85,7 +122,7 @@ const CombatScreen: React.FC<CombatScreenProps> = ({
     const opponentDice = currentPlayer === 1 ? player2Dice : player1Dice;
     
     if (currentDice[dieIndex].used) {
-      addToCombatLog('This die has already been used!');
+      addToCombatLog('Dieser Würfel wurde bereits verwendet!');
       return;
     }
 
@@ -104,17 +141,17 @@ const CombatScreen: React.FC<CombatScreenProps> = ({
       });
     }
 
-    addToCombatLog(`Player ${currentPlayer} strikes with a ${currentDice[dieIndex].value}`);
+    addToCombatLog(`Spieler ${currentPlayer} greift mit einer ${currentDice[dieIndex].value} an`);
 
     // Check if opponent has usable dice
     if (hasUsableDice(opponentDice)) {
       setCurrentPlayer(currentPlayer === 1 ? 2 : 1);
-      addToCombatLog(`Turn switches to Player ${currentPlayer === 1 ? 2 : 1}`);
+      addToCombatLog(`Zug wechselt zu Spieler ${currentPlayer === 1 ? 2 : 1}`);
     } else if (hasUsableDice(currentDice)) {
       // Current player still has usable dice
-      addToCombatLog(`Player ${currentPlayer} continues their turn`);
+      addToCombatLog(`Spieler ${currentPlayer} setzt seinen Zug fort`);
     } else {
-      addToCombatLog('Combat phase ends - no usable dice remaining');
+      addToCombatLog('Kampfphase endet - keine verwendbaren Würfel mehr übrig');
       // Handle end of combat phase here
     }
   };
@@ -124,7 +161,7 @@ const CombatScreen: React.FC<CombatScreenProps> = ({
     const opponentDice = currentPlayer === 1 ? player2Dice : player1Dice;
 
     if (currentDice[dieIndex].used) {
-      addToCombatLog('This die has already been used!');
+      addToCombatLog('Dieser Würfel wurde bereits verwendet!');
       return;
     }
 
@@ -143,39 +180,66 @@ const CombatScreen: React.FC<CombatScreenProps> = ({
       });
     }
 
-    addToCombatLog(`Player ${currentPlayer} blocks with a ${currentDice[dieIndex].value}`);
+    addToCombatLog(`Spieler ${currentPlayer} blockt mit einer ${currentDice[dieIndex].value}`);
 
     // Check if opponent has usable dice
     if (hasUsableDice(opponentDice)) {
       setCurrentPlayer(currentPlayer === 1 ? 2 : 1);
-      addToCombatLog(`Turn switches to Player ${currentPlayer === 1 ? 2 : 1}`);
+      addToCombatLog(`Zug wechselt zu Spieler ${currentPlayer === 1 ? 2 : 1}`);
     } else if (hasUsableDice(currentDice)) {
       // Current player still has usable dice
-      addToCombatLog(`Player ${currentPlayer} continues their turn`);
+      addToCombatLog(`Spieler ${currentPlayer} setzt seinen Zug fort`);
     } else {
-      addToCombatLog('Combat phase ends - no usable dice remaining');
+      addToCombatLog('Kampfphase endet - keine verwendbaren Würfel mehr übrig');
       // Handle end of combat phase here
     }
   };
 
-  useEffect(() => {
-    // Initial combat log message
-    addToCombatLog('Combat begins!');
-  }, []);
+  if (phase === 'selection') {
+    return (
+      <CombatContainer>
+        <SelectionPhase>
+          <ModelSelection
+            warband={player1Warband}
+            playerNumber={1}
+            onModelSelect={setSelectedModel1}
+            selectedModel={selectedModel1}
+          />
+          <ModelSelection
+            warband={player2Warband}
+            playerNumber={2}
+            onModelSelect={setSelectedModel2}
+            selectedModel={selectedModel2}
+          />
+        </SelectionPhase>
+        <StartButton
+          isEnabled={!!selectedModel1 && !!selectedModel2}
+          onClick={startCombat}
+          disabled={!selectedModel1 || !selectedModel2}
+        >
+          Kampf Starten
+        </StartButton>
+      </CombatContainer>
+    );
+  }
 
   return (
     <CombatContainer>
       <ModelsContainer>
-        <ModelCard
-          model={player1Model}
-          isActive={currentPlayer === 1}
-          playerNumber={1}
-        />
-        <ModelCard
-          model={player2Model}
-          isActive={currentPlayer === 2}
-          playerNumber={2}
-        />
+        {selectedModel1 && selectedModel2 && (
+          <>
+            <ModelCard
+              model={selectedModel1}
+              isActive={currentPlayer === 1}
+              playerNumber={1}
+            />
+            <ModelCard
+              model={selectedModel2}
+              isActive={currentPlayer === 2}
+              playerNumber={2}
+            />
+          </>
+        )}
       </ModelsContainer>
       
       <ActionArea>
