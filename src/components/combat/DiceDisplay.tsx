@@ -86,6 +86,7 @@ const Die = styled.div<{
   $isUsed: boolean;
   $isBlockable?: boolean;
   $isBlockMode?: boolean;
+  $isBlockDie: boolean;
 }>`
   width: 40px;
   height: 40px;
@@ -96,16 +97,20 @@ const Die = styled.div<{
   font-size: 1.2em;
   font-weight: bold;
   color: white;
-  cursor: ${props => (props.$isUsable || props.$isBlockable) && !props.$isUsed ? 'pointer' : 'default'};
+  cursor: ${props => ((props.$isUsable && props.$result !== 'miss') || props.$isBlockable) && !props.$isUsed ? 'pointer' : 'default'};
   opacity: ${props => {
     if (props.$isUsed) return 0.5;
-    if (props.$result === 'block' && !props.$isUsable) return 0.5;
+    if (props.$result === 'miss') return 0.5;
     return 1;
   }};
   background: ${props => {
     if (props.$isBlockable && !props.$isUsed) return '#40E0D0';
+    if (props.$isBlockDie) {
+      if (props.$result === 'critical') return '#40E0D0';
+      if (props.$result === 'hit') return '#40E0D0';
+      return '#40E0D0';
+    }
     switch (props.$result) {
-      case 'block': return '#40E0D0';
       case 'miss': return '#666';
       case 'hit': return '#4a4aff';
       case 'critical': return '#8a2be2';
@@ -122,10 +127,10 @@ const Die = styled.div<{
     }
   `}
   
-  ${props => props.$isUsable && !props.$isUsed && !props.$isBlockMode && css`
+  ${props => props.$isUsable && !props.$isUsed && !props.$isBlockMode && props.$result !== 'miss' && css`
     &:hover {
       transform: scale(1.1);
-      animation: ${pulse} 1.5s infinite;
+      animation: ${props.$isBlockDie ? blockPulse : pulse} 1.5s infinite;
     }
   `}
 `;
@@ -160,9 +165,9 @@ const DiceDisplay: React.FC<DiceDisplayProps> = ({
   onDieClick
 }) => {
   const getStats = (dice: DieResult[]) => {
-    const hits = dice.filter(d => !d.isBlockDie && d.isHit && !d.isCritical && !d.isUsed).length;
-    const crits = dice.filter(d => !d.isBlockDie && d.isCritical && d.isHit && !d.isUsed).length;
-    const blocks = dice.filter(d => d.isBlockDie && d.isHit && !d.isUsed).length;
+    const hits = dice.filter(d => d.isHit && !d.isCritical && !d.isUsed).length;
+    const crits = dice.filter(d => d.isCritical && !d.isUsed).length;
+    const blocks = dice.filter(d => d.isBlockDie && (d.isHit || d.isCritical) && !d.isUsed).length;
     return `${hits} Hits, ${crits} Critical, ${blocks} Block`;
   };
 
@@ -177,18 +182,15 @@ const DiceDisplay: React.FC<DiceDisplayProps> = ({
           {attackerDice.map((die, index) => (
             <Die
               key={index}
-              $result={die.isBlockDie ? 'block' : die.isCritical ? 'critical' : die.isHit ? 'hit' : 'miss'}
+              $result={die.isCritical ? 'critical' : die.isHit ? 'hit' : 'miss'}
               $isUsable={(isAttackerTurn && !die.isUsed)}
               $isUsed={die.isUsed}
               $isBlockMode={isBlockMode}
               $isBlockable={!isAttackerTurn && blockableDice.includes(index)}
+              $isBlockDie={die.isBlockDie}
               onClick={() => {
-                if (!die.isUsed && onDieClick) {
-                  if (isAttackerTurn) {
-                    onDieClick(index, true);
-                  } else if (!isAttackerTurn && blockableDice.includes(index)) {
-                    onDieClick(index, true);
-                  }
+                if (!die.isUsed && onDieClick && ((isAttackerTurn && die.isHit) || (!isAttackerTurn && blockableDice.includes(index)))) {
+                  onDieClick(index, true);
                 }
               }}
             >
@@ -207,18 +209,15 @@ const DiceDisplay: React.FC<DiceDisplayProps> = ({
           {defenderDice.map((die, index) => (
             <Die
               key={index}
-              $result={die.isBlockDie ? 'block' : die.isCritical ? 'critical' : die.isHit ? 'hit' : 'miss'}
+              $result={die.isCritical ? 'critical' : die.isHit ? 'hit' : 'miss'}
               $isUsable={(!isAttackerTurn && !die.isUsed)}
               $isUsed={die.isUsed}
               $isBlockMode={isBlockMode}
               $isBlockable={isAttackerTurn && blockableDice.includes(index)}
+              $isBlockDie={die.isBlockDie}
               onClick={() => {
-                if (!die.isUsed && onDieClick) {
-                  if (!isAttackerTurn) {
-                    onDieClick(index, false);
-                  } else if (isAttackerTurn && blockableDice.includes(index)) {
-                    onDieClick(index, false);
-                  }
+                if (!die.isUsed && onDieClick && ((!isAttackerTurn && die.isHit) || (isAttackerTurn && blockableDice.includes(index)))) {
+                  onDieClick(index, false);
                 }
               }}
             >
@@ -231,4 +230,4 @@ const DiceDisplay: React.FC<DiceDisplayProps> = ({
   );
 };
 
-export default DiceDisplay; 
+export default DiceDisplay;
