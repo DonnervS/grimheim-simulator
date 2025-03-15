@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { Model, WeaponStats } from '../../types/gameTypes'
 import ModelCard from './ModelCard'
-import DiceRoller from './DiceRoller'
-import CombatActions from './CombatActions'
+import DiceDisplay, { DieResult } from './DiceDisplay'
+import ActionButtons from './ActionButtons'
 import CombatLog from './CombatLog'
 
 const CombatContainer = styled.div`
@@ -35,6 +35,15 @@ const DiceArea = styled.div`
   background: rgba(42, 42, 74, 0.8);
   border-radius: 8px;
   border: 2px solid #4a4a8a;
+  width: 100%;
+`
+
+const TurnIndicator = styled.div`
+  color: #8a8aff;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 1.2em;
+  text-align: center;
+  margin-bottom: 20px;
 `
 
 const FighterColumn = styled.div`
@@ -115,29 +124,32 @@ interface CombatScreenProps {
   onCombatEnd: (winner: Model) => void;
 }
 
-interface DiceResult {
-  value: number;
-  isUsed: boolean;
-  isCritical: boolean;
-  isHit: boolean;
-  isBlockable?: boolean;
-}
-
 export const CombatScreen: React.FC<CombatScreenProps> = ({
   attacker,
   defender,
   isMelee,
   onCombatEnd
 }) => {
-  const [attackerDice, setAttackerDice] = useState<DiceResult[]>([])
-  const [defenderDice, setDefenderDice] = useState<DiceResult[]>([])
-  const [selectedWeapon, setSelectedWeapon] = useState<WeaponStats | null>(null)
+  const [attackerWeapon, setAttackerWeapon] = useState<WeaponStats | null>(null)
   const [defenderWeapon, setDefenderWeapon] = useState<WeaponStats | null>(null)
+  const [attackerDice, setAttackerDice] = useState<DieResult[]>([])
+  const [defenderDice, setDefenderDice] = useState<DieResult[]>([])
+  const [isAttackerTurn, setIsAttackerTurn] = useState(true)
+  const [selectedDieIndex, setSelectedDieIndex] = useState<number | null>(null)
   const [combatPhase, setCombatPhase] = useState<'weapon-select' | 'rolling' | 'resolution'>('weapon-select')
   const [combatLog, setCombatLog] = useState<string[]>([])
-  const [isAttackerTurn, setIsAttackerTurn] = useState(true)
+  const [isBlockMode, setIsBlockMode] = useState(false)
+  const [blockableDice, setBlockableDice] = useState<number[]>([])
   const [blockingDieIndex, setBlockingDieIndex] = useState<number | null>(null)
-  const [isBlocking, setIsBlocking] = useState(false)
+
+  useEffect(() => {
+    if (attacker.currentWounds === undefined) {
+      attacker.currentWounds = attacker.stats.WND;
+    }
+    if (defender.currentWounds === undefined) {
+      defender.currentWounds = defender.stats.WND;
+    }
+  }, [attacker, defender]);
 
   const addToCombatLog = (message: string) => {
     setCombatLog(prev => [...prev, message])
@@ -145,173 +157,179 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
 
   const handleWeaponSelect = (weapon: WeaponStats, isAttacker: boolean) => {
     if (isAttacker) {
-      setSelectedWeapon(weapon)
-      addToCombatLog(`${attacker.name} selects ${weapon.name}`)
-      if (!isMelee) {
-        setCombatPhase('rolling')
-      }
+      setAttackerWeapon(weapon)
+      addToCombatLog(`${attacker.name} wählt ${weapon.name}`)
     } else {
       setDefenderWeapon(weapon)
-      addToCombatLog(`${defender.name} selects ${weapon.name}`)
+      addToCombatLog(`${defender.name} wählt ${weapon.name}`)
       setCombatPhase('rolling')
     }
   }
 
-  const handleDiceRoll = (isAttacker: boolean) => {
-    if (!selectedWeapon || !defenderWeapon) return
+  const rollDice = (weapon: WeaponStats, model: Model): DieResult[] => {
+    // Berechne zusätzliche Blockwürfel basierend auf SAV
+    const extraBlockDice = model.stats.SAV <= 3 ? 2 : model.stats.SAV === 4 ? 1 : 0
+    const totalDice = weapon.ATK + extraBlockDice
 
-    // Roll for both fighters
-    const rollForFighter = (weapon: WeaponStats): DiceResult[] => {
-      return Array.from({ length: weapon.ATK }, () => {
-        const value = Math.floor(Math.random() * 6) + 1
-        return {
-          value,
-          isUsed: false,
-          isCritical: value === 6,
-          isHit: value >= weapon.HTV
-        }
-      })
-    }
+    return Array.from({ length: totalDice }, () => {
+      const value = Math.floor(Math.random() * 6) + 1
+      const isCritical = value === 6
+      const isHit = isCritical || value >= weapon.HTV
+      return { value, isHit, isCritical, isUsed: false }
+    })
+  }
 
-    const attackerResults = rollForFighter(selectedWeapon)
-    const defenderResults = rollForFighter(defenderWeapon)
+  const handleDiceRoll = () => {
+    if (!attackerWeapon || !defenderWeapon) return
+
+    const attackerResults = rollDice(attackerWeapon, attacker)
+    const defenderResults = rollDice(defenderWeapon, defender)
 
     setAttackerDice(attackerResults)
     setDefenderDice(defenderResults)
 
-    addToCombatLog(`${attacker.name} rolls ${attackerResults.length} dice`)
-    const attackerHits = attackerResults.filter(die => die.isHit).length
-    const attackerCrits = attackerResults.filter(die => die.isCritical).length
-    addToCombatLog(`Results for ${attacker.name}: ${attackerHits} hits${attackerCrits > 0 ? `, including ${attackerCrits} critical hits!` : ''}`)
-
-    addToCombatLog(`${defender.name} rolls ${defenderResults.length} dice`)
-    const defenderHits = defenderResults.filter(die => die.isHit).length
-    const defenderCrits = defenderResults.filter(die => die.isCritical).length
-    addToCombatLog(`Results for ${defender.name}: ${defenderHits} hits${defenderCrits > 0 ? `, including ${defenderCrits} critical hits!` : ''}`)
+    addToCombatLog(`${attacker.name} würfelt ${attackerResults.filter(d => d.isHit).length} Treffer`)
+    addToCombatLog(`${defender.name} würfelt ${defenderResults.filter(d => d.isHit).length} Treffer`)
 
     setCombatPhase('resolution')
-    addToCombatLog(`${isAttackerTurn ? attacker.name : defender.name}'s turn`)
   }
 
-  const handleDiceSelection = (isAttacker: boolean, diceIndex: number, action: 'strike' | 'block') => {
-    // Grundlegende Variablen
-    const currentDice = isAttacker ? attackerDice : defenderDice;
-    const setCurrentDice = isAttacker ? setAttackerDice : setDefenderDice;
-    const enemyDice = isAttacker ? defenderDice : attackerDice;
-    const setEnemyDice = isAttacker ? setDefenderDice : setAttackerDice;
-    const currentModel = isAttacker ? attacker : defender;
-    const enemyModel = isAttacker ? defender : attacker;
+  const hasUnusedHits = (dice: DieResult[]) => {
+    return dice.some(die => (die.isHit || die.isCritical) && !die.isUsed)
+  }
 
-    // Überprüfen Sie, ob es der richtige Zug ist
-    if (!isBlocking && ((isAttacker && !isAttackerTurn) || (!isAttacker && isAttackerTurn))) {
-      addToCombatLog(`Es ist nicht dein Zug!`);
-      return;
-    }
-
-    // Überprüfen Sie, ob der Würfel verwendet werden kann
-    const selectedDie = currentDice[diceIndex];
-    if (!selectedDie || selectedDie.isUsed || (!selectedDie.isHit && !isBlocking)) {
-      return;
-    }
-
-    if (action === 'strike') {
-      if (isBlocking) return;
-
-      // Führen Sie den Schlag aus
-      const newDice = currentDice.map((die, i) => 
-        i === diceIndex ? { ...die, isUsed: true } : die
-      );
-      setCurrentDice(newDice);
-
-      // Berechnen Sie den Schaden
-      const damage = selectedDie.isCritical ? 
-        (isAttacker ? selectedWeapon?.CRT : defenderWeapon?.CRT) : 
-        (isAttacker ? selectedWeapon?.DMG : defenderWeapon?.DMG);
-
-      if (damage) {
-        enemyModel.currentWounds = Math.max(0, enemyModel.currentWounds - damage);
-        addToCombatLog(`${currentModel.name} trifft für ${damage} Schaden${selectedDie.isCritical ? ' (Kritischer Treffer!)' : ''}`);
-        addToCombatLog(`${enemyModel.name} hat noch ${enemyModel.currentWounds} Wunden`);
-
-        if (enemyModel.currentWounds <= 0) {
-          addToCombatLog(`${enemyModel.name} wurde besiegt!`);
-          onCombatEnd(currentModel);
-          return;
-        }
+  const handleDieSelect = (index: number) => {
+    if (isBlockMode) {
+      // Wenn wir im Block-Modus sind und ein blockbarer Würfel wurde ausgewählt
+      if (blockableDice.includes(index)) {
+        handleBlockDie(index)
       }
+      return
+    }
+    setSelectedDieIndex(index)
+  }
 
-      // Spieler wechseln
-      setIsAttackerTurn(!isAttackerTurn);
-      addToCombatLog(`${!isAttackerTurn ? attacker.name : defender.name} ist am Zug`);
-
-    } else if (action === 'block') {
-      if (!isBlocking) {
-        // Blockierung initiieren
-        console.log('Blockierung wird initiiert:', {
-          blockingDieIndex: diceIndex,
-          blockingDie: selectedDie,
-          isAttackerDice: isAttacker
-        });
-        
-        setBlockingDieIndex(diceIndex);
-        setIsBlocking(true);
-
-        // Markieren Sie die blockierbaren Würfel
-        const updatedEnemyDice = enemyDice.map(die => ({
-          ...die,
-          isBlockable: !die.isUsed && die.isHit && !die.isCritical
-        }));
-        setEnemyDice(updatedEnemyDice);
-
-        addToCombatLog(`${currentModel.name} versucht zu blocken`);
-      } else {
-        // Blockierung ausführen
-        console.log('Blockierung wird ausgeführt:', {
-          targetDieIndex: diceIndex,
-          targetDie: enemyDice[diceIndex],
-          blockingDieIndex,
-          blockingDie: currentDice[blockingDieIndex!]
-        });
-
-        if (blockingDieIndex === null) {
-          console.error('Kein blockierender Würfel ausgewählt');
-          return;
-        }
-
-        const targetDie = enemyDice[diceIndex];
-        if (!targetDie?.isBlockable) {
-          console.log('Zielwürfel ist nicht blockierbar:', targetDie);
-          return;
-        }
-
-        // Führen Sie die Blockierung durch
-        const updatedEnemyDice = enemyDice.map((die, i) => 
-          i === diceIndex ? { ...die, isUsed: true, isBlockable: false } : { ...die, isBlockable: false }
-        );
-        setEnemyDice(updatedEnemyDice);
-
-        const updatedCurrentDice = currentDice.map((die, i) => 
-          i === blockingDieIndex ? { ...die, isUsed: true } : die
-        );
-        setCurrentDice(updatedCurrentDice);
-
-        addToCombatLog(`${currentModel.name} blockt erfolgreich einen Treffer von ${enemyModel.name}`);
-
-        // Blockierung zurücksetzen
-        setBlockingDieIndex(null);
-        setIsBlocking(false);
+  const findBlockableDice = (selectedDie: DieResult, opponentDice: DieResult[]): number[] => {
+    return opponentDice.reduce((blockable: number[], die, index) => {
+      if (!die.isUsed && (die.isHit || die.isCritical) && (!die.isCritical || selectedDie.isCritical)) {
+        blockable.push(index)
       }
+      return blockable
+    }, [])
+  }
+
+  const handleBlockStart = () => {
+    if (selectedDieIndex === null) return
+    
+    const currentDice = isAttackerTurn ? attackerDice : defenderDice
+    const selectedDie = currentDice[selectedDieIndex]
+    const opponentDice = isAttackerTurn ? defenderDice : attackerDice
+    
+    if (!selectedDie || selectedDie.isUsed) return
+
+    const blockable = findBlockableDice(selectedDie, opponentDice)
+    if (blockable.length > 0) {
+      setIsBlockMode(true)
+      setBlockableDice(blockable)
+      setBlockingDieIndex(selectedDieIndex)
     }
   }
 
-  const canBlock = (isAttacker: boolean) => {
-    const currentDice = isAttacker ? attackerDice : defenderDice;
-    return currentDice.some(die => !die.isUsed && die.isHit);
+  const handleBlockDie = (opponentDieIndex: number) => {
+    if (blockingDieIndex === null) return
+    
+    const currentDice = isAttackerTurn ? attackerDice : defenderDice
+    const selectedDie = currentDice[blockingDieIndex]
+    const opponentDice = isAttackerTurn ? defenderDice : attackerDice
+    
+    if (!selectedDie || selectedDie.isUsed) return
+
+    // Markiere beide Würfel als benutzt
+    const updatedCurrentDice = [...currentDice]
+    updatedCurrentDice[blockingDieIndex] = { ...selectedDie, isUsed: true }
+
+    const updatedOpponentDice = [...opponentDice]
+    updatedOpponentDice[opponentDieIndex] = { ...opponentDice[opponentDieIndex], isUsed: true }
+
+    if (isAttackerTurn) {
+      setAttackerDice(updatedCurrentDice)
+      setDefenderDice(updatedOpponentDice)
+    } else {
+      setDefenderDice(updatedCurrentDice)
+      setAttackerDice(updatedOpponentDice)
+    }
+
+    addToCombatLog(`${isAttackerTurn ? attacker.name : defender.name} blockt einen Treffer`)
+
+    // Reset block mode
+    setIsBlockMode(false)
+    setBlockableDice([])
+    setBlockingDieIndex(null)
+    setSelectedDieIndex(null)
+
+    // Wechsle den Spieler wenn möglich
+    const otherPlayerHasHits = hasUnusedHits(isAttackerTurn ? defenderDice : attackerDice)
+    if (otherPlayerHasHits) {
+      setIsAttackerTurn(!isAttackerTurn)
+    }
   }
 
-  const canStrike = (isAttacker: boolean) => {
-    const currentDice = isAttacker ? attackerDice : defenderDice;
-    return currentDice.some(die => !die.isUsed && die.isHit);
+  const handleStrike = () => {
+    if (selectedDieIndex === null) return
+    
+    const currentDice = isAttackerTurn ? attackerDice : defenderDice
+    const selectedDie = currentDice[selectedDieIndex]
+    const weapon = isAttackerTurn ? attackerWeapon : defenderWeapon
+    const targetModel = isAttackerTurn ? defender : attacker
+    
+    if (!weapon || !selectedDie || selectedDie.isUsed) return
+
+    const damage = selectedDie.isCritical ? weapon.CRT : weapon.DMG
+    const newWounds = Math.max(0, targetModel.currentWounds - damage)
+    
+    if (isAttackerTurn) {
+      defender.currentWounds = newWounds
+    } else {
+      attacker.currentWounds = newWounds
+    }
+
+    // Markiere den Würfel als benutzt
+    const updatedDice = [...currentDice]
+    updatedDice[selectedDieIndex] = { ...selectedDie, isUsed: true }
+    if (isAttackerTurn) {
+      setAttackerDice(updatedDice)
+    } else {
+      setDefenderDice(updatedDice)
+    }
+
+    addToCombatLog(`${isAttackerTurn ? attacker.name : defender.name} verursacht ${damage} Schaden`)
+
+    // Prüfe auf Kampfende
+    if (newWounds <= 0) {
+      addToCombatLog(`${targetModel.name} wurde ausgeschaltet!`)
+      onCombatEnd(isAttackerTurn ? attacker : defender)
+      return
+    }
+
+    // Wechsle den Spieler wenn möglich
+    const otherPlayerHasHits = hasUnusedHits(isAttackerTurn ? defenderDice : attackerDice)
+    if (otherPlayerHasHits) {
+      setIsAttackerTurn(!isAttackerTurn)
+    }
+    setSelectedDieIndex(null)
+  }
+
+  const canBlock = () => {
+    if (selectedDieIndex === null) return false
+    
+    const currentDice = isAttackerTurn ? attackerDice : defenderDice
+    const selectedDie = currentDice[selectedDieIndex]
+    const opponentDice = isAttackerTurn ? defenderDice : attackerDice
+    
+    return opponentDice.some(die => 
+      !die.isUsed && (die.isHit || die.isCritical) && 
+      (!die.isCritical || selectedDie?.isCritical)
+    )
   }
 
   return (
@@ -325,17 +343,17 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
             onWeaponSelect={(weapon) => handleWeaponSelect(weapon, true)}
             alwaysShowWeapons={combatPhase === 'weapon-select'}
           />
-          {selectedWeapon && (
+          {attackerWeapon && (
             <WeaponInfo>
-              <div>{selectedWeapon.name}</div>
+              <div>{attackerWeapon.name}</div>
               <WeaponStatsGrid>
-                <div><StatLabel>RNG:</StatLabel> {selectedWeapon.RNG}"</div>
-                <div><StatLabel>ATK:</StatLabel> {selectedWeapon.ATK}</div>
-                <div><StatLabel>HTV:</StatLabel> {selectedWeapon.HTV}+</div>
-                <div><StatLabel>DMG:</StatLabel> {selectedWeapon.DMG}</div>
+                <div><StatLabel>RNG:</StatLabel> {attackerWeapon.RNG}"</div>
+                <div><StatLabel>ATK:</StatLabel> {attackerWeapon.ATK}</div>
+                <div><StatLabel>HTV:</StatLabel> {attackerWeapon.HTV}+</div>
+                <div><StatLabel>DMG:</StatLabel> {attackerWeapon.DMG}</div>
               </WeaponStatsGrid>
               <WeaponRules>
-                {selectedWeapon.WR.map((rule, index) => (
+                {attackerWeapon.WR.map((rule, index) => (
                   <div key={index}>{rule}</div>
                 ))}
               </WeaponRules>
@@ -345,24 +363,40 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
 
         <DiceArea>
           {combatPhase === 'rolling' && (
-            <button onClick={() => handleDiceRoll(true)}>Würfeln</button>
+            <button onClick={handleDiceRoll}>Würfeln</button>
           )}
+          
           {combatPhase === 'resolution' && (
-            <DiceRoller
-              attackerDice={attackerDice}
-              defenderDice={defenderDice}
-              onDiceClick={handleDiceSelection}
-              isAttackerTurn={isAttackerTurn}
-              isBlocking={isBlocking}
-            />
-          )}
-          {combatPhase === 'resolution' && (
-            <CombatActions
-              canStrike={canStrike(isAttackerTurn)}
-              canBlock={canBlock(!isAttackerTurn)}
-              onStrike={() => {/* Handled by dice click */}}
-              onBlock={() => {/* Handled by dice click */}}
-            />
+            <>
+              <TurnIndicator>
+                {isAttackerTurn ? attacker.name : defender.name} ist am Zug
+                {isBlockMode && " (Blocking)"}
+              </TurnIndicator>
+              
+              <DiceDisplay
+                attackerName={attacker.name}
+                defenderName={defender.name}
+                attackerDice={attackerDice}
+                defenderDice={defenderDice}
+                isAttackerTurn={isAttackerTurn}
+                isBlockMode={isBlockMode}
+                blockableDice={blockableDice}
+                onDieClick={(index, isAttacker) => {
+                  if (isAttacker === isAttackerTurn || isBlockMode) {
+                    handleDieSelect(index);
+                  }
+                }}
+              />
+
+              {selectedDieIndex !== null && !isBlockMode && (
+                <ActionButtons
+                  onStrike={handleStrike}
+                  onBlock={handleBlockStart}
+                  canBlock={canBlock()}
+                  selectedDie={isAttackerTurn ? attackerDice[selectedDieIndex] : defenderDice[selectedDieIndex]}
+                />
+              )}
+            </>
           )}
         </DiceArea>
 
