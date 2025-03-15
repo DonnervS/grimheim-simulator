@@ -1,29 +1,36 @@
-import React from 'react'
-import { Routes, Route } from 'react-router-dom'
-import styled from 'styled-components'
-import BattleScreen from './screens/BattleScreen'
-import MapScreen from './screens/MapScreen'
-import CombatTestScreen from './screens/CombatTestScreen'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import styled from 'styled-components';
+import MapScreen from './components/map/MapScreen';
+import CombatScreen from './components/combat/CombatScreen';
+import { GlobalStyle } from './styles/GlobalStyle';
 
 const AppContainer = styled.div`
-  width: 100vw;
-  height: 100vh;
-  background-color: #1a1a2e;
-  color: #e6e6fa;
-  font-family: 'Press Start 2P', cursive;
+  min-height: 100vh;
+  background: #1a1a2e;
+  color: #fff;
+  font-family: 'Roboto', sans-serif;
   overflow: hidden;
+`
+
+const Header = styled.header`
+  text-align: center;
+  padding: 20px;
 `
 
 function App() {
   return (
     <AppContainer>
+      <Header>
+        <h1>Grimheim Combat Simulator</h1>
+      </Header>
       <Routes>
         <Route path="/" element={<MapScreen />} />
-        <Route path="/battle" element={<BattleScreen />} />
-        <Route path="/combat-test" element={<CombatTestScreen />} />
+        <Route path="/combat" element={<CombatScreen />} />
       </Routes>
+      <GlobalStyle />
     </AppContainer>
-  )
+  );
 }
 
-export default App
+export default App;
