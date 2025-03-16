@@ -14,31 +14,38 @@ const TestContainer = styled.div`
   padding: 20px;
   color: #e6e6fa;
   font-family: 'Press Start 2P', cursive;
-`;
+  overflow-y: auto;
+  overflow-x: hidden;
 
-const Header = styled.div`
-  margin-bottom: 20px;
-  text-align: center;
-`;
+  /* Customize scrollbar */
+  &::-webkit-scrollbar {
+    width: 12px;
+  }
 
-const Title = styled.h1`
-  color: #8a8aff;
-  margin-bottom: 10px;
-`;
+  &::-webkit-scrollbar-track {
+    background: #1a1a2e;
+  }
 
-const Subtitle = styled.p`
-  color: #6a6aaa;
-  font-size: 0.8em;
+  &::-webkit-scrollbar-thumb {
+    background: #4a4a8a;
+    border-radius: 6px;
+    border: 3px solid #1a1a2e;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #6a6aaa;
+  }
 `;
 
 const CombatContainer = styled.div`
   width: 100%;
   max-width: 1200px;
-  height: calc(100vh - 120px);
+  min-height: calc(100vh - 40px);
   background: rgba(42, 42, 74, 0.8);
   border-radius: 8px;
   border: 2px solid #4a4a8a;
-  overflow: hidden;
+  overflow: visible;
+  margin-bottom: 20px;
 `;
 
 export const CombatTestScreen: React.FC = () => {
@@ -46,18 +53,11 @@ export const CombatTestScreen: React.FC = () => {
 
   const handleCombatEnd = (winner: Model) => {
     setWinner(winner);
-    alert(`Kampf beendet! Gewinner: ${winner.name}`);
+    alert(`Combat ended! Winner: ${winner.name}`);
   };
 
   return (
     <TestContainer>
-      <Header>
-        <Title>Kampfsystem-Test</Title>
-        <Subtitle>
-          {savageBrute.name} vs {bruteWithGreataxe.name}
-        </Subtitle>
-      </Header>
-
       <CombatContainer>
         <CombatScreen
           attacker={savageBrute}
