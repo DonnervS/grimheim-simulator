@@ -16,25 +16,10 @@ const TestContainer = styled.div`
   font-family: 'Press Start 2P', cursive;
 `;
 
-const Header = styled.div`
-  margin-bottom: 20px;
-  text-align: center;
-`;
-
-const Title = styled.h1`
-  color: #8a8aff;
-  margin-bottom: 10px;
-`;
-
-const Subtitle = styled.p`
-  color: #6a6aaa;
-  font-size: 0.8em;
-`;
-
 const CombatContainer = styled.div`
   width: 100%;
   max-width: 1200px;
-  height: calc(100vh - 120px);
+  height: calc(100vh - 40px);
   background: rgba(42, 42, 74, 0.8);
   border-radius: 8px;
   border: 2px solid #4a4a8a;
@@ -46,18 +31,11 @@ export const CombatTestScreen: React.FC = () => {
 
   const handleCombatEnd = (winner: Model) => {
     setWinner(winner);
-    alert(`Kampf beendet! Gewinner: ${winner.name}`);
+    alert(`Combat ended! Winner: ${winner.name}`);
   };
 
   return (
     <TestContainer>
-      <Header>
-        <Title>Kampfsystem-Test</Title>
-        <Subtitle>
-          {savageBrute.name} vs {bruteWithGreataxe.name}
-        </Subtitle>
-      </Header>
-
       <CombatContainer>
         <CombatScreen
           attacker={savageBrute}

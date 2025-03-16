@@ -17,7 +17,7 @@ export interface WeaponStats {
   HTV: number;   // Hit Value
   DMG: number;   // Normal Damage
   CRT: number;   // Critical Damage
-  WR: string[];  // Weapon Rules
+  rules?: string;
 }
 
 // Status-Effekte

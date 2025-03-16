@@ -14,9 +14,17 @@ const AppContainer = styled.div`
   overflow: hidden;
 `
 
+const Header = styled.header`
+  text-align: center;
+  padding: 20px;
+`
+
 function App() {
   return (
     <AppContainer>
+      <Header>
+        <h1>Grimheim Combat Simulator</h1>
+      </Header>
       <Routes>
         <Route path="/" element={<MapScreen />} />
         <Route path="/battle" element={<BattleScreen />} />
