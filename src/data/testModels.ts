@@ -95,7 +95,7 @@ const torch: WeaponStats = {
 export const fighter: Model = {
   id: "fighter_1",
   name: "Fighter",
-  faction: "Test Faction",
+  faction: "Beasts",
   bodyType: "",
   tier: "normal",
   armor: "none",
@@ -122,7 +122,7 @@ export const fighter: Model = {
 export const savageBrute: Model = {
   id: "savage_brute_1",
   name: "Savage Brute with Warhammer",
-  faction: "Test Faction",
+  faction: "Beasts",
   bodyType: "",
   tier: "normal",
   armor: "medium",
