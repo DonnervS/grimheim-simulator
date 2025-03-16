@@ -1,7 +1,7 @@
 import { Model, WeaponStats } from '../types/gameTypes';
 
 // Weapon Definitions
-const brutalWarhammer: WeaponStats = {
+export const brutalWarhammer: WeaponStats = {
   name: "Brutal Warhammer",
   RNG: 1,    // 1"
   ATK: 2,    // 2 dice
@@ -11,7 +11,7 @@ const brutalWarhammer: WeaponStats = {
   rules: "Two-handed, Armor Shatter, Strike Last, Stun, Brutal"
 };
 
-const fangs: WeaponStats = {
+export const fangs: WeaponStats = {
   name: "Fangs",
   RNG: 1,    // 1"
   ATK: 3,    // 3 dice
@@ -21,7 +21,7 @@ const fangs: WeaponStats = {
   rules: ""
 };
 
-const greataxe: WeaponStats = {
+export const greataxe: WeaponStats = {
   name: "Greataxe",
   RNG: 1,    // 1"
   ATK: 4,    // 4 dice
@@ -31,7 +31,7 @@ const greataxe: WeaponStats = {
   rules: "Two-handed, Strike Last, Rending"
 };
 
-const pistol: WeaponStats = {
+export const pistol: WeaponStats = {
   name: "Pistol",
   RNG: 10,   // 10"
   ATK: 2,    // 2 dice
@@ -41,7 +41,7 @@ const pistol: WeaponStats = {
   rules: "Armor Piercing"
 };
 
-const axe: WeaponStats = {
+export const axe: WeaponStats = {
   name: "Axe",
   RNG: 1,    // 1"
   ATK: 3,    // 3 dice
@@ -51,7 +51,7 @@ const axe: WeaponStats = {
   rules: "Armor Piercing"
 };
 
-const crossbow: WeaponStats = {
+export const crossbow: WeaponStats = {
   name: "Crossbow",
   RNG: 12,   // 12"
   ATK: 2,    // 2 dice
@@ -61,7 +61,7 @@ const crossbow: WeaponStats = {
   rules: "Armor Piercing"
 };
 
-const knife: WeaponStats = {
+export const knife: WeaponStats = {
   name: "Knife",
   RNG: 1,    // 1"
   ATK: 3,    // 3 dice
@@ -71,7 +71,7 @@ const knife: WeaponStats = {
   rules: ""
 };
 
-const duelingSword: WeaponStats = {
+export const duelingSword: WeaponStats = {
   name: "Duelling Sword",
   RNG: 1,    // 1"
   ATK: 3,    // 3 dice
@@ -81,7 +81,7 @@ const duelingSword: WeaponStats = {
   rules: "Parry"
 };
 
-const torch: WeaponStats = {
+export const torch: WeaponStats = {
   name: "Torch",
   RNG: 1,    // 1"
   ATK: 0,    // 0 dice
@@ -89,6 +89,86 @@ const torch: WeaponStats = {
   DMG: 1,    // 1 damage
   CRT: 2,    // 2 critical damage
   rules: "Reveal"
+};
+
+export const gnarledStaff: WeaponStats = {
+  name: "Gnarled Staff",
+  RNG: 8,    // 8"
+  ATK: 2,    // 2 dice
+  HTV: 4,    // 4+
+  DMG: 3,    // 3 damage
+  CRT: 6,    // 6 critical damage
+  rules: "Blighted"
+};
+
+export const brutalSpear: WeaponStats = {
+  name: "Brutal Spear",
+  RNG: 2,    // 2"
+  ATK: 3,    // 3 dice
+  HTV: 4,    // 4+
+  DMG: 2,    // 2 damage
+  CRT: 3,    // 3 critical damage
+  rules: "Reach, Brutal"
+};
+
+export const twoHandaxes: WeaponStats = {
+  name: "Two Handaxes",
+  RNG: 1,    // 1"
+  ATK: 3,    // 3 dice
+  HTV: 4,    // 4+
+  DMG: 2,    // 2 damage
+  CRT: 3,    // 3 critical damage
+  rules: "Dual Wield, Armor Piercing"
+};
+
+export const halberd: WeaponStats = {
+  name: "Halberd",
+  RNG: 2,    // 2"
+  ATK: 3,    // 3 dice
+  HTV: 4,    // 4+
+  DMG: 2,    // 2 damage
+  CRT: 3,    // 3 critical damage
+  rules: "Reach"
+};
+
+export const shockGrasp: WeaponStats = {
+  name: "Shock Grasp",
+  RNG: 1,    // 1"
+  ATK: 2,    // 2 dice
+  HTV: 5,    // 5+
+  DMG: 2,    // 2 damage
+  CRT: 2,    // 2 critical damage
+  rules: "Stun"
+};
+
+export const electroCoil: WeaponStats = {
+  name: "Electro Coil",
+  RNG: 6,    // 6"
+  ATK: 3,    // 3 dice
+  HTV: 4,    // 4+
+  DMG: 2,    // 2 damage
+  CRT: 3,    // 3 critical damage
+  rules: "Stun"
+};
+
+export const club: WeaponStats = {
+  name: "Club",
+  RNG: 1,    // 1"
+  ATK: 3,    // 3 dice
+  HTV: 5,    // 5+
+  DMG: 2,    // 2 damage
+  CRT: 3,    // 3 critical damage
+  rules: ""
+};
+
+export const deathGrip: WeaponStats = {
+  name: "Death Grip",
+  RNG: 1,    // 1"
+  ATK: 1,    // 1 dice
+  HTV: 3,    // 3+
+  DMG: 2,    // 2 damage
+  CRT: 3,    // 3 critical damage
+  rules: "Blighted, Necrotic"
 };
 
 // Test Models
@@ -122,7 +202,7 @@ export const fighter: Model = {
 export const savageBrute: Model = {
   id: "savage_brute_1",
   name: "Savage Brute with Warhammer",
-  faction: "Beasts",
+  faction: "Primordial",
   bodyType: "",
   tier: "normal",
   armor: "medium",
@@ -275,6 +355,251 @@ export const witchhunter: Model = {
   weapons: [duelingSword, pistol, torch],
   gear: [],
   currentWounds: 25,
+  statusEffects: [],
+  injuries: [],
+  isReady: true,
+  isHidden: false,
+  position: { x: 0, y: 0 }
+};
+
+// Primordial Models
+export const savageSorcererLord: Model = {
+  id: "savage_sorcerer_lord_1",
+  name: "Savage Sorcerer Lord",
+  faction: "Primordial",
+  bodyType: "",
+  tier: "leader",
+  armor: "medium",
+  class: "",
+  stats: {
+    AP: 4,
+    PT: 218,
+    MOV: 6,
+    DEF: 3,
+    SAV: 4,
+    WND: 25,
+    SR: ["Leader", "Hero", "Arcane", "Fly", "Medium Armor"]
+  },
+  weapons: [gnarledStaff],
+  gear: [],
+  currentWounds: 25,
+  statusEffects: [],
+  injuries: [],
+  isReady: true,
+  isHidden: false,
+  position: { x: 0, y: 0 }
+};
+
+export const savageFighterWithSpear: Model = {
+  id: "savage_fighter_spear_1",
+  name: "Savage Fighter with Spear",
+  faction: "Primordial",
+  bodyType: "",
+  tier: "normal",
+  armor: "medium",
+  class: "",
+  stats: {
+    AP: 2,
+    PT: 126,
+    MOV: 4,
+    DEF: 3,
+    SAV: 4,
+    WND: 13,
+    SR: ["Medium Armor", "Furious", "Relentless"]
+  },
+  weapons: [brutalSpear],
+  gear: [],
+  currentWounds: 13,
+  statusEffects: [],
+  injuries: [],
+  isReady: true,
+  isHidden: false,
+  position: { x: 0, y: 0 }
+};
+
+export const savageFighterWithAxes: Model = {
+  id: "savage_fighter_axes_1",
+  name: "Savage Fighter with two Axes",
+  faction: "Primordial",
+  bodyType: "",
+  tier: "normal",
+  armor: "medium",
+  class: "",
+  stats: {
+    AP: 2,
+    PT: 125,
+    MOV: 4,
+    DEF: 3,
+    SAV: 4,
+    WND: 13,
+    SR: ["Medium Armor", "Furious", "Relentless"]
+  },
+  weapons: [twoHandaxes],
+  gear: [],
+  currentWounds: 13,
+  statusEffects: [],
+  injuries: [],
+  isReady: true,
+  isHidden: false,
+  position: { x: 0, y: 0 }
+};
+
+// Undead Models
+export const zombieWithKnife: Model = {
+  id: "zombie_knife_1",
+  name: "Zombie with Knife",
+  faction: "Undead",
+  bodyType: "",
+  tier: "normal",
+  armor: "none",
+  class: "",
+  stats: {
+    AP: 2,
+    PT: 61,
+    MOV: 3,
+    DEF: 3,
+    SAV: 6,
+    WND: 8,
+    SR: ["Resilient", "Group", "Necrotic Hunger", "Ambush"]
+  },
+  weapons: [knife],
+  gear: [],
+  currentWounds: 8,
+  statusEffects: [],
+  injuries: [],
+  isReady: true,
+  isHidden: false,
+  position: { x: 0, y: 0 }
+};
+
+export const zombieWithHalberd: Model = {
+  id: "zombie_halberd_1",
+  name: "Zombie with Halberd and Shield",
+  faction: "Undead",
+  bodyType: "",
+  tier: "normal",
+  armor: "none",
+  class: "",
+  stats: {
+    AP: 2,
+    PT: 85,
+    MOV: 3,
+    DEF: 3,
+    SAV: 5,
+    WND: 8,
+    SR: ["Resilient", "Slow", "Necrotic Hunger", "Shield"]
+  },
+  weapons: [halberd],
+  gear: [],
+  currentWounds: 8,
+  statusEffects: [],
+  injuries: [],
+  isReady: true,
+  isHidden: false,
+  position: { x: 0, y: 0 }
+};
+
+export const zombieWithElectroCoil: Model = {
+  id: "zombie_electrocoil_1",
+  name: "Zombie with Electro Coil",
+  faction: "Undead",
+  bodyType: "",
+  tier: "normal",
+  armor: "none",
+  class: "",
+  stats: {
+    AP: 2,
+    PT: 65,
+    MOV: 3,
+    DEF: 3,
+    SAV: 6,
+    WND: 8,
+    SR: ["Resilient", "Group", "Slow", "Necrotic Hunger"]
+  },
+  weapons: [shockGrasp, electroCoil],
+  gear: [],
+  currentWounds: 8,
+  statusEffects: [],
+  injuries: [],
+  isReady: true,
+  isHidden: false,
+  position: { x: 0, y: 0 }
+};
+
+export const zombieWithKnifeAndElectroCoil: Model = {
+  id: "zombie_knife_electrocoil_1",
+  name: "Zombie with Knife and Electro Coil",
+  faction: "Undead",
+  bodyType: "",
+  tier: "normal",
+  armor: "none",
+  class: "",
+  stats: {
+    AP: 2,
+    PT: 72,
+    MOV: 3,
+    DEF: 3,
+    SAV: 6,
+    WND: 8,
+    SR: ["Resilient", "Group", "Slow", "Necrotic Hunger"]
+  },
+  weapons: [shockGrasp, electroCoil, knife],
+  gear: [],
+  currentWounds: 8,
+  statusEffects: [],
+  injuries: [],
+  isReady: true,
+  isHidden: false,
+  position: { x: 0, y: 0 }
+};
+
+export const zombieWithClubAndElectroCoil: Model = {
+  id: "zombie_club_electrocoil_1",
+  name: "Zombie with Club and Electro Coil",
+  faction: "Undead",
+  bodyType: "",
+  tier: "normal",
+  armor: "none",
+  class: "",
+  stats: {
+    AP: 2,
+    PT: 72,
+    MOV: 3,
+    DEF: 3,
+    SAV: 6,
+    WND: 8,
+    SR: ["Resilient", "Group", "Slow", "Necrotic Hunger"]
+  },
+  weapons: [shockGrasp, electroCoil, club],
+  gear: [],
+  currentWounds: 8,
+  statusEffects: [],
+  injuries: [],
+  isReady: true,
+  isHidden: false,
+  position: { x: 0, y: 0 }
+};
+
+export const necromancerWithStaff: Model = {
+  id: "necromancer_staff_1",
+  name: "Necromancer with Staff",
+  faction: "Undead",
+  bodyType: "",
+  tier: "leader",
+  armor: "none",
+  class: "",
+  stats: {
+    AP: 4,
+    PT: 189,
+    MOV: 4,
+    DEF: 3,
+    SAV: 5,
+    WND: 20,
+    SR: ["Leader", "Arcane", "Archmage", "Fear"]
+  },
+  weapons: [gnarledStaff, deathGrip],
+  gear: [],
+  currentWounds: 20,
   statusEffects: [],
   injuries: [],
   isReady: true,
