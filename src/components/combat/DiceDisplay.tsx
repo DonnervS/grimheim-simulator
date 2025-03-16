@@ -84,9 +84,10 @@ const Die = styled.div<{
   $result: 'miss' | 'hit' | 'critical' | 'block'; 
   $isUsable: boolean; 
   $isUsed: boolean;
-  $isBlockable?: boolean;
-  $isBlockMode?: boolean;
+  $isBlockable: boolean;
+  $isBlockMode: boolean;
   $isBlockDie: boolean;
+  $isUpgradedCritical: boolean;
 }>`
   width: 40px;
   height: 40px;
@@ -113,7 +114,7 @@ const Die = styled.div<{
     switch (props.$result) {
       case 'miss': return '#666';
       case 'hit': return '#4a4aff';
-      case 'critical': return '#8a2be2';
+      case 'critical': return props.$isUpgradedCritical ? '#9400D3' : '#8a2be2';
     }
   }};
   transition: all 0.2s ease;
@@ -141,6 +142,7 @@ export interface DieResult {
   isCritical: boolean;
   isUsed: boolean;
   isBlockDie: boolean;
+  isUpgradedByCritical?: boolean;
 }
 
 interface DiceDisplayProps {
@@ -167,8 +169,9 @@ const DiceDisplay: React.FC<DiceDisplayProps> = ({
   const getStats = (dice: DieResult[]) => {
     const hits = dice.filter(d => d.isHit && !d.isCritical && !d.isUsed).length;
     const crits = dice.filter(d => d.isCritical && !d.isUsed).length;
+    const upgradedCrits = dice.filter(d => d.isUpgradedByCritical && !d.isUsed).length;
     const blocks = dice.filter(d => d.isBlockDie && (d.isHit || d.isCritical) && !d.isUsed).length;
-    return `${hits} Hits, ${crits} Critical, ${blocks} Block`;
+    return `${hits} Hits, ${crits} Critical (${upgradedCrits} Upgraded), ${blocks} Block`;
   };
 
   return (
@@ -183,13 +186,14 @@ const DiceDisplay: React.FC<DiceDisplayProps> = ({
             <Die
               key={index}
               $result={die.isCritical ? 'critical' : die.isHit ? 'hit' : 'miss'}
-              $isUsable={(isAttackerTurn && !die.isUsed)}
+              $isUsable={(isAttackerTurn && !die.isUsed && (die.isHit || die.isCritical))}
               $isUsed={die.isUsed}
-              $isBlockMode={isBlockMode}
-              $isBlockable={!isAttackerTurn && blockableDice.includes(index)}
+              $isBlockMode={isBlockMode || false}
+              $isBlockable={(!isAttackerTurn && blockableDice.includes(index)) || false}
               $isBlockDie={die.isBlockDie}
+              $isUpgradedCritical={Boolean(die.isUpgradedByCritical)}
               onClick={() => {
-                if (!die.isUsed && onDieClick && ((isAttackerTurn && die.isHit) || (!isAttackerTurn && blockableDice.includes(index)))) {
+                if (!die.isUsed && onDieClick && ((isAttackerTurn && (die.isHit || die.isCritical)) || (!isAttackerTurn && blockableDice.includes(index)))) {
                   onDieClick(index, true);
                 }
               }}
@@ -210,13 +214,14 @@ const DiceDisplay: React.FC<DiceDisplayProps> = ({
             <Die
               key={index}
               $result={die.isCritical ? 'critical' : die.isHit ? 'hit' : 'miss'}
-              $isUsable={(!isAttackerTurn && !die.isUsed)}
+              $isUsable={(!isAttackerTurn && !die.isUsed && (die.isHit || die.isCritical))}
               $isUsed={die.isUsed}
-              $isBlockMode={isBlockMode}
-              $isBlockable={isAttackerTurn && blockableDice.includes(index)}
+              $isBlockMode={isBlockMode || false}
+              $isBlockable={(isAttackerTurn && blockableDice.includes(index)) || false}
               $isBlockDie={die.isBlockDie}
+              $isUpgradedCritical={Boolean(die.isUpgradedByCritical)}
               onClick={() => {
-                if (!die.isUsed && onDieClick && ((!isAttackerTurn && die.isHit) || (isAttackerTurn && blockableDice.includes(index)))) {
+                if (!die.isUsed && onDieClick && ((!isAttackerTurn && (die.isHit || die.isCritical)) || (isAttackerTurn && blockableDice.includes(index)))) {
                   onDieClick(index, false);
                 }
               }}
@@ -230,4 +235,4 @@ const DiceDisplay: React.FC<DiceDisplayProps> = ({
   );
 };
 
-export default DiceDisplay;
+export default DiceDisplay; 
