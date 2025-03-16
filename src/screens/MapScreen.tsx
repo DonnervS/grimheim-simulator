@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { useNavigate } from 'react-router-dom'
 
 const MapContainer = styled.div`
   width: 100%;
@@ -53,7 +54,18 @@ const ActionButton = styled.button`
   }
 `
 
+const TestButton = styled(ActionButton)`
+  margin-left: auto;
+  background-color: #2a4a8a;
+  
+  &:hover {
+    background-color: #3a5aaa;
+  }
+`
+
 function MapScreen() {
+  const navigate = useNavigate();
+
   return (
     <MapContainer>
       <SidePanel>
@@ -74,6 +86,9 @@ function MapScreen() {
         <ActionButton>Bewegen</ActionButton>
         <ActionButton>Kämpfen</ActionButton>
         <ActionButton>Zug Beenden</ActionButton>
+        <TestButton onClick={() => navigate('/combat-test')}>
+          Combat Test
+        </TestButton>
       </ActionBar>
     </MapContainer>
   )

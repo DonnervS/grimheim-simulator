@@ -1,5 +1,5 @@
 import React from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Link } from 'react-router-dom'
 import styled from 'styled-components'
 import BattleScreen from './screens/BattleScreen'
 import MapScreen from './screens/MapScreen'
@@ -12,12 +12,47 @@ const AppContainer = styled.div`
   color: #e6e6fa;
   font-family: 'Press Start 2P', cursive;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 `
 
 const Header = styled.header`
   text-align: center;
   padding: 20px;
 `
+
+const MainMenu = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+`
+
+const MenuButton = styled(Link)`
+  background-color: #4a4a8a;
+  color: #e6e6fa;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 14px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #6a6aaa;
+    transform: scale(1.05);
+  }
+`
+
+const MainScreen = () => (
+  <MainMenu>
+    <MenuButton to="/map">Start Game</MenuButton>
+    <MenuButton to="/combat-test">Combat Test</MenuButton>
+  </MainMenu>
+);
 
 function App() {
   return (
@@ -26,7 +61,8 @@ function App() {
         <h1>Grimheim Combat Simulator</h1>
       </Header>
       <Routes>
-        <Route path="/" element={<MapScreen />} />
+        <Route path="/" element={<MainScreen />} />
+        <Route path="/map" element={<MapScreen />} />
         <Route path="/battle" element={<BattleScreen />} />
         <Route path="/combat-test" element={<CombatTestScreen />} />
       </Routes>

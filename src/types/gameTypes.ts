@@ -9,26 +9,6 @@ export interface ModelStats {
   SR: string[];  // Special Rules
 }
 
-// Waffen-Statistiken
-export interface WeaponStats {
-  name: string;   // Name der Waffe
-  RNG: number;   // Range in inches
-  ATK: number;   // Attack Dice
-  HTV: number;   // Hit Value
-  DMG: number;   // Normal Damage
-  CRT: number;   // Critical Damage
-  rules?: string;
-}
-
-// Status-Effekte
-export type StatusEffect = 
-  | 'Stunned'
-  | 'Burning'
-  | 'Frozen'
-  | 'Fearful'
-  | 'Poisoned'
-  | 'Cursed';
-
 // Verletzungen
 export type Injury = 
   | 'Head'    // HTV +1
@@ -92,4 +72,27 @@ export interface GameState {
       y: number;
     };
   }[];
+}
+
+// Status-Effekte
+export type StatusEffect = 
+  | 'Stunned'
+  | 'Burning'
+  | 'Frozen'
+  | 'Fearful'
+  | 'Poisoned'
+  | 'Cursed';
+
+export type WeaponType = 'close' | 'range';
+
+// Waffen-Statistiken
+export interface WeaponStats {
+  name: string;   // Name der Waffe
+  RNG: number;   // Range in inches
+  ATK: number;   // Attack Dice
+  HTV: number;   // Hit Value
+  DMG: number;   // Normal Damage
+  CRT: number;   // Critical Damage
+  rules?: string;
+  weaponType: WeaponType;
 }

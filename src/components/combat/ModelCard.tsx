@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Model, WeaponStats } from '../../types/gameTypes';
+import { fists } from '../../data/testModels';
 
 const Card = styled.div<{ $isActive: boolean }>`
   background: rgba(26, 26, 46, 0.9);
@@ -78,6 +79,25 @@ const WeaponButton = styled.button<{ $isSelected?: boolean }>`
   }
 `;
 
+const RulesContainer = styled.div`
+  margin-top: 10px;
+  padding: 8px;
+  background: rgba(74, 74, 138, 0.3);
+  border-radius: 4px;
+`;
+
+const RulesTitle = styled.div`
+  font-size: 0.8em;
+  color: #8a8aff;
+  margin-bottom: 4px;
+  font-family: 'Press Start 2P', cursive;
+`;
+
+const RulesList = styled.div`
+  font-size: 0.9em;
+  color: #e6e6fa;
+`;
+
 interface ModelCardProps {
   model: Model;
   onWeaponSelect: (weapon: WeaponStats) => void;
@@ -91,7 +111,16 @@ const ModelCard: React.FC<ModelCardProps> = ({
   selectedWeapon,
   isSelectable
 }) => {
-  const woundPercentage = (model.currentWounds / model.stats.WND) * 100;
+  // Ensure both values are defined and not zero before calculating percentage
+  const woundPercentage = model.currentWounds !== undefined && model.stats.WND > 0
+    ? (model.currentWounds / model.stats.WND) * 100
+    : 0;
+
+  // Get close combat weapons
+  const closeWeapons = model.weapons.filter(weapon => weapon.weaponType === 'close');
+  
+  // Add Unarmed as fallback only if no other close combat weapons are available
+  const availableWeapons = closeWeapons.length > 0 ? closeWeapons : [fists];
 
   return (
     <Card $isActive={isSelectable}>
@@ -113,17 +142,28 @@ const ModelCard: React.FC<ModelCardProps> = ({
         <StatBox>
           <StatLabel>WND</StatLabel>
           <StatValue $isWounds $woundPercentage={woundPercentage}>
-            {model.currentWounds}/{model.stats.WND}
+            {model.currentWounds ?? model.stats.WND}/{model.stats.WND}
           </StatValue>
         </StatBox>
       </StatsGrid>
 
-      {(isSelectable) && (
+      {model.stats.SR && model.stats.SR.length > 0 && (
+        <RulesContainer>
+          <RulesTitle>Special Rules</RulesTitle>
+          <RulesList>
+            {model.stats.SR.join(', ')}
+          </RulesList>
+        </RulesContainer>
+      )}
+
+      {isSelectable && (
         <WeaponList>
-          {model.weapons.map((weapon, index) => (
+          {availableWeapons.map((weapon, index) => (
             <WeaponButton
-              key={index}
+              key={`${weapon.name}-${index}`}
               onClick={() => onWeaponSelect(weapon)}
+              $isSelected={selectedWeapon?.name === weapon.name}
+              type="button"
             >
               {weapon.name}
             </WeaponButton>
