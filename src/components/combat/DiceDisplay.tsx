@@ -186,14 +186,14 @@ const DiceDisplay: React.FC<DiceDisplayProps> = ({
             <Die
               key={index}
               $result={die.isCritical ? 'critical' : die.isHit ? 'hit' : 'miss'}
-              $isUsable={(isAttackerTurn && !die.isUsed && (die.isHit || die.isCritical))}
+              $isUsable={(isAttackerTurn && !die.isUsed && ((die.isHit && !die.isCritical) || die.isCritical || die.isUpgradedByCritical))}
               $isUsed={die.isUsed}
               $isBlockMode={isBlockMode || false}
               $isBlockable={(!isAttackerTurn && blockableDice.includes(index)) || false}
               $isBlockDie={die.isBlockDie}
               $isUpgradedCritical={Boolean(die.isUpgradedByCritical)}
               onClick={() => {
-                if (!die.isUsed && onDieClick && ((isAttackerTurn && (die.isHit || die.isCritical)) || (!isAttackerTurn && blockableDice.includes(index)))) {
+                if (!die.isUsed && onDieClick && ((isAttackerTurn && ((die.isHit && !die.isCritical) || die.isCritical || die.isUpgradedByCritical)) || (!isAttackerTurn && blockableDice.includes(index)))) {
                   onDieClick(index, true);
                 }
               }}
@@ -214,14 +214,14 @@ const DiceDisplay: React.FC<DiceDisplayProps> = ({
             <Die
               key={index}
               $result={die.isCritical ? 'critical' : die.isHit ? 'hit' : 'miss'}
-              $isUsable={(!isAttackerTurn && !die.isUsed && (die.isHit || die.isCritical))}
+              $isUsable={(!isAttackerTurn && !die.isUsed && ((die.isHit && !die.isCritical) || die.isCritical || die.isUpgradedByCritical))}
               $isUsed={die.isUsed}
               $isBlockMode={isBlockMode || false}
               $isBlockable={(isAttackerTurn && blockableDice.includes(index)) || false}
               $isBlockDie={die.isBlockDie}
               $isUpgradedCritical={Boolean(die.isUpgradedByCritical)}
               onClick={() => {
-                if (!die.isUsed && onDieClick && ((!isAttackerTurn && (die.isHit || die.isCritical)) || (isAttackerTurn && blockableDice.includes(index)))) {
+                if (!die.isUsed && onDieClick && ((!isAttackerTurn && ((die.isHit && !die.isCritical) || die.isCritical || die.isUpgradedByCritical)) || (isAttackerTurn && blockableDice.includes(index)))) {
                   onDieClick(index, false);
                 }
               }}

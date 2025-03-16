@@ -1,6 +1,17 @@
-import { Model, WeaponStats } from '../types/gameTypes';
+import { Model, WeaponStats, WeaponType } from '../types/gameTypes';
 
 // Weapon Definitions
+export const fists: WeaponStats = {
+  name: "Unarmed",
+  RNG: 1,    // 1"
+  ATK: 2,    // 2 dice
+  HTV: 5,    // 5+
+  DMG: 1,    // 1 damage
+  CRT: 1,    // 1 critical damage
+  rules: "",
+  weaponType: "close"
+};
+
 export const brutalWarhammer: WeaponStats = {
   name: "Brutal Warhammer",
   RNG: 1,    // 1"
@@ -8,7 +19,8 @@ export const brutalWarhammer: WeaponStats = {
   HTV: 3,    // 3+
   DMG: 2,    // 2 damage
   CRT: 4,    // 4 critical damage
-  rules: "Two-handed, Armor Shatter, Strike Last, Stun, Brutal"
+  rules: "Two-handed, Armor Shatter, Strike Last, Stun, Brutal",
+  weaponType: "close"
 };
 
 export const fangs: WeaponStats = {
@@ -18,7 +30,8 @@ export const fangs: WeaponStats = {
   HTV: 5,    // 5+
   DMG: 2,    // 2 damage
   CRT: 3,    // 3 critical damage
-  rules: ""
+  rules: "",
+  weaponType: "close"
 };
 
 export const greataxe: WeaponStats = {
@@ -28,7 +41,8 @@ export const greataxe: WeaponStats = {
   HTV: 4,    // 4+
   DMG: 2,    // 2 damage
   CRT: 4,    // 4 critical damage
-  rules: "Two-handed, Strike Last, Rending"
+  rules: "Two-handed, Strike Last, Rending",
+  weaponType: "close"
 };
 
 export const pistol: WeaponStats = {
@@ -38,7 +52,8 @@ export const pistol: WeaponStats = {
   HTV: 3,    // 3+
   DMG: 2,    // 2 damage
   CRT: 4,    // 4 critical damage
-  rules: "Armor Piercing"
+  rules: "Armor Piercing",
+  weaponType: "range"
 };
 
 export const axe: WeaponStats = {
@@ -48,7 +63,8 @@ export const axe: WeaponStats = {
   HTV: 4,    // 4+
   DMG: 2,    // 2 damage
   CRT: 3,    // 3 critical damage
-  rules: "Armor Piercing"
+  rules: "Armor Piercing",
+  weaponType: "close"
 };
 
 export const crossbow: WeaponStats = {
@@ -58,7 +74,8 @@ export const crossbow: WeaponStats = {
   HTV: 3,    // 3+
   DMG: 2,    // 2 damage
   CRT: 4,    // 4 critical damage
-  rules: "Armor Piercing"
+  rules: "Armor Piercing",
+  weaponType: "range"
 };
 
 export const knife: WeaponStats = {
@@ -68,7 +85,8 @@ export const knife: WeaponStats = {
   HTV: 5,    // 5+
   DMG: 2,    // 2 damage
   CRT: 3,    // 3 critical damage
-  rules: ""
+  rules: "",
+  weaponType: "close"
 };
 
 export const duelingSword: WeaponStats = {
@@ -78,7 +96,8 @@ export const duelingSword: WeaponStats = {
   HTV: 4,    // 4+
   DMG: 2,    // 2 damage
   CRT: 3,    // 3 critical damage
-  rules: "Parry"
+  rules: "Parry",
+  weaponType: "close"
 };
 
 export const torch: WeaponStats = {
@@ -88,7 +107,8 @@ export const torch: WeaponStats = {
   HTV: 4,    // 4+
   DMG: 1,    // 1 damage
   CRT: 2,    // 2 critical damage
-  rules: "Reveal"
+  rules: "Reveal",
+  weaponType: "close"
 };
 
 export const gnarledStaff: WeaponStats = {
@@ -98,7 +118,8 @@ export const gnarledStaff: WeaponStats = {
   HTV: 4,    // 4+
   DMG: 3,    // 3 damage
   CRT: 6,    // 6 critical damage
-  rules: "Blighted"
+  rules: "Blighted",
+  weaponType: "range"
 };
 
 export const brutalSpear: WeaponStats = {
@@ -108,17 +129,19 @@ export const brutalSpear: WeaponStats = {
   HTV: 4,    // 4+
   DMG: 2,    // 2 damage
   CRT: 3,    // 3 critical damage
-  rules: "Reach, Brutal"
+  rules: "Reach, Brutal",
+  weaponType: "close"
 };
 
 export const twoHandaxes: WeaponStats = {
   name: "Two Handaxes",
   RNG: 1,    // 1"
-  ATK: 3,    // 3 dice
+  ATK: 4,    // 3 dice
   HTV: 4,    // 4+
   DMG: 2,    // 2 damage
   CRT: 3,    // 3 critical damage
-  rules: "Dual Wield, Armor Piercing"
+  rules: "Armor Piercing",
+  weaponType: "close"
 };
 
 export const halberd: WeaponStats = {
@@ -128,7 +151,8 @@ export const halberd: WeaponStats = {
   HTV: 4,    // 4+
   DMG: 2,    // 2 damage
   CRT: 3,    // 3 critical damage
-  rules: "Reach"
+  rules: "Reach",
+  weaponType: "close"
 };
 
 export const shockGrasp: WeaponStats = {
@@ -138,7 +162,8 @@ export const shockGrasp: WeaponStats = {
   HTV: 5,    // 5+
   DMG: 2,    // 2 damage
   CRT: 2,    // 2 critical damage
-  rules: "Stun"
+  rules: "Stun",
+  weaponType: "close"
 };
 
 export const electroCoil: WeaponStats = {
@@ -148,7 +173,8 @@ export const electroCoil: WeaponStats = {
   HTV: 4,    // 4+
   DMG: 2,    // 2 damage
   CRT: 3,    // 3 critical damage
-  rules: "Stun"
+  rules: "Stun",
+  weaponType: "range"
 };
 
 export const club: WeaponStats = {
@@ -158,7 +184,8 @@ export const club: WeaponStats = {
   HTV: 5,    // 5+
   DMG: 2,    // 2 damage
   CRT: 3,    // 3 critical damage
-  rules: ""
+  rules: "",
+  weaponType: "close"
 };
 
 export const deathGrip: WeaponStats = {
@@ -168,7 +195,8 @@ export const deathGrip: WeaponStats = {
   HTV: 3,    // 3+
   DMG: 2,    // 2 damage
   CRT: 3,    // 3 critical damage
-  rules: "Blighted, Necrotic"
+  rules: "Blighted, Necrotic",
+  weaponType: "close"
 };
 
 // Test Models
@@ -214,7 +242,7 @@ export const savageBrute: Model = {
     DEF: 4,
     SAV: 4,
     WND: 16,
-    SR: ["Tank", "Medium Armor", "Tougher"]
+    SR: ["Tank", "Medium Armor", "Tough"]
   },
   weapons: [brutalWarhammer],
   gear: [],
@@ -362,7 +390,7 @@ export const witchhunter: Model = {
   position: { x: 0, y: 0 }
 };
 
-// Primordial Models
+// Bloodforged Models
 export const savageSorcererLord: Model = {
   id: "savage_sorcerer_lord_1",
   name: "Savage Sorcerer Lord",
@@ -444,7 +472,7 @@ export const savageFighterWithAxes: Model = {
   position: { x: 0, y: 0 }
 };
 
-// Undead Models
+// Undying Models
 export const zombieWithKnife: Model = {
   id: "zombie_knife_1",
   name: "Zombie with Knife",

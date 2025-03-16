@@ -19,7 +19,7 @@ import {
   zombieWithClubAndElectroCoil,
   necromancerWithStaff
 } from '../data/testModels';
-import { Model } from '../types/gameTypes';
+import { Model, WeaponStats } from '../types/gameTypes';
 
 const TestContainer = styled.div`
   width: 100vw;
@@ -207,6 +207,8 @@ export const CombatTestScreen: React.FC = () => {
   const [winner, setWinner] = useState<Model | null>(null);
   const [selectedAttacker, setSelectedAttacker] = useState<Model | null>(null);
   const [selectedDefender, setSelectedDefender] = useState<Model | null>(null);
+  const [selectedAttackerWeapon, setSelectedAttackerWeapon] = useState<WeaponStats | null>(null);
+  const [selectedDefenderWeapon, setSelectedDefenderWeapon] = useState<WeaponStats | null>(null);
   const [combatStarted, setCombatStarted] = useState(false);
   const [attackerFaction, setAttackerFaction] = useState<string>('');
   const [defenderFaction, setDefenderFaction] = useState<string>('');
@@ -221,11 +223,11 @@ export const CombatTestScreen: React.FC = () => {
     gunslingerWithPistol,
     marksmanWithCrossbow,
     witchhunter,
-    // Bloodforged
+    // Primordial
     savageSorcererLord,
     savageFighterWithSpear,
     savageFighterWithAxes,
-    // Undying
+    // Undead
     zombieWithKnife,
     zombieWithHalberd,
     zombieWithElectroCoil,
@@ -253,15 +255,11 @@ export const CombatTestScreen: React.FC = () => {
     alert(`Combat ended! Winner: ${winner.name}`);
   };
 
-  const startCombat = () => {
-    if (selectedAttacker && selectedDefender) {
-      setCombatStarted(true);
-    }
-  };
-
   const resetSelection = () => {
     setSelectedAttacker(null);
     setSelectedDefender(null);
+    setSelectedAttackerWeapon(null);
+    setSelectedDefenderWeapon(null);
     setAttackerFaction('');
     setDefenderFaction('');
     setCombatStarted(false);
@@ -270,6 +268,8 @@ export const CombatTestScreen: React.FC = () => {
 
   const startNewRound = () => {
     if (selectedAttacker && selectedDefender) {
+      setSelectedAttackerWeapon(null);
+      setSelectedDefenderWeapon(null);
       setCombatStarted(false);
       setTimeout(() => setCombatStarted(true), 0);
     }
@@ -287,9 +287,31 @@ export const CombatTestScreen: React.FC = () => {
     setSelectedDefender(model || null);
   };
 
-  if (!combatStarted) {
-    return (
-      <TestContainer>
+  return (
+    <TestContainer>
+      {combatStarted && selectedAttacker && selectedDefender ? (
+        <>
+          <CombatContainer>
+            <CombatScreen
+              attacker={selectedAttacker}
+              defender={selectedDefender}
+              onWinnerDeclared={handleCombatEnd}
+              selectedAttackerWeapon={selectedAttackerWeapon}
+              selectedDefenderWeapon={selectedDefenderWeapon}
+              onAttackerWeaponSelect={setSelectedAttackerWeapon}
+              onDefenderWeaponSelect={setSelectedDefenderWeapon}
+            />
+          </CombatContainer>
+          <ButtonContainer>
+            <ActionButton onClick={resetSelection}>
+              End Combat
+            </ActionButton>
+            <ActionButton onClick={startNewRound}>
+              New Round
+            </ActionButton>
+          </ButtonContainer>
+        </>
+      ) : (
         <SelectionContainer>
           <Title>Combat Setup</Title>
           
@@ -352,34 +374,13 @@ export const CombatTestScreen: React.FC = () => {
           </SelectionBox>
 
           <StartButton
-            onClick={startCombat}
+            onClick={() => setCombatStarted(true)}
             disabled={!selectedAttacker || !selectedDefender}
           >
             Start Combat
           </StartButton>
         </SelectionContainer>
-      </TestContainer>
-    );
-  }
-
-  return (
-    <TestContainer>
-      <CombatContainer>
-        <CombatScreen
-          attacker={selectedAttacker!}
-          defender={selectedDefender!}
-          isMelee={true}
-          onCombatEnd={handleCombatEnd}
-        />
-      </CombatContainer>
-      <ButtonContainer>
-        <ActionButton onClick={resetSelection}>
-          New Combat
-        </ActionButton>
-        <ActionButton onClick={startNewRound}>
-          New Round
-        </ActionButton>
-      </ButtonContainer>
+      )}
     </TestContainer>
   );
 };

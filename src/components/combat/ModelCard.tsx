@@ -1,7 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Model, WeaponStats } from '../../types/gameTypes';
-import { fists } from '../../data/testModels';
+
+// Create a local fallback weapon
+const fallbackFists: WeaponStats = {
+  name: "Unarmed",
+  RNG: 1,    // 1"
+  ATK: 2,    // 2 dice
+  HTV: 5,    // 5+
+  DMG: 1,    // 1 damage
+  CRT: 1,    // 1 critical damage
+  rules: "",
+  weaponType: "close"
+};
 
 const Card = styled.div<{ $isActive: boolean }>`
   background: rgba(26, 26, 46, 0.9);
@@ -120,7 +131,7 @@ const ModelCard: React.FC<ModelCardProps> = ({
   const closeWeapons = model.weapons.filter(weapon => weapon.weaponType === 'close');
   
   // Add Unarmed as fallback only if no other close combat weapons are available
-  const availableWeapons = closeWeapons.length > 0 ? closeWeapons : [fists];
+  const availableWeapons = closeWeapons.length > 0 ? closeWeapons : [fallbackFists];
 
   return (
     <Card $isActive={isSelectable}>
