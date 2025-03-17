@@ -400,24 +400,30 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
     
     // Check if the die can be used for blocking
     const currentWeapon = isAttackerTurn ? selectedAttackerWeapon : selectedDefenderWeapon;
+    const opponentWeapon = isAttackerTurn ? selectedDefenderWeapon : selectedAttackerWeapon;
     const hasParry = currentWeapon?.rules?.includes('Parry') ?? false;
+    const opponentHasBrutal = opponentWeapon?.rules?.includes('Brutal') ?? false;
     const selectedDie = currentDice[index];
 
     // Only check for blockable targets if this is a block die or has Parry
     if (selectedDie.isBlockDie || hasParry) {
       const hasBlockableTargets = opponentDice.some(oppDie => {
         if (!oppDie.isUsed && oppDie.isHit) {
-          // Wenn der ausgewählte Würfel kritisch ist (6), kann er alles blocken
-          if (selectedDie.isCritical) {
+          // If opponent has Brutal rule and this is not a critical die, can't block
+          if (opponentHasBrutal && !selectedDie.isCritical) {
+            return false;
+          }
+          // If the selected die is critical (6), it can block anything
+          else if (selectedDie.isCritical) {
             return true;
           }
-          // Wenn der Würfel ein Blockwürfel ist
+          // If the die is a block die
           else if (selectedDie.isBlockDie) {
             return !oppDie.isCritical;
           }
-          // Wenn der Würfel ein normaler Angriffswürfel ist und die Waffe Parry hat
+          // If the die is a normal attack die and the weapon has Parry
           else if (hasParry) {
-            return true; // Kann auch kritische Treffer blocken
+            return true; // Can also block critical hits
           }
         }
         return false;
@@ -427,6 +433,7 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
         hasBlockableTargets,
         selectedDie,
         hasParry,
+        opponentHasBrutal,
         isBlockDie: selectedDie.isBlockDie,
         isCritical: selectedDie.isCritical
       });
@@ -449,25 +456,31 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
     });
 
     const currentWeapon = isAttackerTurn ? selectedAttackerWeapon : selectedDefenderWeapon;
+    const opponentWeapon = isAttackerTurn ? selectedDefenderWeapon : selectedAttackerWeapon;
     const hasParry = currentWeapon?.rules?.includes('Parry') ?? false;
+    const opponentHasBrutal = opponentWeapon?.rules?.includes('Brutal') ?? false;
 
     const blockable = opponentDice.reduce((blockable: number[], die, index) => {
       let canBlock = false;
 
       if (!die.isUsed && die.isHit) {
-        // Wenn der ausgewählte Würfel kritisch ist (6), kann er alles blocken
-        if (selectedDie.isCritical) {
+        // If opponent has Brutal rule, only critical dice can block
+        if (opponentHasBrutal && !selectedDie.isCritical) {
+          canBlock = false;
+        }
+        // If the selected die is critical (6), it can block anything
+        else if (selectedDie.isCritical) {
           canBlock = true;
         }
-        // Wenn der Würfel ein Blockwürfel ist
+        // If the die is a block die
         else if (selectedDie.isBlockDie) {
           canBlock = !die.isCritical;
         }
-        // Wenn der Würfel ein normaler Angriffswürfel ist und die Waffe Parry hat
+        // If the die is a normal attack die and the weapon has Parry
         else if (hasParry) {
-          canBlock = true; // Kann auch kritische Treffer blocken
+          canBlock = true; // Can also block critical hits
         }
-        // Normaler Angriffswürfel ohne Parry
+        // Normal attack die without Parry
         else {
           canBlock = !die.isCritical;
         }
@@ -482,7 +495,8 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
           isCritical: die.isCritical,
           selectedDieIsCritical: selectedDie.isCritical,
           hasParry: hasParry,
-          isBlockDie: selectedDie.isBlockDie
+          isBlockDie: selectedDie.isBlockDie,
+          opponentHasBrutal: opponentHasBrutal
         }
       });
       
@@ -502,19 +516,31 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
     const currentDice = isAttackerTurn ? attackerDice : defenderDice;
     const selectedDie = currentDice[selectedDieIndex];
     const opponentDice = isAttackerTurn ? defenderDice : attackerDice;
+    const opponentWeapon = isAttackerTurn ? selectedDefenderWeapon : selectedAttackerWeapon;
+    const opponentHasBrutal = opponentWeapon?.rules?.includes('Brutal') ?? false;
     
     console.log('Block start:', {
       selectedDie,
       selectedDieIndex,
-      opponentDice
+      opponentDice,
+      opponentHasBrutal
     });
 
     if (!selectedDie || selectedDie.isUsed) return;
+
+    // Check if opponent has Brutal and this is not a critical die
+    if (opponentHasBrutal && !selectedDie.isCritical) {
+      addToCombatLog(`Cannot block hits from Brutal weapons with non-critical dice`);
+      return;
+    }
 
     const blockable = findBlockableDice(selectedDie, opponentDice);
     console.log('Found blockable dice:', blockable);
     
     if (blockable.length > 0) {
+      if (opponentHasBrutal) {
+        addToCombatLog(`Hits from Brutal weapons can only be blocked with critical dice`);
+      }
       setIsBlockMode(true);
       setBlockableDice(blockable);
       setBlockingDieIndex(selectedDieIndex);
@@ -772,18 +798,33 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
     const currentDice = isAttackerTurn ? attackerDice : defenderDice
     const selectedDie = currentDice[selectedDieIndex]
     const opponentDice = isAttackerTurn ? defenderDice : attackerDice
+    const opponentWeapon = isAttackerTurn ? selectedDefenderWeapon : selectedAttackerWeapon
+    const opponentHasBrutal = opponentWeapon?.rules?.includes('Brutal') ?? false
     
     if (!selectedDie || selectedDie.isUsed) return
 
-    // Finde einen blockbaren gegnerischen Würfel
-    const blockableIndex = opponentDice.findIndex(die => 
-      !die.isUsed && (die.isHit || die.isCritical) && 
-      (!die.isCritical || selectedDie.isCritical)
-    )
+    // Check if opponent has Brutal and this is not a critical die
+    if (opponentHasBrutal && !selectedDie.isCritical) {
+      addToCombatLog(`Cannot block hits from Brutal weapons with non-critical dice`)
+      return
+    }
+
+    // Find a blockable opponent die
+    const blockableIndex = opponentDice.findIndex(die => {
+      if (!die.isUsed && (die.isHit || die.isCritical)) {
+        // If opponent has Brutal rule and this is not a critical die, can't block
+        if (opponentHasBrutal && !selectedDie.isCritical) {
+          return false
+        }
+        // If the die is critical, it can only be blocked by critical dice
+        return !die.isCritical || selectedDie.isCritical
+      }
+      return false
+    })
 
     if (blockableIndex === -1) return
 
-    // Markiere beide Würfel als benutzt
+    // Mark both dice as used
     const updatedCurrentDice = [...currentDice]
     updatedCurrentDice[selectedDieIndex] = { ...selectedDie, isUsed: true }
 
@@ -800,7 +841,7 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
 
     addToCombatLog(`${isAttackerTurn ? "Attacker" : "Defender"} blocks a hit`)
 
-    // Wechsle den Spieler wenn möglich
+    // Switch player if possible
     const otherPlayerHasHits = hasUnusedHits(isAttackerTurn ? defenderDice : attackerDice)
     if (otherPlayerHasHits) {
       setIsAttackerTurn(!isAttackerTurn)
@@ -814,29 +855,36 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
     const currentDice = isAttackerTurn ? attackerDice : defenderDice;
     const selectedDie = currentDice[selectedDieIndex];
     const currentWeapon = isAttackerTurn ? selectedAttackerWeapon : selectedDefenderWeapon;
+    const opponentWeapon = isAttackerTurn ? selectedDefenderWeapon : selectedAttackerWeapon;
     
     // Allow blocking with any die that's not used
     if (!selectedDie || selectedDie.isUsed) return false;
 
     const hasParry = currentWeapon?.rules?.includes('Parry') ?? false;
+    const opponentHasBrutal = opponentWeapon?.rules?.includes('Brutal') ?? false;
     const opponentDice = isAttackerTurn ? defenderDice : attackerDice;
 
-    // Wenn der Würfel kritisch ist (6), kann er immer zum Blocken verwendet werden
+    // If opponent has Brutal rule and this is not a critical die, blocking is not possible
+    if (opponentHasBrutal && !selectedDie.isCritical) {
+      return false;
+    }
+
+    // If the die is critical (6), it can always be used for blocking
     if (selectedDie.isCritical) {
       return opponentDice.some(die => !die.isUsed && die.isHit);
     }
 
     return opponentDice.some(die => {
       if (!die.isUsed && die.isHit) {
-        // Wenn der Würfel ein Blockwürfel ist
+        // If the die is a block die
         if (selectedDie.isBlockDie) {
           return !die.isCritical;
         }
-        // Wenn der Würfel ein normaler Angriffswürfel ist und die Waffe Parry hat
+        // If the die is a normal attack die and the weapon has Parry
         else if (hasParry) {
-          return true; // Kann auch kritische Treffer blocken
+          return true; // Can also block critical hits
         }
-        // Normaler Angriffswürfel ohne Parry
+        // Normal attack die without Parry
         else {
           return !die.isCritical;
         }
