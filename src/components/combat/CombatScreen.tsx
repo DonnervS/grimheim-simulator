@@ -405,6 +405,11 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
     const opponentHasBrutal = opponentWeapon?.rules?.includes('Brutal') ?? false;
     const selectedDie = currentDice[index];
 
+    // If opponent has Brutal rule and this is not a critical die, show warning message
+    if (opponentHasBrutal && !selectedDie.isCritical && hasUnusedHits(opponentDice)) {
+      addToCombatLog(`Cannot block hits from Brutal weapons - critical hits required`);
+    }
+
     // Only check for blockable targets if this is a block die or has Parry
     if (selectedDie.isBlockDie || hasParry) {
       const hasBlockableTargets = opponentDice.some(oppDie => {
@@ -464,7 +469,7 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
       let canBlock = false;
 
       if (!die.isUsed && die.isHit) {
-        // If opponent has Brutal rule, only critical dice can block
+        // If opponent has Brutal, only critical dice can block, regardless of die type
         if (opponentHasBrutal && !selectedDie.isCritical) {
           canBlock = false;
         }
@@ -472,9 +477,9 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
         else if (selectedDie.isCritical) {
           canBlock = true;
         }
-        // If the die is a block die
+        // If the die is a block die (and opponent doesn't have Brutal)
         else if (selectedDie.isBlockDie) {
-          canBlock = !die.isCritical;
+          canBlock = !die.isCritical; // Block dice can block normal hits
         }
         // If the die is a normal attack die and the weapon has Parry
         else if (hasParry) {
@@ -494,8 +499,8 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
           isHit: die.isHit,
           isCritical: die.isCritical,
           selectedDieIsCritical: selectedDie.isCritical,
+          selectedDieIsBlockDie: selectedDie.isBlockDie,
           hasParry: hasParry,
-          isBlockDie: selectedDie.isBlockDie,
           opponentHasBrutal: opponentHasBrutal
         }
       });
@@ -529,8 +534,9 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
     if (!selectedDie || selectedDie.isUsed) return;
 
     // Check if opponent has Brutal and this is not a critical die
+    // For Brutal weapons, only critical dice can block regardless of die type
     if (opponentHasBrutal && !selectedDie.isCritical) {
-      addToCombatLog(`Cannot block hits from Brutal weapons with non-critical dice`);
+      addToCombatLog(`Cannot block hits from Brutal weapons - critical hits required`);
       return;
     }
 
@@ -804,15 +810,16 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
     if (!selectedDie || selectedDie.isUsed) return
 
     // Check if opponent has Brutal and this is not a critical die
+    // For Brutal weapons, only critical dice can block regardless of die type
     if (opponentHasBrutal && !selectedDie.isCritical) {
-      addToCombatLog(`Cannot block hits from Brutal weapons with non-critical dice`)
+      addToCombatLog(`Cannot block hits from Brutal weapons - critical hits required`)
       return
     }
 
     // Find a blockable opponent die
     const blockableIndex = opponentDice.findIndex(die => {
       if (!die.isUsed && (die.isHit || die.isCritical)) {
-        // If opponent has Brutal rule and this is not a critical die, can't block
+        // If opponent has Brutal rule and this is not a critical die
         if (opponentHasBrutal && !selectedDie.isCritical) {
           return false
         }
@@ -865,6 +872,7 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
     const opponentDice = isAttackerTurn ? defenderDice : attackerDice;
 
     // If opponent has Brutal rule and this is not a critical die, blocking is not possible
+    // For Brutal weapons, only critical dice can block regardless of die type
     if (opponentHasBrutal && !selectedDie.isCritical) {
       return false;
     }
@@ -878,7 +886,7 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
       if (!die.isUsed && die.isHit) {
         // If the die is a block die
         if (selectedDie.isBlockDie) {
-          return !die.isCritical;
+          return !die.isCritical; // Block dice can block normal hits
         }
         // If the die is a normal attack die and the weapon has Parry
         else if (hasParry) {
