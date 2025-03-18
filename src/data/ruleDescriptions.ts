@@ -86,7 +86,7 @@ export const modelRuleDescriptions: Record<string, string> = {
   "Teleport": "Move the model up to 12\" in a straight line, to a position that can be seen by the model. Can ignore obstacles or terrain inbetween. Counts as a charge action if the Movement end in Meele Range of an enemy model",
   "Throwable": "Can be used in Close Combat and also used for ranged attacks. Limited to 1 ranged attack.",
   "Torch": "Torch hidden models within 6\". Can use the Fire special rule in close combat.",
-  "Tough": "After performing a Ranged Attack of Overwatch against a target, you may make another Ranged Attack against each other valid target within 6 inches of the original target.",
+  "Tough": "Any successful resolved hit that inflicts Damage is reduced by 1.",
   "Tougher": "Any successful resolved hit that inflicts Damage is reduced by 2.",
   "Toughest": "Any successful resolved hit that inflicts Damage is reduced by 3.",
   "Two-handed": "Cannot use a shield or another weapon and a two-handed weapon in the same round.",
