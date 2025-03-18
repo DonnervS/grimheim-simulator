@@ -7,7 +7,7 @@ export const fists: WeaponStats = {
   ATK: 2,    // 2 dice
   HTV: 5,    // 5+
   DMG: 1,    // 1 damage
-  CRT: 1,    // 1 critical damage
+  CRT: 2,    // 1 critical damage
   rules: "",
   weaponType: "close"
 };
@@ -19,7 +19,7 @@ export const brutalWarhammer: WeaponStats = {
   HTV: 3,    // 3+
   DMG: 2,    // 2 damage
   CRT: 4,    // 4 critical damage
-  rules: "Two-handed, Armor Shatter, Strike Last, Stun, Brutal",
+  rules: "Two-handed, Ravaging, Strike Last, Stun, Brutal",
   weaponType: "close"
 };
 
@@ -63,7 +63,7 @@ export const axe: WeaponStats = {
   HTV: 4,    // 4+
   DMG: 2,    // 2 damage
   CRT: 3,    // 3 critical damage
-  rules: "Armor Piercing",
+  rules: "Rending",
   weaponType: "close"
 };
 
@@ -140,7 +140,7 @@ export const twoHandaxes: WeaponStats = {
   HTV: 4,    // 4+
   DMG: 2,    // 2 damage
   CRT: 3,    // 3 critical damage
-  rules: "Armor Piercing",
+  rules: "Rending",
   weaponType: "close"
 };
 

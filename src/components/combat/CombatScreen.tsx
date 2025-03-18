@@ -5,6 +5,8 @@ import DiceDisplay, { DieResult } from './DiceDisplay'
 import ModelCard from './ModelCard'
 import ActionButtons from './ActionButtons'
 import CombatLog from './CombatLog'
+import Tooltip from '../ui/Tooltip'
+import { weaponRuleDescriptions } from '../../data/ruleDescriptions'
 
 const CombatContainer = styled.div`
   width: 100%;
@@ -61,17 +63,69 @@ const FighterLabel = styled.div`
   margin-bottom: 10px;
 `
 
-const WeaponInfo = styled.div`
-  background: rgba(42, 42, 74, 0.8);
-  border-radius: 8px;
-  border: 2px solid #4a4a8a;
-  padding: 10px;
-  width: 100%;
-  text-align: center;
-  color: #e6e6fa;
-  font-family: 'Press Start 2P', cursive;
-  font-size: 0.8em;
-`
+const WeaponRuleItem = styled.span`
+  cursor: help;
+  border-bottom: 1px dotted #8a8aff;
+  margin-right: 4px;
+  display: inline-block;
+  background-color: rgba(74, 74, 138, 0.3);
+  padding: 1px 4px;
+  border-radius: 3px;
+  &:hover {
+    color: #8a8aff;
+    background-color: rgba(74, 74, 138, 0.5);
+  }
+`;
+
+const WeaponInfo = ({ weapon }: { weapon: WeaponStats }) => {
+  const renderWeaponRules = (rules: string) => {
+    if (!rules) return null;
+    
+    const rulesList = rules.split(',').map(rule => rule.trim());
+    
+    return (
+      <div style={{ 
+        marginTop: '4px', 
+        fontSize: '0.7em',
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '4px' 
+      }}>
+        {rulesList.map((rule, index) => {
+          const description = weaponRuleDescriptions[rule] || 'No description available';
+          return (
+            <Tooltip 
+              key={index} 
+              text={description}
+              position="bottom"
+            >
+              <WeaponRuleItem>
+                {rule}
+              </WeaponRuleItem>
+            </Tooltip>
+          );
+        })}
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      <div style={{ fontSize: '0.8em', fontWeight: 'bold' }}>{weapon.name}</div>
+      <WeaponStatsGrid>
+        <StatsRow>
+          <div><StatLabel>RNG:</StatLabel> {weapon.RNG}"</div>
+          <div><StatLabel>ATK:</StatLabel> {weapon.ATK}D6</div>
+        </StatsRow>
+        <StatsRow>
+          <div><StatLabel>HTV:</StatLabel> {weapon.HTV}+</div>
+          <div><StatLabel>DMG:</StatLabel> {weapon.DMG}/{weapon.CRT}</div>
+        </StatsRow>
+      </WeaponStatsGrid>
+      {weapon.rules && renderWeaponRules(weapon.rules)}
+    </div>
+  );
+};
 
 const WeaponStatsGrid = styled.div`
   display: grid;
@@ -929,22 +983,7 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
             isSelectable={combatPhase === 'weapon-select'}
           />
           {selectedAttackerWeapon && (
-            <WeaponInfo>
-              {selectedAttackerWeapon.name}
-              <WeaponStatsGrid>
-                <StatsRow>
-                  <div><StatLabel>ATK:</StatLabel> {selectedAttackerWeapon.ATK}</div>
-                  <div><StatLabel>HTV:</StatLabel> {selectedAttackerWeapon.HTV}+</div>
-                </StatsRow>
-                <StatsRow>
-                  <div><StatLabel>DMG:</StatLabel> {selectedAttackerWeapon.DMG}</div>
-                  <div><StatLabel>CRT:</StatLabel> {selectedAttackerWeapon.CRT}</div>
-                </StatsRow>
-              </WeaponStatsGrid>
-              {selectedAttackerWeapon.rules && (
-                <WeaponRules>{selectedAttackerWeapon.rules}</WeaponRules>
-              )}
-            </WeaponInfo>
+            <WeaponInfo weapon={selectedAttackerWeapon} />
           )}
         </FighterColumn>
 
@@ -1050,22 +1089,7 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
             isSelectable={combatPhase === 'weapon-select'}
           />
           {selectedDefenderWeapon && (
-            <WeaponInfo>
-              {selectedDefenderWeapon.name}
-              <WeaponStatsGrid>
-                <StatsRow>
-                  <div><StatLabel>ATK:</StatLabel> {selectedDefenderWeapon.ATK}</div>
-                  <div><StatLabel>HTV:</StatLabel> {selectedDefenderWeapon.HTV}+</div>
-                </StatsRow>
-                <StatsRow>
-                  <div><StatLabel>DMG:</StatLabel> {selectedDefenderWeapon.DMG}</div>
-                  <div><StatLabel>CRT:</StatLabel> {selectedDefenderWeapon.CRT}</div>
-                </StatsRow>
-              </WeaponStatsGrid>
-              {selectedDefenderWeapon.rules && (
-                <WeaponRules>{selectedDefenderWeapon.rules}</WeaponRules>
-              )}
-            </WeaponInfo>
+            <WeaponInfo weapon={selectedDefenderWeapon} />
           )}
         </FighterColumn>
       </BattleArea>

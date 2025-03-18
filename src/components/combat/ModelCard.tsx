@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Model, WeaponStats } from '../../types/gameTypes';
+import Tooltip from '../ui/Tooltip';
+import { modelRuleDescriptions, weaponRuleDescriptions } from '../../data/ruleDescriptions';
 
 // Create a local fallback weapon
 const fallbackFists: WeaponStats = {
@@ -73,6 +75,21 @@ const WeaponList = styled.div`
   margin-top: 15px;
 `;
 
+const RuleItem = styled.span`
+  display: inline-block;
+  margin-right: 4px;
+  margin-bottom: 4px;
+  cursor: help;
+  border-bottom: 1px dotted #8a8aff;
+  background-color: rgba(74, 74, 138, 0.4);
+  padding: 2px 6px;
+  border-radius: 3px;
+  &:hover {
+    color: #8a8aff;
+    background-color: rgba(74, 74, 138, 0.6);
+  }
+`;
+
 const WeaponButton = styled.button<{ $isSelected?: boolean }>`
   width: 100%;
   padding: 8px;
@@ -87,6 +104,22 @@ const WeaponButton = styled.button<{ $isSelected?: boolean }>`
   &:hover {
     background: #7a7aef;
     transform: scale(1.02);
+  }
+`;
+
+const WeaponRuleItem = styled.span`
+  font-size: 0.8em;
+  color: #aaa;
+  display: inline-block;
+  margin-right: 4px;
+  cursor: help;
+  border-bottom: 1px dotted #8a8aff;
+  background-color: rgba(74, 74, 138, 0.3);
+  padding: 1px 4px;
+  border-radius: 3px;
+  &:hover {
+    color: #8a8aff;
+    background-color: rgba(74, 74, 138, 0.5);
   }
 `;
 
@@ -107,6 +140,9 @@ const RulesTitle = styled.div`
 const RulesList = styled.div`
   font-size: 0.9em;
   color: #e6e6fa;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
 `;
 
 interface ModelCardProps {
@@ -132,6 +168,37 @@ const ModelCard: React.FC<ModelCardProps> = ({
   
   // Add Unarmed as fallback only if no other close combat weapons are available
   const availableWeapons = closeWeapons.length > 0 ? closeWeapons : [fallbackFists];
+
+  // Function to render weapon rules with tooltips
+  const renderWeaponRules = (rules: string) => {
+    if (!rules) return null;
+    
+    const rulesList = rules.split(',').map(rule => rule.trim());
+    
+    return (
+      <div style={{ 
+        marginTop: '4px',
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '4px' 
+      }}>
+        {rulesList.map((rule, index) => {
+          const description = weaponRuleDescriptions[rule] || 'No description available';
+          return (
+            <Tooltip 
+              key={index} 
+              text={description}
+              position="bottom"
+            >
+              <WeaponRuleItem>
+                {rule}
+              </WeaponRuleItem>
+            </Tooltip>
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
     <Card $isActive={isSelectable}>
@@ -162,7 +229,20 @@ const ModelCard: React.FC<ModelCardProps> = ({
         <RulesContainer>
           <RulesTitle>Special Rules</RulesTitle>
           <RulesList>
-            {model.stats.SR.join(', ')}
+            {model.stats.SR.map((rule, index) => {
+              const description = modelRuleDescriptions[rule] || 'No description available';
+              return (
+                <Tooltip 
+                  key={index} 
+                  text={description}
+                  position="bottom"
+                >
+                  <RuleItem>
+                    {rule}
+                  </RuleItem>
+                </Tooltip>
+              );
+            })}
           </RulesList>
         </RulesContainer>
       )}
@@ -170,14 +250,16 @@ const ModelCard: React.FC<ModelCardProps> = ({
       {isSelectable && (
         <WeaponList>
           {availableWeapons.map((weapon, index) => (
-            <WeaponButton
-              key={`${weapon.name}-${index}`}
-              onClick={() => onWeaponSelect(weapon)}
-              $isSelected={selectedWeapon?.name === weapon.name}
-              type="button"
-            >
-              {weapon.name}
-            </WeaponButton>
+            <div key={`${weapon.name}-${index}`}>
+              <WeaponButton
+                onClick={() => onWeaponSelect(weapon)}
+                $isSelected={selectedWeapon?.name === weapon.name}
+                type="button"
+              >
+                {weapon.name}
+              </WeaponButton>
+              {weapon.rules && renderWeaponRules(weapon.rules)}
+            </div>
           ))}
         </WeaponList>
       )}

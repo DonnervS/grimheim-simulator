@@ -41,3 +41,6 @@ build/
 # local-config.json
 browser-tools-server/
 # local-screenshots/
+.cursorrules
+.cursorcolors
+.gitignore
