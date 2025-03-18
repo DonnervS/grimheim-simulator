@@ -591,7 +591,6 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
     if (!selectedDie || selectedDie.isUsed) return;
 
     // Check if opponent has Brutal and this is not a critical die
-    // For Brutal weapons, only critical dice can block regardless of die type
     if (opponentHasBrutal && !selectedDie.isCritical) {
       addToCombatLog(`Cannot block hits from Brutal weapons - critical hits required`);
       return;
@@ -606,6 +605,56 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
       }
       setIsBlockMode(true);
       setBlockableDice(blockable);
+      setBlockingDieIndex(selectedDieIndex);
+    }
+  }
+
+  // New function for Shield Block
+  const handleShieldBlockStart = () => {
+    if (selectedDieIndex === null) return;
+    
+    const currentDice = isAttackerTurn ? attackerDice : defenderDice;
+    const selectedDie = currentDice[selectedDieIndex];
+    const opponentDice = isAttackerTurn ? defenderDice : attackerDice;
+    
+    // Find an unused Shield block die
+    const shieldBlockDieIndex = currentDice.findIndex(die => 
+      die.isBlockDie && !die.isUsed
+    );
+    
+    if (shieldBlockDieIndex === -1) {
+      addToCombatLog(`No unused Shield block die available`);
+      return;
+    }
+    
+    // Upgrade the selected normal die to critical
+    const updatedCurrentDice = [...currentDice];
+    updatedCurrentDice[selectedDieIndex] = { 
+      ...selectedDie, 
+      isCritical: true,
+      isUpgradedByCritical: true
+    };
+    
+    if (isAttackerTurn) {
+      setAttackerDice(updatedCurrentDice);
+    } else {
+      setDefenderDice(updatedCurrentDice);
+    }
+    
+    addToCombatLog(`${isAttackerTurn ? "Attacker" : "Defender"} uses Shield to upgrade a normal hit to critical`);
+    
+    // Now find blockable dice (including critical hits)
+    const blockable = opponentDice.reduce((blockable: number[], die, index) => {
+      if (!die.isUsed && die.isHit) {
+        blockable.push(index);
+      }
+      return blockable;
+    }, []);
+    
+    if (blockable.length > 0) {
+      setIsBlockMode(true);
+      setBlockableDice(blockable);
+      // We're blocking with the upgraded die, not the shield die
       setBlockingDieIndex(selectedDieIndex);
     }
   }
@@ -626,47 +675,35 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
       blockingDieIndex,
       opponentDieIndex,
       isBlockMode,
-      hasShield
+      hasShield,
+      isUpgradedByCritical: selectedDie.isUpgradedByCritical
     });
 
     if (!selectedDie || selectedDie.isUsed) return;
-
-    // Check if Shield upgrade is needed before block (if target is critical but blocking die is not)
-    let shouldUpgradeToBlock = false;
-    if (hasShield && selectedDie.isBlockDie && !selectedDie.isCritical && targetDie.isCritical) {
-      // Need to upgrade to block a critical hit
-      if (window.confirm('Target is a critical hit. Do you want to use Shield rule to upgrade your block to a critical hit? This is required to block this hit.')) {
-        shouldUpgradeToBlock = true;
-      } else {
-        // User chose not to upgrade, cannot block this critical hit
-        addToCombatLog(`Cannot block critical hit without upgrading the block die`);
-        setIsBlockMode(false);
-        setBlockableDice([]);
-        setBlockingDieIndex(null);
-        setSelectedDieIndex(null);
-        return;
-      }
-    }
 
     // Mark both dice as used
     const updatedCurrentDice = [...currentDice];
     updatedCurrentDice[blockingDieIndex] = { 
       ...selectedDie, 
-      isUsed: true,
-      // Upgrade to critical if Shield is used for that purpose
-      isCritical: selectedDie.isCritical || shouldUpgradeToBlock
+      isUsed: true
     };
 
     const updatedOpponentDice = [...opponentDice];
     updatedOpponentDice[opponentDieIndex] = { ...opponentDice[opponentDieIndex], isUsed: true };
 
-    // Check if regular Shield upgrade option is available (both dice are normal hits)
-    if (hasShield && selectedDie.isBlockDie && !selectedDie.isCritical && !shouldUpgradeToBlock && !targetDie.isCritical) {
-      // Optional upgrade for future use
-      if (window.confirm('Do you want to use Shield rule to upgrade this block to a critical hit? This could allow blocking critical hits later.')) {
-        // Upgrade the block die to a critical hit
-        updatedCurrentDice[blockingDieIndex].isCritical = true;
-        addToCombatLog(`${isAttackerTurn ? "Attacker" : "Defender"} uses Shield to upgrade block to critical hit`);
+    // If this was an upgraded die using Shield, also mark the shield block die as used
+    if (selectedDie.isUpgradedByCritical && hasShield) {
+      // Find the first unused shield block die
+      const shieldBlockDieIndex = updatedCurrentDice.findIndex(die => 
+        die.isBlockDie && !die.isUsed
+      );
+      
+      if (shieldBlockDieIndex !== -1) {
+        updatedCurrentDice[shieldBlockDieIndex] = {
+          ...updatedCurrentDice[shieldBlockDieIndex],
+          isUsed: true
+        };
+        addToCombatLog(`Shield block die is used for the upgrade`);
       }
     }
 
@@ -678,8 +715,8 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
       setAttackerDice(updatedOpponentDice);
     }
 
-    if (shouldUpgradeToBlock) {
-      addToCombatLog(`${isAttackerTurn ? "Attacker" : "Defender"} uses Shield to upgrade block and blocks a critical hit`);
+    if (selectedDie.isUpgradedByCritical) {
+      addToCombatLog(`${isAttackerTurn ? "Attacker" : "Defender"} uses Shield-upgraded hit to block ${targetDie.isCritical ? 'a critical hit' : 'a hit'}`);
     } else {
       addToCombatLog(`${isAttackerTurn ? "Attacker" : "Defender"} blocks a hit`);
     }
@@ -1011,6 +1048,34 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
     });
   }
 
+  // Add a function to check if shield block is available
+  const canShieldBlock = () => {
+    if (selectedDieIndex === null) return false;
+    
+    const currentDice = isAttackerTurn ? attackerDice : defenderDice;
+    const selectedDie = currentDice[selectedDieIndex];
+    const currentModel = isAttackerTurn ? attacker : defender;
+    const hasShield = currentModel.stats.SR?.includes('Shield');
+    const opponentDice = isAttackerTurn ? defenderDice : attackerDice;
+    
+    // Must be a normal hit (not critical, not a block die)
+    if (!selectedDie || selectedDie.isUsed || selectedDie.isCritical || selectedDie.isBlockDie) {
+      return false;
+    }
+    
+    // Must have an unused shield block die available
+    const hasUnusedShieldBlock = currentDice.some(die => 
+      die.isBlockDie && !die.isUsed
+    );
+    
+    // Must have something to block in opponent's dice
+    const hasOpponentHits = opponentDice.some(die => 
+      !die.isUsed && die.isHit
+    );
+    
+    return hasShield && hasUnusedShieldBlock && hasOpponentHits;
+  };
+
   const handleBack = () => {
     setSelectedDieIndex(null);
     setIsBlockMode(false);
@@ -1111,8 +1176,7 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
                         onClick={handleBlockStart}
                         disabled={!canBlock()}
                       >
-                        {attacker.stats.SR?.includes('Shield') && !attackerDice[selectedDieIndex].isCritical ? 
-                          'Block (Shield)' : 'Block'}
+                        Block
                       </BlockOnlyButton>
                     )) : 
                     (defenderDice[selectedDieIndex].isBlockDie && (
@@ -1120,8 +1184,27 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
                         onClick={handleBlockStart}
                         disabled={!canBlock()}
                       >
-                        {defender.stats.SR?.includes('Shield') && !defenderDice[selectedDieIndex].isCritical ? 
-                          'Block (Shield)' : 'Block'}
+                        Block
+                      </BlockOnlyButton>
+                    ))
+                  }
+                  
+                  {/* Show shield block button for normal hits when shield block is available */}
+                  {isAttackerTurn ? 
+                    (!attackerDice[selectedDieIndex].isBlockDie && canShieldBlock() && (
+                      <BlockOnlyButton 
+                        onClick={handleShieldBlockStart}
+                        style={{ backgroundColor: '#8080ff' }}
+                      >
+                        Shield Block
+                      </BlockOnlyButton>
+                    )) : 
+                    (!defenderDice[selectedDieIndex].isBlockDie && canShieldBlock() && (
+                      <BlockOnlyButton 
+                        onClick={handleShieldBlockStart}
+                        style={{ backgroundColor: '#8080ff' }}
+                      >
+                        Shield Block
                       </BlockOnlyButton>
                     ))
                   }

@@ -67,7 +67,7 @@ export const modelRuleDescriptions: Record<string, string> = {
   "Robust 2": "The rules for Injured only apply if the model has lost half (rounded down) of its wounds.",
   "Savage": "Affected by Frenzy unless a Hero/leader is within 6\".",
   "Scout": "Can deploy after all other units and move twice its MOV before battle.",
-  "Shield": "+1 block die. Can upgrade normal block to critical to block critical hits.",
+  "Shield": "+1 block die. Can upgrade normal hit using block die to block critical hits.",
   "Silent": "Can use Hide and Shoot actions in the same activation.",
   "Slow": "Cannot use the RUN action.",
   "Smoke": "The model is cloaked in smoke and until its next activation it is considered to be in cover when it is selected as a target for attack.",
