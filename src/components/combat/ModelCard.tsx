@@ -3,6 +3,22 @@ import styled from 'styled-components';
 import { Model, WeaponStats } from '../../types/gameTypes';
 import Tooltip from '../ui/Tooltip';
 import { modelRuleDescriptions, weaponRuleDescriptions } from '../../data/ruleDescriptions';
+import {
+  Card,
+  ModelName,
+  StatsGrid,
+  StatBox,
+  StatLabel,
+  StatValue,
+  WeaponList,
+  WeaponButton,
+  WeaponStatsDisplay,
+  WeaponRuleItem,
+  RulesContainer,
+  RulesTitle,
+  RulesList,
+  RuleItem
+} from './ModelCardStyles';
 
 // Create a local fallback weapon
 const fallbackFists: WeaponStats = {
@@ -12,138 +28,9 @@ const fallbackFists: WeaponStats = {
   HTV: 5,    // 5+
   DMG: 1,    // 1 damage
   CRT: 1,    // 1 critical damage
-  rules: "",
+  rules: [],
   weaponType: "close"
 };
-
-const Card = styled.div<{ $isActive: boolean }>`
-  background: rgba(26, 26, 46, 0.9);
-  border-radius: 8px;
-  border: 2px solid ${props => props.$isActive ? '#8a8aff' : '#4a4a8a'};
-  padding: 20px;
-  width: 250px;
-  color: #e6e6fa;
-  transition: all 0.2s ease;
-
-  ${props => props.$isActive && `
-    box-shadow: 0 0 10px #8a8aff;
-    transform: scale(1.02);
-  `}
-`;
-
-const ModelName = styled.h2`
-  margin: 0 0 10px 0;
-  font-size: 1.2em;
-  color: #8a8aff;
-  font-family: 'Press Start 2P', cursive;
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin: 10px 0;
-`;
-
-const StatBox = styled.div`
-  background: #444;
-  border-radius: 4px;
-  padding: 8px;
-  text-align: center;
-`;
-
-const StatLabel = styled.div`
-  font-size: 0.8em;
-  color: #8a8aff;
-  margin-bottom: 4px;
-`;
-
-const StatValue = styled.div<{ $isWounds?: boolean; $woundPercentage?: number }>`
-  font-size: 1.2em;
-  font-weight: bold;
-  color: ${props => {
-    if (props.$isWounds && props.$woundPercentage !== undefined) {
-      if (props.$woundPercentage > 50) return '#4CAF50';
-      if (props.$woundPercentage > 25) return '#FFA500';
-      return '#FF4444';
-    }
-    return 'inherit';
-  }};
-`;
-
-const WeaponList = styled.div`
-  margin-top: 15px;
-`;
-
-const RuleItem = styled.span`
-  display: inline-block;
-  margin-right: 4px;
-  margin-bottom: 4px;
-  cursor: help;
-  border-bottom: 1px dotted #8a8aff;
-  background-color: rgba(74, 74, 138, 0.4);
-  padding: 2px 6px;
-  border-radius: 3px;
-  &:hover {
-    color: #8a8aff;
-    background-color: rgba(74, 74, 138, 0.6);
-  }
-`;
-
-const WeaponButton = styled.button<{ $isSelected?: boolean }>`
-  width: 100%;
-  padding: 8px;
-  margin: 5px 0;
-  background: ${props => props.$isSelected ? '#8a8aff' : '#4a4a8a'};
-  border: none;
-  border-radius: 4px;
-  color: white;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: #7a7aef;
-    transform: scale(1.02);
-  }
-`;
-
-const WeaponRuleItem = styled.span`
-  font-size: 0.8em;
-  color: #aaa;
-  display: inline-block;
-  margin-right: 4px;
-  cursor: help;
-  border-bottom: 1px dotted #8a8aff;
-  background-color: rgba(74, 74, 138, 0.3);
-  padding: 1px 4px;
-  border-radius: 3px;
-  &:hover {
-    color: #8a8aff;
-    background-color: rgba(74, 74, 138, 0.5);
-  }
-`;
-
-const RulesContainer = styled.div`
-  margin-top: 10px;
-  padding: 8px;
-  background: rgba(74, 74, 138, 0.3);
-  border-radius: 4px;
-`;
-
-const RulesTitle = styled.div`
-  font-size: 0.8em;
-  color: #8a8aff;
-  margin-bottom: 4px;
-  font-family: 'Press Start 2P', cursive;
-`;
-
-const RulesList = styled.div`
-  font-size: 0.9em;
-  color: #e6e6fa;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-`;
 
 interface ModelCardProps {
   model: Model;
@@ -170,10 +57,8 @@ const ModelCard: React.FC<ModelCardProps> = ({
   const availableWeapons = closeWeapons.length > 0 ? closeWeapons : [fallbackFists];
 
   // Function to render weapon rules with tooltips
-  const renderWeaponRules = (rules: string) => {
-    if (!rules) return null;
-    
-    const rulesList = rules.split(',').map(rule => rule.trim());
+  const renderWeaponRules = (rules: string[]) => {
+    if (!rules || rules.length === 0) return null;
     
     return (
       <div style={{ 
@@ -182,7 +67,7 @@ const ModelCard: React.FC<ModelCardProps> = ({
         flexWrap: 'wrap',
         gap: '4px' 
       }}>
-        {rulesList.map((rule, index) => {
+        {rules.map((rule, index) => {
           const description = weaponRuleDescriptions[rule] || 'No description available';
           return (
             <Tooltip 
