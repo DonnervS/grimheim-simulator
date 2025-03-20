@@ -81,6 +81,22 @@ const DiceButton = styled.button`
   }
 `;
 
+const ButtonContainer = styled.div`
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+  justify-content: center;
+`;
+
+const ControlButton = styled(DiceButton)`
+  margin: 0;
+  background: ${props => props.color || '#4a4a8a'};
+  
+  &:hover {
+    background: ${props => props.color ? `${props.color}cc` : '#6a6aaa'};
+  }
+`;
+
 const CombatLog = styled.div`
   width: 100%;
   max-width: 800px;
@@ -132,6 +148,7 @@ interface RangedCombatScreenProps {
   onAttackerWeaponSelect: (weapon: WeaponStats) => void;
   onDefenderWeaponSelect: (weapon: WeaponStats) => void;
   onWinnerDeclared: (winner: Model) => void;
+  onEndCombat: () => void;
 }
 
 export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
@@ -141,12 +158,14 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
   defenderWeapon,
   onAttackerWeaponSelect,
   onDefenderWeaponSelect,
-  onWinnerDeclared
+  onWinnerDeclared,
+  onEndCombat
 }) => {
   const [phase, setPhase] = useState<'attack' | 'save'>('attack');
   const [combatLog, setCombatLog] = useState<string[]>([]);
   const [diceResults, setDiceResults] = useState<number[]>([]);
   const [isRolling, setIsRolling] = useState(false);
+  const [round, setRound] = useState(1);
 
   useEffect(() => {
     // Initialize wounds if not set
@@ -220,6 +239,12 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
     onWinnerDeclared(winner);
   };
 
+  const handleNewRound = () => {
+    setRound(prev => prev + 1);
+    setPhase('attack');
+    addToCombatLog(`\n--- Round ${round + 1} ---\n`);
+  };
+
   return (
     <CombatContainer>
       <BattleArea>
@@ -270,6 +295,15 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
           <LogEntry key={index}>{entry}</LogEntry>
         ))}
       </CombatLog>
+
+      <ButtonContainer>
+        <ControlButton onClick={handleNewRound} color="#4a4a8a">
+          New Round
+        </ControlButton>
+        <ControlButton onClick={onEndCombat} color="#4a4a8a">
+          End Combat
+        </ControlButton>
+      </ButtonContainer>
     </CombatContainer>
   );
 };
