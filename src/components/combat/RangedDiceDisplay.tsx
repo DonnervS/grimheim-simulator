@@ -1,39 +1,45 @@
 import React from 'react';
-import styled, { keyframes, css } from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
-const roll = keyframes`
+const rollAnimation = keyframes`
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 `;
 
 const DiceContainer = styled.div`
   display: flex;
-  gap: 10px;
   flex-wrap: wrap;
+  gap: 10px;
   justify-content: center;
-  padding: 20px;
-  min-height: 60px;
+  margin: 20px 0;
+  padding: 10px;
+  background: rgba(26, 26, 46, 0.7);
+  border-radius: 8px;
+  min-height: 80px;
+  align-items: center;
 `;
 
-const Die = styled.div<{ $isRolling: boolean }>`
-  width: 40px;
-  height: 40px;
-  background: #8a8aff;
+interface DiceProps {
+  isRolling: boolean;
+}
+
+const Dice = styled.div<DiceProps>`
+  width: 50px;
+  height: 50px;
+  background: #e6e6fa;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2em;
+  font-size: 1.5em;
   font-weight: bold;
-  color: white;
-  margin: 5px;
-  ${props => props.$isRolling && css`
-    animation: ${roll} 0.5s linear infinite;
-  `}
-  transition: all 0.2s ease;
-
+  color: #1a1a2e;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  animation: ${props => props.isRolling ? rollAnimation : 'none'} 0.5s linear infinite;
+  
   &:hover {
-    transform: ${props => props.$isRolling ? 'none' : 'scale(1.1)'};
+    transform: ${props => props.isRolling ? 'none' : 'scale(1.1)'};
+    transition: transform 0.2s ease;
   }
 `;
 
@@ -46,9 +52,9 @@ const RangedDiceDisplay: React.FC<RangedDiceDisplayProps> = ({ diceResults, isRo
   return (
     <DiceContainer>
       {diceResults.map((result, index) => (
-        <Die key={index} $isRolling={isRolling}>
+        <Dice key={index} isRolling={isRolling}>
           {isRolling ? '?' : result}
-        </Die>
+        </Dice>
       ))}
     </DiceContainer>
   );
