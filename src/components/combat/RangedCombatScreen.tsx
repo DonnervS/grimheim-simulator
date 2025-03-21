@@ -435,11 +435,81 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
     }, 1000);
   };
 
+  const handleSaveActionButton = (mode: 'block' | 'upgrade') => {
+    if (saveInteraction.selectedSaveIndex === null) return;
+
+    const die = defenderDice[saveInteraction.selectedSaveIndex];
+    console.log('Selected die for action:', {
+      index: saveInteraction.selectedSaveIndex,
+      die,
+      mode
+    });
+
+    let availableTargets: number[] = [];
+
+    if (mode === 'block') {
+      if (die.isCritical) {
+        // Critical saves can block any hit
+        availableTargets = attackerDice
+          .map((die, idx) => ({ die, idx }))
+          .filter(({ die }) => (die.isHit || die.isCritical) && !die.isBlocked)
+          .map(({ idx }) => idx);
+      } else {
+        // Normal saves can only block normal hits
+        availableTargets = attackerDice
+          .map((die, idx) => ({ die, idx }))
+          .filter(({ die }) => die.isHit && !die.isCritical && !die.isBlocked)
+          .map(({ idx }) => idx);
+      }
+    } else if (mode === 'upgrade') {
+      // Can upgrade any non-critical, non-used save
+      availableTargets = defenderDice
+        .map((die, idx) => ({ die, idx }))
+        .filter(({ die, idx }) => {
+          const isValidSave = die.isSave || die.isShieldSave;
+          const isNotCritical = !die.isCritical;
+          const isNotUsed = !die.isUsed;
+          const isNotSelected = idx !== saveInteraction.selectedSaveIndex;
+          
+          console.log('Checking die for upgrade:', {
+            idx,
+            die,
+            isValidSave,
+            isNotCritical,
+            isNotUsed,
+            isNotSelected,
+            wouldBeTarget: isValidSave && isNotCritical && isNotUsed && isNotSelected
+          });
+          
+          return isValidSave && isNotCritical && isNotUsed && isNotSelected;
+        })
+        .map(({ idx }) => idx);
+      
+      console.log('Available upgrade targets:', {
+        allDice: defenderDice,
+        filteredTargets: availableTargets,
+        selectedDie: die
+      });
+    }
+
+    setSaveInteraction({
+      ...saveInteraction,
+      mode,
+      availableTargets
+    });
+  };
+
   const handleSaveDieClick = (index: number) => {
     if (phase !== 'resolve') return;
     
+    // Wenn wir bereits im Upgrade/Block-Modus sind und der Würfel ein gültiges Ziel ist
+    if (saveInteraction.mode && saveInteraction.availableTargets.includes(index)) {
+      handleTargetDieClick(index);
+      return;
+    }
+    
     const die = defenderDice[index];
-    if (!die.isSave) return;
+    if (!die.isSave && !die.isShieldSave) return; // Allow clicking both normal and shield saves
 
     // Reset if clicking the same die
     if (saveInteraction.selectedSaveIndex === index) {
@@ -458,51 +528,18 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
     });
   };
 
-  const handleSaveActionButton = (mode: 'block' | 'upgrade') => {
-    if (saveInteraction.selectedSaveIndex === null) return;
-
-    const die = defenderDice[saveInteraction.selectedSaveIndex];
-    let availableTargets: number[] = [];
-
-    if (mode === 'block') {
-      if (die.isCritical) {
-        // Critical saves can block any hit
-        availableTargets = attackerDice
-          .map((die, idx) => ({ die, idx }))
-          .filter(({ die }) => (die.isHit || die.isCritical) && !die.isBlocked)
-          .map(({ idx }) => idx);
-      } else {
-        // Normal saves can only block normal hits
-        availableTargets = attackerDice
-          .map((die, idx) => ({ die, idx }))
-          .filter(({ die }) => die.isHit && !die.isCritical && !die.isBlocked)
-          .map(({ idx }) => idx);
-      }
-    } else if (mode === 'upgrade') {
-      // Can upgrade any non-critical save (including shield saves)
-      availableTargets = defenderDice
-        .map((die, idx) => ({ die, idx }))
-        .filter(({ die, idx }) => 
-          die.isSave && 
-          !die.isCritical && 
-          !die.isUsed &&
-          idx !== saveInteraction.selectedSaveIndex)
-        .map(({ idx }) => idx);
-    }
-
-    setSaveInteraction({
-      ...saveInteraction,
-      mode,
-      availableTargets
-    });
-  };
-
   const handleTargetDieClick = (index: number) => {
     if (!saveInteraction.mode || saveInteraction.selectedSaveIndex === null) return;
 
     const { mode, selectedSaveIndex } = saveInteraction;
-    const newDefenderDice = [...defenderDice];
-    
+    console.log('Target die clicked:', {
+      mode,
+      targetIndex: index,
+      selectedIndex: selectedSaveIndex,
+      targetDie: defenderDice[index],
+      sourceDie: defenderDice[selectedSaveIndex]
+    });
+
     if (mode === 'block') {
       // Mark the attack die as blocked
       const newAttackerDice = [...attackerDice];
@@ -513,30 +550,58 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
       setAttackerDice(newAttackerDice);
 
       // Mark the save die as used
+      const newDefenderDice = [...defenderDice];
       newDefenderDice[selectedSaveIndex] = {
         ...newDefenderDice[selectedSaveIndex],
         isUsed: true
       };
+      setDefenderDice(newDefenderDice);
       
       addToCombatLog(`Used a ${defenderDice[selectedSaveIndex].isShieldSave ? 'shield' : 'normal'} save to block a ${attackerDice[index].isCritical ? 'critical' : 'normal'} hit`);
     } else if (mode === 'upgrade') {
-      // Upgrade the target die to critical
-      newDefenderDice[index] = {
-        ...newDefenderDice[index],
-        isCritical: true,
-        value: Math.max(newDefenderDice[index].value, 6) // Ensure critical value
-      };
-      
-      // Mark the upgrading die as used
-      newDefenderDice[selectedSaveIndex] = {
-        ...newDefenderDice[selectedSaveIndex],
-        isUsed: true
-      };
-      
-      addToCombatLog(`Used a ${defenderDice[selectedSaveIndex].isShieldSave ? 'shield' : 'normal'} save (${defenderDice[selectedSaveIndex].value}) to upgrade a ${defenderDice[index].isShieldSave ? 'shield' : 'normal'} save (${defenderDice[index].value}) to critical`);
-    }
+      console.log('Before upgrade - Full state:', {
+        defenderDice,
+        targetIndex: index,
+        selectedIndex: selectedSaveIndex,
+        mode
+      });
 
-    setDefenderDice(newDefenderDice);
+      // Create a new array with updated dice
+      const newDefenderDice = defenderDice.map((die, i) => {
+        if (i === index) {
+          const upgradedDie = {
+            ...die,
+            isCritical: true,
+            value: 6,
+            isSave: true,
+            isSelected: false,
+            isBlocked: false,
+            isUsed: false
+          };
+          console.log('Upgrading die:', { original: die, upgraded: upgradedDie });
+          return upgradedDie;
+        }
+        if (i === selectedSaveIndex) {
+          const usedDie = {
+            ...die,
+            isUsed: true,
+            isSelected: false
+          };
+          console.log('Marking source die as used:', { original: die, used: usedDie });
+          return usedDie;
+        }
+        return die;
+      });
+
+      console.log('After upgrade - New state:', newDefenderDice);
+      
+      // Force a re-render by creating a completely new array
+      setDefenderDice([...newDefenderDice]);
+      
+      const sourceType = defenderDice[selectedSaveIndex].isShieldSave ? 'shield' : 'normal';
+      const targetType = defenderDice[index].isShieldSave ? 'shield' : 'normal';
+      addToCombatLog(`Used a ${sourceType} save to upgrade a ${targetType} save to critical`);
+    }
 
     // Reset interaction state
     setSaveInteraction({
@@ -702,7 +767,7 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
                 >
                   Block Hit
                 </ActionButton>
-                {!defenderDice[saveInteraction.selectedSaveIndex].isCritical && (
+                {!defenderDice[saveInteraction.selectedSaveIndex].isCritical && !defenderDice[saveInteraction.selectedSaveIndex].isUsed && (
                   <ActionButton
                     onClick={() => handleSaveActionButton('upgrade')}
                     disabled={saveInteraction.mode === 'upgrade'}
