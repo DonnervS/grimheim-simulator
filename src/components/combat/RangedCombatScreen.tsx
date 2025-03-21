@@ -272,7 +272,7 @@ interface SaveState extends DiceSelectionState {
   selectedSaveIndices: number[];
 }
 
-interface SaveInteractionState {
+interface SaveInteraction {
   selectedSaveIndex: number | null;
   mode: 'block' | 'upgrade' | null;
   availableTargets: number[];
@@ -294,6 +294,22 @@ interface DiceSelectionState {
   defenderSaves: DieResult[];
   selectedHits: number[];
   selectedSaves: number[];
+}
+
+interface ModelStats {
+  MOV: number;
+  DEF: number;
+  SAV: number;
+  WND: number;
+  SHD: number;  // Add shield dice to stats
+  SR: string[];
+}
+
+interface WeaponStats {
+  RNG: string;
+  ATK: number;
+  DMG: string;
+  rules: string[];  // Add rules array to weapon stats
 }
 
 export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
@@ -326,7 +342,7 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
     coverSaveUsed: false,
     selectedSaveIndices: []
   });
-  const [saveInteraction, setSaveInteraction] = useState<SaveInteractionState>({
+  const [saveInteraction, setSaveInteraction] = useState<SaveInteraction>({
     selectedSaveIndex: null,
     mode: null,
     availableTargets: []
@@ -380,59 +396,83 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
     }, 1000);
   };
 
-  const handleSaveRoll = (inCover: boolean = false) => {
-    if (!attackerWeapon || !defender) return;
-    
+  const handleSaveRoll = () => {
+    if (phase !== 'save' || !attackerWeapon || !defender.stats) return;
+
     setIsRolling(true);
     setTimeout(() => {
-      // Prüfe, ob der Verteidiger die Special Rule "Shield" hat
-      const hasShield = defender.stats.SR.some(rule => rule.toLowerCase() === 'shield');
+      // Calculate modified save value based on weapon rules
+      let modifiedSaveValue = defender.stats.SAV;
+      if (attackerWeapon.rules?.includes('Armor Piercing')) {
+        modifiedSaveValue = Math.min(modifiedSaveValue + 1, 6);
+        addToCombatLog('Armor Piercing reduces save value by 1');
+      } else if (attackerWeapon.rules?.includes('Armor Shatter')) {
+        modifiedSaveValue = Math.min(modifiedSaveValue + 2, 6);
+        addToCombatLog('Armor Shatter reduces save value by 2');
+      }
 
-      // Bestimme die Anzahl der zu würfelnden Würfel (einer weniger wenn in Cover)
-      const diceToRoll = inCover ? defender.stats.DEF - 1 : defender.stats.DEF;
-
-      // Würfle normale Rettungswürfe
-      const normalSaves = rollDice(diceToRoll).map(die => ({
-        ...die,
-        isSave: die.value >= defender.stats.SAV || die.value === 6,
-        isHit: false,
-        isCritical: die.value === 6,
-        isShieldSave: false,
-        isCoverSave: false,
-        isSelected: false
-      }));
-
-      // Füge automatischen Erfolg für Cover hinzu
-      const coverSave = inCover ? [{
-        value: defender.stats.SAV,
+      const numDice = defender.stats.DEF;
+      const results = rollDice(numDice).map(({ value }) => ({
+        value,
         isHit: false,
         isCritical: false,
-        isSave: true,
+        isSave: value >= modifiedSaveValue,
         isShieldSave: false,
-        isCoverSave: true,
-        isSelected: false
-      }] : [];
+        isCoverSave: false,
+        isSelected: false,
+        isBlocked: false,
+        isUsed: false
+      }));
 
-      // Würfle Schildwurf wenn vorhanden
-      const shieldRoll = hasShield ? Math.floor(Math.random() * 6) + 1 : 0;
-      const shieldSave = hasShield ? [{
-        value: shieldRoll,
+      // Add shield saves
+      const shieldResults = rollDice(defender.stats.SHD || 0).map(({ value }) => ({
+        value,
         isHit: false,
-        isCritical: shieldRoll === 6,
-        isSave: shieldRoll >= defender.stats.SAV || shieldRoll === 6,
+        isCritical: false,
+        isSave: value >= modifiedSaveValue,
         isShieldSave: true,
         isCoverSave: false,
-        isSelected: false
-      }] : [];
+        isSelected: false,
+        isBlocked: false,
+        isUsed: false
+      }));
 
-      const allSaves = [...normalSaves, ...coverSave, ...shieldSave];
-      
-      setDefenderDice(allSaves);
+      const allResults = [...results, ...shieldResults];
+      setDefenderDice(allResults);
       setPhase('resolve');
-
       setIsRolling(false);
-      addToCombatLog(`${defender.name} rolls ${diceToRoll} save dice${inCover ? ' (in cover)' : ''}${hasShield ? ' and 1 shield save' : ''}`);
+
+      const numSaves = allResults.filter(die => die.isSave).length;
+      const numShieldSaves = allResults.filter(die => die.isSave && die.isShieldSave).length;
+      
+      addToCombatLog(`Rolled ${numDice} defense dice and ${defender.stats.SHD || 0} shield dice with ${numSaves} successes (${numShieldSaves} shield saves) at ${modifiedSaveValue}+`);
     }, 1000);
+  };
+
+  const getModifiedSaveValue = () => {
+    if (!attackerWeapon || !defender.stats) return defender.stats?.SAV;
+
+    let modifiedSaveValue = defender.stats.SAV;
+    if (attackerWeapon.rules?.includes('Armor Piercing')) {
+      modifiedSaveValue = Math.min(modifiedSaveValue + 1, 6);
+    } else if (attackerWeapon.rules?.includes('Armor Shatter')) {
+      modifiedSaveValue = Math.min(modifiedSaveValue + 2, 6);
+    }
+    return modifiedSaveValue;
+  };
+
+  const renderSaveValue = () => {
+    if (!attackerWeapon || !defender.stats) return defender.stats?.SAV + '+';
+
+    const originalValue = defender.stats.SAV;
+    const modifiedValue = getModifiedSaveValue();
+    const isModified = modifiedValue > originalValue;
+
+    return (
+      <span style={{ color: isModified ? '#ff4444' : 'inherit' }}>
+        {modifiedValue}+
+      </span>
+    );
   };
 
   const handleSaveActionButton = (mode: 'block' | 'upgrade') => {
@@ -740,16 +780,10 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
                 Roll Attack
               </SaveButton>
               <SaveButton
-                onClick={() => handleSaveRoll(false)}
+                onClick={handleSaveRoll}
                 disabled={isRolling || phase !== 'save'}
               >
                 Roll Save
-              </SaveButton>
-              <SaveButton
-                onClick={() => handleSaveRoll(true)}
-                disabled={isRolling || phase !== 'save'}
-              >
-                Roll Save in Cover
               </SaveButton>
             </SaveButtonContainer>
             <RangedDiceDisplay
@@ -800,6 +834,7 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
             selectedWeapon={defenderWeapon}
             onWeaponSelect={onDefenderWeaponSelect}
             isSelectable={false}
+            modifiedSaveValue={phase !== 'attack' ? getModifiedSaveValue() : undefined}
           />
         </ModelArea>
       </BattleArea>

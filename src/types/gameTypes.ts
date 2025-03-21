@@ -6,6 +6,7 @@ export interface ModelStats {
   DEF: number;   // Defense Dice
   SAV: number;   // Save Value
   WND: number;   // Wounds
+  SHD: number;   // Shield dice
   SR: string[];  // Special Rules
 }
 
@@ -88,11 +89,11 @@ export type WeaponType = 'close' | 'range';
 // Waffen-Statistiken
 export interface WeaponStats {
   name: string;   // Name der Waffe
-  RNG: number;   // Range in inches
+  RNG: string;   // Range in inches
   ATK: number;   // Attack Dice
-  HTV: number;   // Hit Value
-  DMG: number;   // Normal Damage
-  CRT: number;   // Critical Damage
-  rules?: string;
-  weaponType: WeaponType;
+  DMG: string;   // Normal Damage
+  HTV: string;   // Hit Value
+  CRT: string;   // Critical Damage
+  weaponType: string;
+  rules: string[];  // Weapon rules like Armor Piercing
 }
