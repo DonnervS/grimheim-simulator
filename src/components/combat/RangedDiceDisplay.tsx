@@ -26,6 +26,7 @@ interface DiceProps {
   isSave?: boolean;
   isSelected?: boolean;
   isClickable?: boolean;
+  isShieldSave?: boolean;
 }
 
 const Dice = styled.div<DiceProps>`
@@ -34,11 +35,12 @@ const Dice = styled.div<DiceProps>`
   background: ${props => {
     if (props.isRolling) return '#e6e6fa';
     if (props.isSelected) return '#666666';
+    if (props.isShieldSave) return '#E8E8E8';
     if (props.isCritical && props.isSave) return '#ffd700';
-    if (props.isCritical) return '#ff4500';
-    if (props.isHit) return '#90ee90';
-    if (props.isSave) return '#40e0d0';
-    return '#ff6b6b';
+    if (props.isCritical) return '#800080';
+    if (props.isHit) return '#0000ff';
+    if (props.isSave) return '#CD7F32';
+    return '#404040';
   }};
   border-radius: 8px;
   display: flex;
@@ -46,7 +48,11 @@ const Dice = styled.div<DiceProps>`
   justify-content: center;
   font-size: 1.5em;
   font-weight: bold;
-  color: ${props => props.isSelected ? '#cccccc' : '#1a1a2e'};
+  color: ${props => {
+    if (props.isShieldSave && props.isCritical) return '#ffd700';
+    if (!props.isSave && !props.isHit && !props.isCritical) return '#808080';
+    return props.isSelected ? '#cccccc' : '#1a1a2e';
+  }};
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   animation: ${props => props.isRolling ? rollAnimation : 'none'} 0.5s linear infinite;
   opacity: ${props => props.isSelected ? 0.7 : 1};
@@ -66,6 +72,7 @@ export interface DieResult {
   isCritical: boolean;
   isSave: boolean;
   isSelected: boolean;
+  isShieldSave?: boolean;
 }
 
 interface RangedDiceDisplayProps {
@@ -102,6 +109,7 @@ const RangedDiceDisplay: React.FC<RangedDiceDisplayProps> = ({
             isSave={result.isSave}
             isSelected={result.isSelected}
             isClickable={!!onDieClick}
+            isShieldSave={result.isShieldSave}
             onClick={() => !isRolling && onDieClick && onDieClick(index)}
           >
             {isRolling ? '?' : result.value}
