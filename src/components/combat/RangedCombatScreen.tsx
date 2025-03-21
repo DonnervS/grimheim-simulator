@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Model, WeaponStats } from '../../types/gameTypes';
 import { RangedModelCard } from './RangedModelCard';
-import RangedDiceDisplay from './RangedDiceDisplay';
+import RangedDiceDisplay, { DieResult } from './RangedDiceDisplay';
+import Tooltip from '../ui/Tooltip';
+import { weaponRuleDescriptions } from '../../data/ruleDescriptions';
 
 const CombatContainer = styled.div`
   display: flex;
@@ -26,7 +28,8 @@ const BattleArea = styled.div`
 
 const ModelArea = styled.div<{ $isRight?: boolean }>`
   display: flex;
-  justify-content: ${props => props.$isRight ? 'flex-start' : 'flex-end'};
+  flex-direction: column;
+  align-items: ${props => props.$isRight ? 'flex-start' : 'flex-end'};
   padding: ${props => props.$isRight ? '0 0 0 20px' : '0 20px 0 0'};
 `;
 
@@ -45,14 +48,15 @@ const DiceArea = styled.div`
   align-items: center;
   margin: 20px 0;
   width: 100%;
+  gap: 20px;
 `;
 
 const TurnIndicator = styled.div`
-  font-size: 1.2em;
   color: #8a8aff;
-  margin-bottom: 20px;
   font-family: 'Press Start 2P', cursive;
+  font-size: 1.2em;
   text-align: center;
+  margin-bottom: 20px;
 `;
 
 const DiceButton = styled.button`
@@ -68,7 +72,7 @@ const DiceButton = styled.button`
   width: 100%;
   max-width: 200px;
 
-  &:hover {
+  &:hover:not(:disabled) {
     transform: scale(1.05);
     background: #9a9aff;
   }
@@ -91,7 +95,7 @@ const ControlButton = styled(DiceButton)`
   margin: 0;
   background: ${props => props.color || '#4a4a8a'};
   
-  &:hover {
+  &:hover:not(:disabled) {
     background: ${props => props.color ? `${props.color}cc` : '#6a6aaa'};
   }
 `;
@@ -107,7 +111,6 @@ const CombatLog = styled.div`
   max-height: 200px;
   overflow-y: auto;
 
-  /* Customize scrollbar */
   &::-webkit-scrollbar {
     width: 8px;
   }
@@ -139,6 +142,115 @@ const LogEntry = styled.div`
   }
 `;
 
+const WeaponInfoContainer = styled.div`
+  background: rgba(26, 26, 46, 0.9);
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 10px;
+  border: 2px solid #4a4a8a;
+  width: 300px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+`;
+
+const WeaponTitle = styled.div`
+  color: #8a8aff;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.9em;
+  margin-bottom: 10px;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(138, 138, 255, 0.5);
+`;
+
+const WeaponStatsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+`;
+
+const StatRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #e6e6fa;
+  font-size: 0.9em;
+`;
+
+const StatLabel = styled.span`
+  color: #8a8aff;
+`;
+
+const WeaponRuleItem = styled.span`
+  cursor: help;
+  border-bottom: 1px dotted #8a8aff;
+  margin-right: 4px;
+  display: inline-block;
+  background-color: rgba(74, 74, 138, 0.3);
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: #e6e6fa;
+  font-size: 0.8em;
+  
+  &:hover {
+    background-color: rgba(74, 74, 138, 0.5);
+  }
+`;
+
+const WeaponRules = styled.div`
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+`;
+
+const WeaponInfo: React.FC<{ weapon: WeaponStats }> = ({ weapon }) => {
+  const renderWeaponRules = (rules: string | undefined) => {
+    if (!rules) return null;
+    
+    const rulesList = rules.split(',').map(rule => rule.trim());
+    
+    return (
+      <WeaponRules>
+        {rulesList.map((rule, index) => {
+          const description = weaponRuleDescriptions[rule] || 'No description available';
+          return (
+            <Tooltip 
+              key={index} 
+              text={description}
+              position="bottom"
+            >
+              <WeaponRuleItem>
+                {rule}
+              </WeaponRuleItem>
+            </Tooltip>
+          );
+        })}
+      </WeaponRules>
+    );
+  };
+
+  return (
+    <WeaponInfoContainer>
+      <WeaponTitle>{weapon.name}</WeaponTitle>
+      <WeaponStatsGrid>
+        <StatRow>
+          <StatLabel>RNG:</StatLabel> {weapon.RNG}"
+        </StatRow>
+        <StatRow>
+          <StatLabel>ATK:</StatLabel> {weapon.ATK}D6
+        </StatRow>
+        <StatRow>
+          <StatLabel>HTV:</StatLabel> {weapon.HTV}+
+        </StatRow>
+        <StatRow>
+          <StatLabel>DMG:</StatLabel> {weapon.DMG}/{weapon.CRT}
+        </StatRow>
+      </WeaponStatsGrid>
+      {renderWeaponRules(weapon.rules)}
+    </WeaponInfoContainer>
+  );
+};
+
 interface RangedCombatScreenProps {
   attacker: Model;
   defender: Model;
@@ -162,12 +274,12 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
 }) => {
   const [phase, setPhase] = useState<'attack' | 'save'>('attack');
   const [combatLog, setCombatLog] = useState<string[]>([]);
-  const [diceResults, setDiceResults] = useState<number[]>([]);
+  const [attackerDice, setAttackerDice] = useState<DieResult[]>([]);
+  const [defenderDice, setDefenderDice] = useState<DieResult[]>([]);
   const [isRolling, setIsRolling] = useState(false);
   const [round, setRound] = useState(1);
 
   useEffect(() => {
-    // Initialize wounds if not set
     if (attacker.currentWounds === undefined) {
       attacker.currentWounds = attacker.stats.WND;
     }
@@ -180,8 +292,14 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
     setCombatLog(prev => [...prev, message]);
   };
 
-  const rollDice = (amount: number): number[] => {
-    return Array.from({ length: amount }, () => Math.floor(Math.random() * 6) + 1);
+  const rollDice = (amount: number): DieResult[] => {
+    return Array.from({ length: amount }, () => ({
+      value: Math.floor(Math.random() * 6) + 1,
+      isHit: false,
+      isCritical: false,
+      isSave: false,
+      isSelected: false
+    }));
   };
 
   const handleAttackRoll = () => {
@@ -189,12 +307,18 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
     setIsRolling(true);
 
     const dice = rollDice(attackerWeapon.ATK);
-    setDiceResults(dice);
+    const processedDice = dice.map(die => ({
+      ...die,
+      isHit: die.value >= attackerWeapon.HTV,
+      isCritical: die.value === 6
+    }));
 
-    const hits = dice.filter(d => d >= attackerWeapon.HTV).length;
-    const criticals = dice.filter(d => d === 6).length;
+    setAttackerDice(processedDice);
 
-    addToCombatLog(`${attacker.name} rolls ${dice.join(', ')} for attack`);
+    const hits = processedDice.filter(d => d.isHit).length;
+    const criticals = processedDice.filter(d => d.isCritical).length;
+
+    addToCombatLog(`${attacker.name} rolls ${processedDice.map(d => d.value).join(', ')} for attack`);
     addToCombatLog(`Hits: ${hits}, Criticals: ${criticals}`);
 
     if (hits > 0 || criticals > 0) {
@@ -211,10 +335,15 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
     setIsRolling(true);
 
     const dice = rollDice(defender.stats.DEF);
-    setDiceResults(dice);
+    const processedDice = dice.map(die => ({
+      ...die,
+      isSave: die.value >= defender.stats.SAV
+    }));
 
-    const saves = dice.filter(d => d >= defender.stats.SAV).length;
-    addToCombatLog(`${defender.name} rolls ${dice.join(', ')} for save`);
+    setDefenderDice(processedDice);
+
+    const saves = processedDice.filter(d => d.isSave).length;
+    addToCombatLog(`${defender.name} rolls ${processedDice.map(d => d.value).join(', ')} for save`);
     addToCombatLog(`Saves: ${saves}`);
 
     // Calculate damage
@@ -228,6 +357,8 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
       handleCombatEnd(attacker);
     } else {
       setPhase('attack');
+      setAttackerDice([]);
+      setDefenderDice([]);
     }
 
     setTimeout(() => setIsRolling(false), 1000);
@@ -241,6 +372,8 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
   const handleNewRound = () => {
     setRound(prev => prev + 1);
     setPhase('attack');
+    setAttackerDice([]);
+    setDefenderDice([]);
     addToCombatLog(`\n--- Round ${round + 1} ---\n`);
   };
 
@@ -254,14 +387,21 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
             onWeaponSelect={onAttackerWeaponSelect}
             isSelectable={true}
           />
+          {attackerWeapon && <WeaponInfo weapon={attackerWeapon} />}
         </ModelArea>
         
         <CenterArea>
           <TurnIndicator>Round {round}</TurnIndicator>
           <DiceArea>
             <RangedDiceDisplay
-              diceResults={diceResults}
-              isRolling={isRolling}
+              diceResults={attackerDice}
+              isRolling={isRolling && phase === 'attack'}
+              label="Attacker Dice"
+            />
+            <RangedDiceDisplay
+              diceResults={defenderDice}
+              isRolling={isRolling && phase === 'save'}
+              label="Defender Dice"
             />
             {phase === 'attack' ? (
               <DiceButton

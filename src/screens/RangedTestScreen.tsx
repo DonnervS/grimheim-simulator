@@ -203,7 +203,7 @@ export const RangedTestScreen: React.FC = () => {
   const [attackerFaction, setAttackerFaction] = useState<string>('');
   const [defenderFaction, setDefenderFaction] = useState<string>('');
 
-  const availableModels = [
+  const allModels = [
     savageBrute,
     bruteWithGreataxe,
     fighter,
@@ -222,9 +222,26 @@ export const RangedTestScreen: React.FC = () => {
     necromancerWithStaff
   ];
 
-  const factions = Array.from(new Set(availableModels.map(model => model.faction)));
+  // Filter models that have ranged weapons for attackers
+  const availableAttackers = allModels.filter(model => 
+    model.weapons.some(weapon => weapon.weaponType === 'range')
+  );
 
-  const modelsByFaction = availableModels.reduce((acc, model) => {
+  // All models can be defenders
+  const availableDefenders = allModels;
+
+  const attackerFactions = Array.from(new Set(availableAttackers.map(model => model.faction)));
+  const defenderFactions = Array.from(new Set(availableDefenders.map(model => model.faction)));
+
+  const attackersByFaction = availableAttackers.reduce((acc, model) => {
+    if (!acc[model.faction]) {
+      acc[model.faction] = [];
+    }
+    acc[model.faction].push(model);
+    return acc;
+  }, {} as Record<string, Model[]>);
+
+  const defendersByFaction = availableDefenders.reduce((acc, model) => {
     if (!acc[model.faction]) {
       acc[model.faction] = [];
     }
@@ -257,7 +274,8 @@ export const RangedTestScreen: React.FC = () => {
   };
 
   const handleModelSelect = (modelName: string, isAttacker: boolean) => {
-    const model = availableModels.find(m => m.name === modelName);
+    const model = (isAttacker ? availableAttackers : availableDefenders)
+      .find(m => m.name === modelName);
     if (model) {
       if (isAttacker) {
         setSelectedAttacker({ ...model });
@@ -276,9 +294,9 @@ export const RangedTestScreen: React.FC = () => {
             <SubTitle>Select two fighters to test ranged combat mechanics</SubTitle>
 
             <SelectionStep>
-              <Title>Select Attacker</Title>
+              <Title>Select Attacker (with Ranged Weapons)</Title>
               <FactionGrid>
-                {factions.map(faction => (
+                {attackerFactions.map(faction => (
                   <FactionButton
                     key={faction}
                     $isSelected={attackerFaction === faction}
@@ -295,7 +313,7 @@ export const RangedTestScreen: React.FC = () => {
                     onChange={(e) => handleModelSelect(e.target.value, true)}
                   >
                     <option value="">Select a fighter...</option>
-                    {modelsByFaction[attackerFaction].map(model => (
+                    {attackersByFaction[attackerFaction].map(model => (
                       <option key={model.name} value={model.name}>
                         {model.name}
                       </option>
@@ -308,7 +326,7 @@ export const RangedTestScreen: React.FC = () => {
             <SelectionStep>
               <Title>Select Defender</Title>
               <FactionGrid>
-                {factions.map(faction => (
+                {defenderFactions.map(faction => (
                   <FactionButton
                     key={faction}
                     $isSelected={defenderFaction === faction}
@@ -325,7 +343,7 @@ export const RangedTestScreen: React.FC = () => {
                     onChange={(e) => handleModelSelect(e.target.value, false)}
                   >
                     <option value="">Select a fighter...</option>
-                    {modelsByFaction[defenderFaction].map(model => (
+                    {defendersByFaction[defenderFaction].map(model => (
                       <option key={model.name} value={model.name}>
                         {model.name}
                       </option>
