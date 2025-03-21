@@ -1,27 +1,23 @@
 import React from 'react';
+import styled from 'styled-components';
 import { Model, WeaponStats } from '../../types/gameTypes';
+import Tooltip from '../ui/Tooltip';
+import { modelRuleDescriptions, weaponRuleDescriptions } from '../../data/ruleDescriptions';
 import {
-  ModelCardContainer,
-  ModelImage,
-  ModelInfo,
+  Card,
   ModelName,
-  StatsContainer,
-  StatBlock,
+  StatsGrid,
+  StatBox,
   StatLabel,
   StatValue,
-  WeaponStatsDisplay,
-  WeaponName,
-  WeaponStatBlock,
-  WeaponStatLabel,
-  WeaponStatValue,
-  RuleItem,
-  RuleTooltip,
-  WeaponContainer,
   WeaponList,
-  WeaponListItem,
-  HealthBar,
-  HealthBarFill,
-  HealthText
+  WeaponButton,
+  WeaponStatsDisplay,
+  WeaponRuleItem,
+  RulesContainer,
+  RulesTitle,
+  RulesList,
+  RuleItem
 } from './ModelCardStyles';
 
 interface RangedModelCardProps {
@@ -37,99 +33,109 @@ export const RangedModelCard: React.FC<RangedModelCardProps> = ({
   onWeaponSelect,
   isSelectable
 }) => {
-  const renderWeaponRules = (rules: string[]) => {
-    return rules.map((rule, index) => (
-      <RuleItem key={index}>
-        {rule}
-        <RuleTooltip>{rule}</RuleTooltip>
-      </RuleItem>
-    ));
+  // Ensure both values are defined and not zero before calculating percentage
+  const woundPercentage = model.currentWounds !== undefined && model.stats.WND > 0
+    ? (model.currentWounds / model.stats.WND) * 100
+    : 0;
+
+  // Get ranged weapons
+  const rangedWeapons = model.weapons.filter(weapon => weapon.weaponType === 'range');
+
+  // Function to render weapon rules with tooltips
+  const renderWeaponRules = (rules: string[] | string) => {
+    if (!rules || (Array.isArray(rules) && rules.length === 0)) return null;
+    
+    // Convert string to array if necessary
+    const rulesArray = Array.isArray(rules) ? rules : rules.split(',').map(r => r.trim());
+    
+    return (
+      <div style={{ 
+        marginTop: '4px',
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '4px' 
+      }}>
+        {rulesArray.map((rule, index) => {
+          const description = weaponRuleDescriptions[rule] || 'No description available';
+          return (
+            <Tooltip 
+              key={index} 
+              text={description}
+              position="bottom"
+            >
+              <WeaponRuleItem>
+                {rule}
+              </WeaponRuleItem>
+            </Tooltip>
+          );
+        })}
+      </div>
+    );
   };
 
-  const renderWeaponStats = (weapon: WeaponStats) => (
-    <WeaponStatsDisplay>
-      <WeaponName>{weapon.name}</WeaponName>
-      <WeaponStatBlock>
-        <WeaponStatLabel>RNG</WeaponStatLabel>
-        <WeaponStatValue>{weapon.RNG}</WeaponStatValue>
-      </WeaponStatBlock>
-      <WeaponStatBlock>
-        <WeaponStatLabel>ATK</WeaponStatLabel>
-        <WeaponStatValue>{weapon.ATK}</WeaponStatValue>
-      </WeaponStatBlock>
-      <WeaponStatBlock>
-        <WeaponStatLabel>HTV</WeaponStatLabel>
-        <WeaponStatValue>{weapon.HTV}+</WeaponStatValue>
-      </WeaponStatBlock>
-      <WeaponStatBlock>
-        <WeaponStatLabel>DMG</WeaponStatLabel>
-        <WeaponStatValue>{weapon.DMG}</WeaponStatValue>
-      </WeaponStatBlock>
-      <WeaponStatBlock>
-        <WeaponStatLabel>CRT</WeaponStatLabel>
-        <WeaponStatValue>{weapon.CRT}</WeaponStatValue>
-      </WeaponStatBlock>
-      {weapon.rules && weapon.rules.length > 0 && renderWeaponRules(weapon.rules)}
-    </WeaponStatsDisplay>
-  );
-
-  const rangedWeapons = model.weapons.filter(w => w.weaponType === 'range');
-
   return (
-    <ModelCardContainer>
-      <ModelImage src={model.imageUrl || '/placeholder.png'} alt={model.name} />
-      <ModelInfo>
-        <ModelName>{model.name}</ModelName>
-        <StatsContainer>
-          <StatBlock>
-            <StatLabel>MOV</StatLabel>
-            <StatValue>{model.stats.MOV}</StatValue>
-          </StatBlock>
-          <StatBlock>
-            <StatLabel>DEF</StatLabel>
-            <StatValue>{model.stats.DEF}</StatValue>
-          </StatBlock>
-          <StatBlock>
-            <StatLabel>SAV</StatLabel>
-            <StatValue>{model.stats.SAV}+</StatValue>
-          </StatBlock>
-          <StatBlock>
-            <StatLabel>BRV</StatLabel>
-            <StatValue>{model.stats.BRV}</StatValue>
-          </StatBlock>
-          <StatBlock>
-            <StatLabel>WND</StatLabel>
-            <StatValue>{model.stats.WND}</StatValue>
-          </StatBlock>
-        </StatsContainer>
+    <Card $isActive={isSelectable}>
+      <ModelName>{model.name}</ModelName>
+      
+      <StatsGrid>
+        <StatBox>
+          <StatLabel>MOV</StatLabel>
+          <StatValue>{model.stats.MOV}</StatValue>
+        </StatBox>
+        <StatBox>
+          <StatLabel>DEF</StatLabel>
+          <StatValue>{model.stats.DEF}</StatValue>
+        </StatBox>
+        <StatBox>
+          <StatLabel>SAV</StatLabel>
+          <StatValue>{model.stats.SAV}+</StatValue>
+        </StatBox>
+        <StatBox>
+          <StatLabel>WND</StatLabel>
+          <StatValue $isWounds $woundPercentage={woundPercentage}>
+            {model.currentWounds ?? model.stats.WND}/{model.stats.WND}
+          </StatValue>
+        </StatBox>
+      </StatsGrid>
 
-        <HealthBar>
-          <HealthBarFill
-            width={((model.currentWounds || 0) / model.stats.WND) * 100}
-          />
-          <HealthText>
-            {model.currentWounds || 0}/{model.stats.WND}
-          </HealthText>
-        </HealthBar>
-
-        <WeaponContainer>
-          {selectedWeapon ? (
-            renderWeaponStats(selectedWeapon)
-          ) : (
-            <WeaponList>
-              {rangedWeapons.map((weapon, index) => (
-                <WeaponListItem
-                  key={index}
-                  onClick={() => isSelectable && onWeaponSelect(weapon)}
-                  isSelectable={isSelectable}
+      {model.stats.SR && model.stats.SR.length > 0 && (
+        <RulesContainer>
+          <RulesTitle>Special Rules</RulesTitle>
+          <RulesList>
+            {model.stats.SR.map((rule, index) => {
+              const description = modelRuleDescriptions[rule] || 'No description available';
+              return (
+                <Tooltip 
+                  key={index} 
+                  text={description}
+                  position="bottom"
                 >
-                  {weapon.name}
-                </WeaponListItem>
-              ))}
-            </WeaponList>
-          )}
-        </WeaponContainer>
-      </ModelInfo>
-    </ModelCardContainer>
+                  <RuleItem>
+                    {rule}
+                  </RuleItem>
+                </Tooltip>
+              );
+            })}
+          </RulesList>
+        </RulesContainer>
+      )}
+
+      {isSelectable && (
+        <WeaponList>
+          {rangedWeapons.map((weapon, index) => (
+            <div key={`${weapon.name}-${index}`}>
+              <WeaponButton
+                onClick={() => onWeaponSelect(weapon)}
+                $isSelected={selectedWeapon?.name === weapon.name}
+                type="button"
+              >
+                {weapon.name}
+              </WeaponButton>
+              {weapon.rules && renderWeaponRules(weapon.rules)}
+            </div>
+          ))}
+        </WeaponList>
+      )}
+    </Card>
   );
 };
