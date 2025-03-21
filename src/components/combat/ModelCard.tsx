@@ -57,8 +57,11 @@ const ModelCard: React.FC<ModelCardProps> = ({
   const availableWeapons = closeWeapons.length > 0 ? closeWeapons : [fallbackFists];
 
   // Function to render weapon rules with tooltips
-  const renderWeaponRules = (rules: string[]) => {
-    if (!rules || rules.length === 0) return null;
+  const renderWeaponRules = (rules: string[] | string) => {
+    if (!rules || (Array.isArray(rules) && rules.length === 0)) return null;
+    
+    // Convert string to array if necessary
+    const rulesArray = Array.isArray(rules) ? rules : rules.split(',').map(r => r.trim());
     
     return (
       <div style={{ 
@@ -67,7 +70,7 @@ const ModelCard: React.FC<ModelCardProps> = ({
         flexWrap: 'wrap',
         gap: '4px' 
       }}>
-        {rules.map((rule, index) => {
+        {rulesArray.map((rule, index) => {
           const description = weaponRuleDescriptions[rule] || 'No description available';
           return (
             <Tooltip 

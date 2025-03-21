@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import BattleScreen from './screens/BattleScreen'
 import MapScreen from './screens/MapScreen'
 import CombatTestScreen from './screens/CombatTestScreen'
+import { RangedTestScreen } from './screens/RangedTestScreen'
 
 const AppContainer = styled.div`
   width: 100vw;
@@ -51,6 +52,7 @@ const MainScreen = () => (
   <MainMenu>
     <MenuButton to="/map">Start Game</MenuButton>
     <MenuButton to="/combat-test">Combat Test</MenuButton>
+    <MenuButton to="/ranged-test">Ranged Combat Test</MenuButton>
   </MainMenu>
 );
 
@@ -65,6 +67,7 @@ function App() {
         <Route path="/map" element={<MapScreen />} />
         <Route path="/battle" element={<BattleScreen />} />
         <Route path="/combat-test" element={<CombatTestScreen />} />
+        <Route path="/ranged-test" element={<RangedTestScreen />} />
       </Routes>
     </AppContainer>
   )
