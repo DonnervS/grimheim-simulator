@@ -14,8 +14,8 @@ const CombatContainer = styled.div`
 `;
 
 const BattleArea = styled.div`
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: flex-start;
   width: 100%;
   max-width: 1200px;
@@ -24,20 +24,19 @@ const BattleArea = styled.div`
   position: relative;
 `;
 
-const ModelArea = styled.div`
-  flex: 1;
+const ModelArea = styled.div<{ $isRight?: boolean }>`
   display: flex;
-  justify-content: center;
+  justify-content: ${props => props.$isRight ? 'flex-start' : 'flex-end'};
+  padding: ${props => props.$isRight ? '0 0 0 20px' : '0 20px 0 0'};
 `;
 
 const CenterArea = styled.div`
-  flex: 1;
-  max-width: 400px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   padding-top: 20px;
+  min-width: 400px;
 `;
 
 const DiceArea = styled.div`
@@ -251,59 +250,66 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
         <ModelArea>
           <RangedModelCard
             model={attacker}
-            onWeaponSelect={onAttackerWeaponSelect}
             selectedWeapon={attackerWeapon}
+            onWeaponSelect={onAttackerWeaponSelect}
             isSelectable={true}
           />
         </ModelArea>
         
         <CenterArea>
+          <TurnIndicator>Round {round}</TurnIndicator>
           <DiceArea>
-            <TurnIndicator>
-              {phase === 'attack' ? "Attacker's Turn" : "Defender's Turn"}
-            </TurnIndicator>
+            <RangedDiceDisplay
+              diceResults={diceResults}
+              isRolling={isRolling}
+            />
             {phase === 'attack' ? (
-              <DiceButton onClick={handleAttackRoll} disabled={!attackerWeapon || isRolling}>
+              <DiceButton
+                onClick={handleAttackRoll}
+                disabled={!attackerWeapon || isRolling}
+              >
                 Roll Attack
               </DiceButton>
             ) : (
-              <DiceButton onClick={handleSaveRoll} disabled={isRolling}>
+              <DiceButton
+                onClick={handleSaveRoll}
+                disabled={isRolling}
+              >
                 Roll Save
               </DiceButton>
             )}
-            {diceResults.length > 0 && (
-              <RangedDiceDisplay
-                diceResults={diceResults}
-                isRolling={isRolling}
-              />
-            )}
           </DiceArea>
+          <ButtonContainer>
+            <ControlButton
+              onClick={handleNewRound}
+              color="#4CAF50"
+            >
+              New Round
+            </ControlButton>
+            <ControlButton
+              onClick={onEndCombat}
+              color="#f44336"
+            >
+              End Combat
+            </ControlButton>
+          </ButtonContainer>
         </CenterArea>
 
-        <ModelArea>
+        <ModelArea $isRight>
           <RangedModelCard
             model={defender}
-            onWeaponSelect={onDefenderWeaponSelect}
             selectedWeapon={defenderWeapon}
-            isSelectable={true}
+            onWeaponSelect={onDefenderWeaponSelect}
+            isSelectable={false}
           />
         </ModelArea>
       </BattleArea>
 
       <CombatLog>
-        {combatLog.map((entry, index) => (
-          <LogEntry key={index}>{entry}</LogEntry>
+        {combatLog.map((log, index) => (
+          <LogEntry key={index}>{log}</LogEntry>
         ))}
       </CombatLog>
-
-      <ButtonContainer>
-        <ControlButton onClick={handleNewRound} color="#4a4a8a">
-          New Round
-        </ControlButton>
-        <ControlButton onClick={onEndCombat} color="#4a4a8a">
-          End Combat
-        </ControlButton>
-      </ButtonContainer>
     </CombatContainer>
   );
 };
