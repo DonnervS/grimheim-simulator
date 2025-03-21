@@ -348,31 +348,60 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
   };
 
   const handleSaveRoll = () => {
-    if (!attackerWeapon) return;
+    if (!attackerWeapon || !defender) return;
+    
     setIsRolling(true);
+    setTimeout(() => {
+      // Prüfe, ob der Verteidiger die Special Rule "Shield" hat
+      const hasShield = defender.stats.SR.some(rule => rule.toLowerCase() === 'shield');
 
-    const dice = rollDice(defender.stats.DEF);
-    const processedDice = dice.map(die => ({
-      ...die,
-      isSave: die.value >= defender.stats.SAV,
-      isCritical: die.value === 6,
-      isSelected: false
-    }));
+      // Würfle normale Rettungswürfe basierend auf DEF
+      const normalSaves = rollDice(defender.stats.DEF).map(die => ({
+        ...die,
+        isSave: die.value >= defender.stats.SAV,
+        isHit: false,
+        isCritical: die.value === 6,
+        isSelected: false,
+        isShieldSave: false
+      }));
 
-    setDefenderDice(processedDice);
-    setDiceSelection(prev => ({
-      ...prev,
-      defenderSaves: processedDice.filter(d => d.isSave || d.isCritical)
-    }));
+      // Würfle Schildwurf wenn vorhanden
+      const shieldRoll = hasShield ? Math.floor(Math.random() * 6) + 1 : 0;
+      const shieldSave = hasShield ? [{
+        value: shieldRoll,
+        isHit: false,
+        isCritical: shieldRoll === 6,
+        isSave: true,
+        isSelected: false,
+        isShieldSave: true
+      }] : [];
 
-    const saves = processedDice.filter(d => d.isSave).length;
-    const criticalSaves = processedDice.filter(d => d.isCritical).length;
+      const allSaves = [...normalSaves, ...shieldSave];
+      
+      // Setze beide States
+      setDefenderDice(allSaves);
+      setDiceSelection(prev => ({
+        ...prev,
+        defenderSaves: allSaves
+      }));
 
-    addToCombatLog(`${defender.name} rolls ${processedDice.map(d => d.value).join(', ')} for save`);
-    addToCombatLog(`Saves: ${saves}, Critical Saves: ${criticalSaves}`);
+      // Zähle erfolgreiche Würfe für das Log
+      const successfulNormalSaves = normalSaves.filter(die => die.isSave || die.isCritical).length;
+      const shieldSuccess = hasShield && shieldRoll <= 5;
+      const shieldCritical = hasShield && shieldRoll === 6;
 
-    setPhase('resolve');
-    setTimeout(() => setIsRolling(false), 1000);
+      setIsRolling(false);
+      addToCombatLog(`${defender.name} würfelt ${defender.stats.DEF} Rettungswürfe${hasShield ? ' und 1 Schildwurf' : ''}`);
+      
+      if (hasShield) {
+        const shieldResult = shieldSuccess ? "erfolgreich" : shieldCritical ? "kritisch" : "verfehlt";
+        addToCombatLog(`Erfolgreiche Rettungen: ${successfulNormalSaves}, Schildrettung: ${shieldResult} (${shieldRoll})`);
+      } else {
+        addToCombatLog(`Erfolgreiche Rettungen: ${successfulNormalSaves}`);
+      }
+
+      setPhase('resolve');
+    }, 1000);
   };
 
   const handleDieClick = (index: number, type: 'hit' | 'save') => {
@@ -400,37 +429,65 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
   };
 
   const handleResolveSaves = () => {
-    const { attackerHits, defenderSaves, selectedHits, selectedSaves } = diceSelection;
+    if (!attackerWeapon || !defender) return;
+
+    // Zähle erfolgreiche normale Rettungswürfe und kritische Rettungswürfe
+    const successfulSaves = diceSelection.defenderSaves.filter(
+      die => !die.isShieldSave && !die.isSelected && (die.value >= defender.stats.SAV || die.isCritical)
+    ).length;
+
+    // Zähle erfolgreiche Schildrettungswürfe
+    const successfulShieldSaves = diceSelection.defenderSaves.filter(
+      die => die.isShieldSave && !die.isSelected && (die.value <= 5 || die.isCritical)
+    ).length;
+
+    // Gesamtzahl der erfolgreichen Rettungswürfe
+    const totalSaves = successfulSaves + successfulShieldSaves;
+
+    // Zähle kritische Treffer und normale Treffer
+    const criticalHits = diceSelection.attackerHits.filter(
+      die => !die.isSelected && die.isCritical
+    ).length;
+    const normalHits = diceSelection.attackerHits.filter(
+      die => !die.isSelected && die.isHit && !die.isCritical
+    ).length;
+
+    // Berechne den Schaden
+    let damage = 0;
+    let remainingSaves = totalSaves;
+
+    // Verarbeite zuerst kritische Treffer
+    const unblockableCrits = Math.max(0, criticalHits - successfulShieldSaves);
+    damage += unblockableCrits * attackerWeapon.CRT;
+    remainingSaves = Math.max(0, remainingSaves - criticalHits);
+
+    // Verarbeite dann normale Treffer
+    const unblockedHits = Math.max(0, normalHits - remainingSaves);
+    damage += unblockedHits * attackerWeapon.DMG;
+
+    // Aktualisiere die Wunden des Verteidigers
+    const newWounds = Math.max(0, defender.currentWounds - damage);
     
-    // Remove selected hits
-    const remainingHits = attackerHits.filter((_, index) => !selectedHits.includes(index));
+    // Füge Kampflog-Einträge hinzu
+    addToCombatLog(`${defender.name} blockt ${totalSaves} Treffer (${successfulSaves} normale, ${successfulShieldSaves} Schild)`);
+    addToCombatLog(`${defender.name} erleidet ${damage} Schaden`);
     
-    // Calculate final damage
-    const normalHits = remainingHits.filter(hit => !hit.isCritical).length;
-    const criticalHits = remainingHits.filter(hit => hit.isCritical).length;
-    
-    const damage = (normalHits * attackerWeapon!.DMG) + (criticalHits * attackerWeapon!.CRT);
-    
-    if (damage > 0) {
-      defender.currentWounds = Math.max(0, (defender.currentWounds ?? 0) - damage);
-      addToCombatLog(`${defender.name} takes ${damage} damage from ${normalHits} normal hits and ${criticalHits} critical hits`);
+    if (newWounds <= 0) {
+      handleCombatEnd(attacker);
+      addToCombatLog(`${attacker.name} gewinnt den Kampf!`);
     } else {
-      addToCombatLog('All hits were saved!');
+      addToCombatLog(`${defender.name} hat noch ${newWounds} Wunden übrig`);
     }
 
-    if (defender.currentWounds <= 0) {
-      handleCombatEnd(attacker);
-    } else {
-      setPhase('attack');
-      setAttackerDice([]);
-      setDefenderDice([]);
-      setDiceSelection({
-        attackerHits: [],
-        defenderSaves: [],
-        selectedHits: [],
-        selectedSaves: []
-      });
-    }
+    // Setze die Würfel zurück
+    setDiceSelection({
+      attackerHits: [],
+      defenderSaves: [],
+      selectedHits: [],
+      selectedSaves: []
+    });
+    
+    setPhase('attack');
   };
 
   const handleCombatEnd = (winner: Model) => {
