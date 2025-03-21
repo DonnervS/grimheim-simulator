@@ -251,6 +251,27 @@ const WeaponInfo: React.FC<{ weapon: WeaponStats }> = ({ weapon }) => {
   );
 };
 
+const SaveButton = styled(DiceButton)`
+  background: ${props => props.disabled ? '#4a4a8a' : '#8a8aff'};
+  margin: 5px 0;
+  
+  &:hover:not(:disabled) {
+    background: ${props => props.disabled ? '#4a4a8a' : '#9a9aff'};
+  }
+`;
+
+const SaveButtonContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 10px 0;
+`;
+
+interface SaveState extends DiceSelectionState {
+  coverSaveUsed: boolean;
+  selectedSaveIndices: number[];
+}
+
 interface RangedCombatScreenProps {
   attacker: Model;
   defender: Model;
@@ -290,6 +311,14 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
     defenderSaves: [],
     selectedHits: [],
     selectedSaves: []
+  });
+  const [saveState, setSaveState] = useState<SaveState>({
+    attackerHits: [],
+    defenderSaves: [],
+    selectedHits: [],
+    selectedSaves: [],
+    coverSaveUsed: false,
+    selectedSaveIndices: []
   });
 
   useEffect(() => {
@@ -347,7 +376,7 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
     setTimeout(() => setIsRolling(false), 1000);
   };
 
-  const handleSaveRoll = () => {
+  const handleSaveRoll = (inCover: boolean = false) => {
     if (!attackerWeapon || !defender) return;
     
     setIsRolling(true);
@@ -355,15 +384,29 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
       // Prüfe, ob der Verteidiger die Special Rule "Shield" hat
       const hasShield = defender.stats.SR.some(rule => rule.toLowerCase() === 'shield');
 
-      // Würfle normale Rettungswürfe basierend auf DEF
-      const normalSaves = rollDice(defender.stats.DEF).map(die => ({
+      // Bestimme die Anzahl der zu würfelnden Würfel (einer weniger wenn in Cover)
+      const diceToRoll = inCover ? defender.stats.DEF - 1 : defender.stats.DEF;
+
+      // Würfle normale Rettungswürfe
+      const normalSaves = rollDice(diceToRoll).map(die => ({
         ...die,
-        isSave: die.value >= defender.stats.SAV,
+        isSave: false, // Wird durch Spieler-Auswahl bestimmt
         isHit: false,
         isCritical: die.value === 6,
         isSelected: false,
         isShieldSave: false
       }));
+
+      // Füge automatischen Erfolg für Cover hinzu
+      const coverSave = inCover ? [{
+        value: 0, // Kein Würfelwurf
+        isHit: false,
+        isCritical: false,
+        isSave: true,
+        isSelected: false,
+        isShieldSave: false,
+        isCoverSave: true
+      }] : [];
 
       // Würfle Schildwurf wenn vorhanden
       const shieldRoll = hasShield ? Math.floor(Math.random() * 6) + 1 : 0;
@@ -376,32 +419,45 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
         isShieldSave: true
       }] : [];
 
-      const allSaves = [...normalSaves, ...shieldSave];
+      const allSaves = [...normalSaves, ...coverSave, ...shieldSave];
       
-      // Setze beide States
       setDefenderDice(allSaves);
-      setDiceSelection(prev => ({
+      setSaveState(prev => ({
         ...prev,
-        defenderSaves: allSaves
+        defenderSaves: allSaves,
+        coverSaveUsed: inCover
       }));
 
-      // Zähle erfolgreiche Würfe für das Log
-      const successfulNormalSaves = normalSaves.filter(die => die.isSave || die.isCritical).length;
-      const shieldSuccess = hasShield && shieldRoll <= 5;
-      const shieldCritical = hasShield && shieldRoll === 6;
-
       setIsRolling(false);
-      addToCombatLog(`${defender.name} würfelt ${defender.stats.DEF} Rettungswürfe${hasShield ? ' und 1 Schildwurf' : ''}`);
-      
-      if (hasShield) {
-        const shieldResult = shieldSuccess ? "erfolgreich" : shieldCritical ? "kritisch" : "verfehlt";
-        addToCombatLog(`Erfolgreiche Rettungen: ${successfulNormalSaves}, Schildrettung: ${shieldResult} (${shieldRoll})`);
-      } else {
-        addToCombatLog(`Erfolgreiche Rettungen: ${successfulNormalSaves}`);
-      }
-
-      setPhase('resolve');
+      addToCombatLog(`${defender.name} rolls ${diceToRoll} save dice${inCover ? ' (in cover)' : ''}${hasShield ? ' and 1 shield save' : ''}`);
     }, 1000);
+  };
+
+  const handleSaveClick = (index: number) => {
+    const save = defenderDice[index];
+    if (!save || isRolling) return;
+
+    // Prüfe ob der Würfel ein gültiger Save ist (>= SAV oder kritisch)
+    const isValidSave = save.value >= defender!.stats.SAV || save.isCritical || save.isCoverSave;
+    if (!isValidSave) return;
+
+    setSaveState(prev => {
+      const isAlreadySelected = prev.selectedSaveIndices.includes(index);
+      
+      if (isAlreadySelected) {
+        // Entferne den Save aus der Auswahl
+        return {
+          ...prev,
+          selectedSaveIndices: prev.selectedSaveIndices.filter(i => i !== index)
+        };
+      } else {
+        // Füge den Save zur Auswahl hinzu
+        return {
+          ...prev,
+          selectedSaveIndices: [...prev.selectedSaveIndices, index]
+        };
+      }
+    });
   };
 
   const handleDieClick = (index: number, type: 'hit' | 'save') => {
@@ -431,60 +487,61 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
   const handleResolveSaves = () => {
     if (!attackerWeapon || !defender) return;
 
-    // Zähle erfolgreiche normale Rettungswürfe und kritische Rettungswürfe
-    const successfulSaves = diceSelection.defenderSaves.filter(
-      die => !die.isShieldSave && !die.isSelected && (die.value >= defender.stats.SAV || die.isCritical)
-    ).length;
+    // Hole die ausgewählten Saves
+    const selectedSaves = saveState.selectedSaveIndices.map(index => defenderDice[index]);
+    
+    // Zähle normale und kritische Saves
+    const normalSaves = selectedSaves.filter(save => !save.isCritical && !save.isShieldSave).length;
+    const criticalSaves = selectedSaves.filter(save => save.isCritical || save.isShieldSave).length;
 
-    // Zähle erfolgreiche Schildrettungswürfe
-    const successfulShieldSaves = diceSelection.defenderSaves.filter(
-      die => die.isShieldSave && !die.isSelected && (die.value <= 5 || die.isCritical)
-    ).length;
-
-    // Gesamtzahl der erfolgreichen Rettungswürfe
-    const totalSaves = successfulSaves + successfulShieldSaves;
-
-    // Zähle kritische Treffer und normale Treffer
-    const criticalHits = diceSelection.attackerHits.filter(
-      die => !die.isSelected && die.isCritical
-    ).length;
-    const normalHits = diceSelection.attackerHits.filter(
-      die => !die.isSelected && die.isHit && !die.isCritical
-    ).length;
-
-    // Berechne den Schaden
+    // Verarbeite die Treffer
+    let remainingHits = [...saveState.attackerHits];
     let damage = 0;
-    let remainingSaves = totalSaves;
 
-    // Verarbeite zuerst kritische Treffer
-    const unblockableCrits = Math.max(0, criticalHits - successfulShieldSaves);
-    damage += unblockableCrits * attackerWeapon.CRT;
-    remainingSaves = Math.max(0, remainingSaves - criticalHits);
+    // Verarbeite kritische Saves zuerst
+    for (let i = 0; i < criticalSaves; i++) {
+      const criticalHitIndex = remainingHits.findIndex(hit => hit.isCritical && !hit.isSelected);
+      if (criticalHitIndex >= 0) {
+        remainingHits[criticalHitIndex].isSelected = true;
+      }
+    }
 
-    // Verarbeite dann normale Treffer
-    const unblockedHits = Math.max(0, normalHits - remainingSaves);
-    damage += unblockedHits * attackerWeapon.DMG;
+    // Verarbeite normale Saves
+    for (let i = 0; i < normalSaves; i++) {
+      const normalHitIndex = remainingHits.findIndex(hit => !hit.isSelected);
+      if (normalHitIndex >= 0) {
+        remainingHits[normalHitIndex].isSelected = true;
+      }
+    }
+
+    // Berechne den Schaden für nicht geblockte Treffer
+    remainingHits.forEach(hit => {
+      if (!hit.isSelected) {
+        damage += hit.isCritical ? attackerWeapon.CRT : attackerWeapon.DMG;
+      }
+    });
 
     // Aktualisiere die Wunden des Verteidigers
     const newWounds = Math.max(0, defender.currentWounds - damage);
     
-    // Füge Kampflog-Einträge hinzu
-    addToCombatLog(`${defender.name} blockt ${totalSaves} Treffer (${successfulSaves} normale, ${successfulShieldSaves} Schild)`);
-    addToCombatLog(`${defender.name} erleidet ${damage} Schaden`);
+    addToCombatLog(`${defender.name} blocks ${selectedSaves.length} hits`);
+    addToCombatLog(`${defender.name} takes ${damage} damage`);
     
     if (newWounds <= 0) {
       handleCombatEnd(attacker);
-      addToCombatLog(`${attacker.name} gewinnt den Kampf!`);
+      addToCombatLog(`${attacker.name} wins the combat!`);
     } else {
-      addToCombatLog(`${defender.name} hat noch ${newWounds} Wunden übrig`);
+      addToCombatLog(`${defender.name} has ${newWounds} wounds remaining`);
     }
 
     // Setze die Würfel zurück
-    setDiceSelection({
+    setSaveState({
       attackerHits: [],
       defenderSaves: [],
       selectedHits: [],
-      selectedSaves: []
+      selectedSaves: [],
+      coverSaveUsed: false,
+      selectedSaveIndices: []
     });
     
     setPhase('attack');
@@ -505,6 +562,14 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
       defenderSaves: [],
       selectedHits: [],
       selectedSaves: []
+    });
+    setSaveState({
+      attackerHits: [],
+      defenderSaves: [],
+      selectedHits: [],
+      selectedSaves: [],
+      coverSaveUsed: false,
+      selectedSaveIndices: []
     });
     addToCombatLog(`\n--- Round ${round + 1} ---\n`);
   };
@@ -531,34 +596,32 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
               label="Attacker Dice"
               onDieClick={phase === 'resolve' ? (index) => handleDieClick(index, 'hit') : undefined}
             />
+            <SaveButtonContainer>
+              <SaveButton
+                onClick={handleAttackRoll}
+                disabled={isRolling || phase !== 'attack' || !attackerWeapon}
+              >
+                Roll Attack
+              </SaveButton>
+              <SaveButton
+                onClick={() => handleSaveRoll(false)}
+                disabled={isRolling || phase !== 'save'}
+              >
+                Roll Save
+              </SaveButton>
+              <SaveButton
+                onClick={() => handleSaveRoll(true)}
+                disabled={isRolling || phase !== 'save'}
+              >
+                Roll Save in Cover
+              </SaveButton>
+            </SaveButtonContainer>
             <RangedDiceDisplay
               diceResults={defenderDice}
               isRolling={isRolling && phase === 'save'}
               label="Defender Dice"
-              onDieClick={phase === 'resolve' ? (index) => handleDieClick(index, 'save') : undefined}
+              onDieClick={phase === 'save' ? handleSaveClick : undefined}
             />
-            {phase === 'attack' ? (
-              <DiceButton
-                onClick={handleAttackRoll}
-                disabled={!attackerWeapon || isRolling}
-              >
-                Roll Attack
-              </DiceButton>
-            ) : phase === 'save' ? (
-              <DiceButton
-                onClick={handleSaveRoll}
-                disabled={isRolling}
-              >
-                Roll Save
-              </DiceButton>
-            ) : (
-              <DiceButton
-                onClick={handleResolveSaves}
-                disabled={isRolling}
-              >
-                Resolve Saves
-              </DiceButton>
-            )}
           </DiceArea>
           <ButtonContainer>
             <ControlButton
@@ -594,3 +657,22 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
     </CombatContainer>
   );
 };
+
+const SpecialRuleTooltip = styled.div`
+  position: absolute;
+  background: rgba(26, 26, 46, 0.95);
+  border: 1px solid #4a4a8a;
+  padding: 10px;
+  border-radius: 4px;
+  color: #e6e6fa;
+  font-size: 0.8em;
+  max-width: 200px;
+  z-index: 1000;
+  pointer-events: none;
+  white-space: normal;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 100%;
+  margin-bottom: 5px;
+`;
