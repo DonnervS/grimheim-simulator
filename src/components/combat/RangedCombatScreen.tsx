@@ -262,6 +262,13 @@ interface RangedCombatScreenProps {
   onEndCombat: () => void;
 }
 
+interface DiceSelectionState {
+  attackerHits: DieResult[];
+  defenderSaves: DieResult[];
+  selectedHits: number[];
+  selectedSaves: number[];
+}
+
 export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
   attacker,
   defender,
@@ -272,12 +279,18 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
   onWinnerDeclared,
   onEndCombat
 }) => {
-  const [phase, setPhase] = useState<'attack' | 'save'>('attack');
+  const [phase, setPhase] = useState<'attack' | 'save' | 'resolve'>('attack');
   const [combatLog, setCombatLog] = useState<string[]>([]);
   const [attackerDice, setAttackerDice] = useState<DieResult[]>([]);
   const [defenderDice, setDefenderDice] = useState<DieResult[]>([]);
   const [isRolling, setIsRolling] = useState(false);
   const [round, setRound] = useState(1);
+  const [diceSelection, setDiceSelection] = useState<DiceSelectionState>({
+    attackerHits: [],
+    defenderSaves: [],
+    selectedHits: [],
+    selectedSaves: []
+  });
 
   useEffect(() => {
     if (attacker.currentWounds === undefined) {
@@ -313,10 +326,14 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
       isCritical: die.value === 6
     }));
 
-    setAttackerDice(processedDice);
-
     const hits = processedDice.filter(d => d.isHit).length;
     const criticals = processedDice.filter(d => d.isCritical).length;
+
+    setAttackerDice(processedDice);
+    setDiceSelection(prev => ({
+      ...prev,
+      attackerHits: processedDice.filter(d => d.isHit || d.isCritical)
+    }));
 
     addToCombatLog(`${attacker.name} rolls ${processedDice.map(d => d.value).join(', ')} for attack`);
     addToCombatLog(`Hits: ${hits}, Criticals: ${criticals}`);
@@ -337,20 +354,68 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
     const dice = rollDice(defender.stats.DEF);
     const processedDice = dice.map(die => ({
       ...die,
-      isSave: die.value >= defender.stats.SAV
+      isSave: die.value >= defender.stats.SAV,
+      isCritical: die.value === 6,
+      isSelected: false
     }));
 
     setDefenderDice(processedDice);
+    setDiceSelection(prev => ({
+      ...prev,
+      defenderSaves: processedDice.filter(d => d.isSave || d.isCritical)
+    }));
 
     const saves = processedDice.filter(d => d.isSave).length;
-    addToCombatLog(`${defender.name} rolls ${processedDice.map(d => d.value).join(', ')} for save`);
-    addToCombatLog(`Saves: ${saves}`);
+    const criticalSaves = processedDice.filter(d => d.isCritical).length;
 
-    // Calculate damage
-    const damage = Math.max(0, attackerWeapon.DMG - saves);
+    addToCombatLog(`${defender.name} rolls ${processedDice.map(d => d.value).join(', ')} for save`);
+    addToCombatLog(`Saves: ${saves}, Critical Saves: ${criticalSaves}`);
+
+    setPhase('resolve');
+    setTimeout(() => setIsRolling(false), 1000);
+  };
+
+  const handleDieClick = (index: number, type: 'hit' | 'save') => {
+    if (phase !== 'resolve') return;
+
+    setDiceSelection(prev => {
+      if (type === 'hit') {
+        const isAlreadySelected = prev.selectedHits.includes(index);
+        return {
+          ...prev,
+          selectedHits: isAlreadySelected
+            ? prev.selectedHits.filter(i => i !== index)
+            : [...prev.selectedHits, index]
+        };
+      } else {
+        const isAlreadySelected = prev.selectedSaves.includes(index);
+        return {
+          ...prev,
+          selectedSaves: isAlreadySelected
+            ? prev.selectedSaves.filter(i => i !== index)
+            : [...prev.selectedSaves, index]
+        };
+      }
+    });
+  };
+
+  const handleResolveSaves = () => {
+    const { attackerHits, defenderSaves, selectedHits, selectedSaves } = diceSelection;
+    
+    // Remove selected hits
+    const remainingHits = attackerHits.filter((_, index) => !selectedHits.includes(index));
+    
+    // Calculate final damage
+    const normalHits = remainingHits.filter(hit => !hit.isCritical).length;
+    const criticalHits = remainingHits.filter(hit => hit.isCritical).length;
+    
+    const damage = (normalHits * attackerWeapon!.DMG) + (criticalHits * attackerWeapon!.CRT);
+    
     if (damage > 0) {
       defender.currentWounds = Math.max(0, (defender.currentWounds ?? 0) - damage);
-      addToCombatLog(`${defender.name} takes ${damage} damage`);
+      addToCombatLog(`${defender.name} takes ${damage} damage from ${normalHits} normal hits and ${criticalHits} critical hits`);
+    } else {
+      addToCombatLog('All hits were saved!');
     }
 
     if (defender.currentWounds <= 0) {
@@ -359,9 +424,13 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
       setPhase('attack');
       setAttackerDice([]);
       setDefenderDice([]);
+      setDiceSelection({
+        attackerHits: [],
+        defenderSaves: [],
+        selectedHits: [],
+        selectedSaves: []
+      });
     }
-
-    setTimeout(() => setIsRolling(false), 1000);
   };
 
   const handleCombatEnd = (winner: Model) => {
@@ -374,6 +443,12 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
     setPhase('attack');
     setAttackerDice([]);
     setDefenderDice([]);
+    setDiceSelection({
+      attackerHits: [],
+      defenderSaves: [],
+      selectedHits: [],
+      selectedSaves: []
+    });
     addToCombatLog(`\n--- Round ${round + 1} ---\n`);
   };
 
@@ -397,11 +472,13 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
               diceResults={attackerDice}
               isRolling={isRolling && phase === 'attack'}
               label="Attacker Dice"
+              onDieClick={phase === 'resolve' ? (index) => handleDieClick(index, 'hit') : undefined}
             />
             <RangedDiceDisplay
               diceResults={defenderDice}
               isRolling={isRolling && phase === 'save'}
               label="Defender Dice"
+              onDieClick={phase === 'resolve' ? (index) => handleDieClick(index, 'save') : undefined}
             />
             {phase === 'attack' ? (
               <DiceButton
@@ -410,12 +487,19 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
               >
                 Roll Attack
               </DiceButton>
-            ) : (
+            ) : phase === 'save' ? (
               <DiceButton
                 onClick={handleSaveRoll}
                 disabled={isRolling}
               >
                 Roll Save
+              </DiceButton>
+            ) : (
+              <DiceButton
+                onClick={handleResolveSaves}
+                disabled={isRolling}
+              >
+                Resolve Saves
               </DiceButton>
             )}
           </DiceArea>
