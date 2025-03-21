@@ -424,8 +424,9 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
         isUsed: false
       }));
 
-      // Add shield saves
-      const shieldResults = rollDice(defender.stats.SHD || 0).map(({ value }) => ({
+      // Add shield saves if the model has the Shield special rule
+      const hasShield = defender.stats.SR.includes('Shield');
+      const shieldResults = hasShield ? rollDice(1).map(({ value }) => ({
         value,
         isHit: false,
         isCritical: false,
@@ -435,7 +436,7 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
         isSelected: false,
         isBlocked: false,
         isUsed: false
-      }));
+      })) : [];
 
       const allResults = [...results, ...shieldResults];
       setDefenderDice(allResults);
@@ -445,7 +446,7 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
       const numSaves = allResults.filter(die => die.isSave).length;
       const numShieldSaves = allResults.filter(die => die.isSave && die.isShieldSave).length;
       
-      addToCombatLog(`Rolled ${numDice} defense dice and ${defender.stats.SHD || 0} shield dice with ${numSaves} successes (${numShieldSaves} shield saves) at ${modifiedSaveValue}+`);
+      addToCombatLog(`Rolled ${numDice} defense dice${hasShield ? ' and 1 shield die' : ''} with ${numSaves} successes (${numShieldSaves} shield saves) at ${modifiedSaveValue}+`);
     }, 1000);
   };
 

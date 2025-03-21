@@ -78,10 +78,12 @@ const WeaponRuleItem = styled.span`
 `;
 
 const WeaponInfo = ({ weapon }: { weapon: WeaponStats }) => {
-  const renderWeaponRules = (rules: string) => {
+  const renderWeaponRules = (rules: string[] | string | undefined) => {
     if (!rules) return null;
     
-    const rulesList = rules.split(',').map(rule => rule.trim());
+    // Convert string to array if necessary
+    const rulesArray = Array.isArray(rules) ? rules : rules.split(',').map(rule => rule.trim());
+    if (rulesArray.length === 0) return null;
     
     return (
       <div style={{ 
@@ -91,7 +93,7 @@ const WeaponInfo = ({ weapon }: { weapon: WeaponStats }) => {
         flexWrap: 'wrap',
         gap: '4px' 
       }}>
-        {rulesList.map((rule, index) => {
+        {rulesArray.map((rule, index) => {
           const description = weaponRuleDescriptions[rule] || 'No description available';
           return (
             <Tooltip 
@@ -333,72 +335,21 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
   }
 
   const rollDiceWithRending = (weapon: WeaponStats, model: Model): DieResult[] => {
-    // Roll attack dice
-    const attackDice = Array.from({ length: weapon.ATK }, () => {
+    const results = Array(weapon.ATK).fill(0).map(() => {
       const value = Math.floor(Math.random() * 6) + 1;
-      const isCritical = value === 6;
-      const isHit = value >= weapon.HTV;
       return {
         value,
-        isHit,
-        isCritical,
-        isUsed: false,
+        isHit: value >= parseInt(weapon.HTV),
+        isCritical: value === 6,
+        isSelected: false,
         isBlockDie: false,
-        isUpgradedByCritical: false
-      } as DieResult;
-    });
-
-    // Roll block dice based on armor rules
-    let blockDiceCount = 0;
-    if (model.stats.SR?.includes('Heavy Armor')) {
-      blockDiceCount = 2;
-    } else if (model.stats.SR?.includes('Medium Armor')) {
-      blockDiceCount = 1;
-    }
-    
-    // Add an extra block die if the model has the Shield rule
-    if (model.stats.SR?.includes('Shield')) {
-      blockDiceCount += 1;
-    }
-
-    const blockDice = Array.from({ length: blockDiceCount }, () => {
-      const value = Math.floor(Math.random() * 6) + 1;
-      const isCritical = value === 6;
-      // If model has Shield rule, ensure the block die is always successful
-      const isHit = model.stats.SR?.includes('Shield') ? true : (value >= model.stats.SAV || isCritical);
-      return {
-        value,
-        isHit,
-        isCritical,
         isUsed: false,
-        isBlockDie: true,
         isUpgradedByCritical: false
-      } as DieResult;
+      };
     });
 
-    const allDice = [...attackDice, ...blockDice];
-
-    // Apply Rending rule if weapon has it
-    if (weapon.rules?.includes('Rending')) {
-      const criticalHits = allDice.filter(die => !die.isBlockDie && die.isCritical).length;
-      const normalHits = allDice.filter(die => !die.isBlockDie && die.isHit && !die.isCritical);
-      
-      if (criticalHits > 0 && normalHits.length > 0) {
-        // Upgrade the first normal hit to a critical hit
-        const firstNormalHitIndex = allDice.findIndex(die => !die.isBlockDie && die.isHit && !die.isCritical);
-        if (firstNormalHitIndex !== -1) {
-          allDice[firstNormalHitIndex] = {
-            ...allDice[firstNormalHitIndex],
-            isCritical: true,
-            isUpgradedByCritical: true
-          };
-          addToCombatLog(`Rending rule: Upgraded one normal hit to a critical hit`);
-        }
-      }
-    }
-
-    return allDice;
-  }
+    return results;
+  };
 
   const handleDiceRoll = () => {
     if (!selectedAttackerWeapon || !selectedDefenderWeapon) return
@@ -409,9 +360,9 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
     setAttackerDice(attackerResults)
     setDefenderDice(defenderResults)
 
-    const attackerHits = attackerResults.filter(d => !d.isBlockDie && d.isHit).length
+    const attackerHits = attackerResults.filter(d => !d.isBlockDie && !d.isUsed).length
     const attackerCrits = attackerResults.filter(d => !d.isBlockDie && d.isCritical).length
-    const defenderHits = defenderResults.filter(d => !d.isBlockDie && d.isHit).length
+    const defenderHits = defenderResults.filter(d => !d.isBlockDie && !d.isUsed).length
     const defenderCrits = defenderResults.filter(d => !d.isBlockDie && d.isCritical).length
     const attackerBlocks = attackerResults.filter(d => d.isBlockDie && (d.value >= attacker.stats.SAV || d.isCritical)).length
     const defenderBlocks = defenderResults.filter(d => d.isBlockDie && (d.value >= defender.stats.SAV || d.isCritical)).length
@@ -737,22 +688,12 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
   };
 
   const calculateDamage = (dice: DieResult[], weapon: WeaponStats, target: Model): number => {
-    // Calculate base damage
-    const baseDamage = dice.reduce((total, die) => {
-      if (die.isCritical) {
-        return total + weapon.CRT;
+    return dice.reduce((total: number, die: DieResult) => {
+      if (!die.isBlockDie && !die.isUsed) {
+        return total + (die.isCritical ? parseInt(weapon.CRT) : parseInt(weapon.DMG));
       }
-      return total + weapon.DMG;
+      return total;
     }, 0);
-
-    // Reduce damage by 1 if target has Tough rule
-    if (target.stats.SR?.includes('Tough')) {
-      const reducedDamage = Math.max(0, baseDamage - dice.length); // Reduce by 1 for each hit
-      addToCombatLog(`${target.name} reduces damage from ${baseDamage} to ${reducedDamage} due to Tough rule`);
-      return reducedDamage;
-    }
-
-    return baseDamage;
   };
 
   const applyDamage = (target: Model, damage: number) => {

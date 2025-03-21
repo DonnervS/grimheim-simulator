@@ -25,13 +25,15 @@ interface RangedModelCardProps {
   selectedWeapon: WeaponStats | null;
   onWeaponSelect: (weapon: WeaponStats) => void;
   isSelectable: boolean;
+  modifiedSaveValue?: number;
 }
 
 export const RangedModelCard: React.FC<RangedModelCardProps> = ({
   model,
   selectedWeapon,
   onWeaponSelect,
-  isSelectable
+  isSelectable,
+  modifiedSaveValue
 }) => {
   // Ensure both values are defined and not zero before calculating percentage
   const woundPercentage = model.currentWounds !== undefined && model.stats.WND > 0
@@ -88,7 +90,9 @@ export const RangedModelCard: React.FC<RangedModelCardProps> = ({
         </StatBox>
         <StatBox>
           <StatLabel>SAV</StatLabel>
-          <StatValue>{model.stats.SAV}+</StatValue>
+          <StatValue style={{ color: modifiedSaveValue && modifiedSaveValue > model.stats.SAV ? '#ff4444' : 'inherit' }}>
+            {modifiedSaveValue !== undefined ? modifiedSaveValue : model.stats.SAV}+
+          </StatValue>
         </StatBox>
         <StatBox>
           <StatLabel>WND</StatLabel>
