@@ -13,6 +13,8 @@ const CombatContainer = styled.div`
   padding: 20px;
   position: relative;
   min-height: 100%;
+  max-height: 100vh;
+  overflow-y: auto;
 `;
 
 const BattleArea = styled.div`
@@ -22,7 +24,7 @@ const BattleArea = styled.div`
   width: 100%;
   max-width: 1200px;
   margin: 20px 0;
-  gap: 40px;
+  gap: 20px;
   position: relative;
 `;
 
@@ -31,6 +33,8 @@ const ModelArea = styled.div<{ $isRight?: boolean }>`
   flex-direction: column;
   align-items: ${props => props.$isRight ? 'flex-start' : 'flex-end'};
   padding: ${props => props.$isRight ? '0 0 0 20px' : '0 20px 0 0'};
+  max-width: 350px;
+  min-width: 300px;
 `;
 
 const CenterArea = styled.div`
@@ -39,7 +43,8 @@ const CenterArea = styled.div`
   align-items: center;
   justify-content: flex-start;
   padding-top: 20px;
-  min-width: 400px;
+  min-width: 300px;
+  max-width: 400px;
 `;
 
 const DiceArea = styled.div`
@@ -103,13 +108,14 @@ const ControlButton = styled(DiceButton)`
 const CombatLog = styled.div`
   width: 100%;
   max-width: 800px;
-  margin-top: 20px;
+  margin: 20px auto;
   padding: 20px;
   background: rgba(26, 26, 46, 0.9);
   border-radius: 8px;
   border: 2px solid #4a4a8a;
-  max-height: 200px;
+  max-height: 150px;
   overflow-y: auto;
+  font-size: 0.9em;
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -148,7 +154,8 @@ const WeaponInfoContainer = styled.div`
   padding: 15px;
   margin-top: 10px;
   border: 2px solid #4a4a8a;
-  width: 300px;
+  width: 100%;
+  max-width: 300px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 `;
 
