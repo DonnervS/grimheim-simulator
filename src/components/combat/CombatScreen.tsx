@@ -380,13 +380,14 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
 
     const allDice = [...attackDice, ...blockDice];
 
-    // Apply Rending rule if weapon has it
+    // Apply Rending and Ravaging rules if weapon has them
     const rulesArray = typeof weapon.rules === 'string' 
       ? weapon.rules.split(',').map((rule: string) => rule.trim())
       : Array.isArray(weapon.rules) 
         ? weapon.rules 
         : [];
 
+    // Apply Rending rule
     if (rulesArray.includes('Rending')) {
       const criticalHits = allDice.filter(die => !die.isBlockDie && die.isCritical).length;
       const normalHits = allDice.filter(die => !die.isBlockDie && die.isHit && !die.isCritical);
@@ -401,6 +402,44 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
             isUpgradedByCritical: true
           };
           addToCombatLog(`Rending rule: Upgraded one normal hit to a critical hit`);
+        }
+      }
+    }
+
+    // Apply Ravaging rule
+    if (rulesArray.includes('Ravaging')) {
+      const criticalHits = allDice.filter(die => !die.isBlockDie && die.isCritical).length;
+      const normalHits = allDice.filter(die => !die.isBlockDie && die.isHit && !die.isCritical);
+      
+      // Only apply Ravaging if there is at least one critical hit
+      if (criticalHits > 0 && normalHits.length > 0) {
+        let upgradesLeft = Math.min(2, normalHits.length);
+        let upgradeCount = 0;
+
+        // Find up to 2 normal hits to upgrade
+        normalHits.forEach((_, index) => {
+          if (upgradesLeft > 0) {
+            const normalHitIndex = allDice.findIndex(die => 
+              !die.isBlockDie && 
+              die.isHit && 
+              !die.isCritical && 
+              !die.isUpgradedByCritical
+            );
+
+            if (normalHitIndex !== -1) {
+              allDice[normalHitIndex] = {
+                ...allDice[normalHitIndex],
+                isCritical: true,
+                isUpgradedByCritical: true
+              };
+              upgradesLeft--;
+              upgradeCount++;
+            }
+          }
+        });
+
+        if (upgradeCount > 0) {
+          addToCombatLog(`Ravaging rule: Upgraded ${upgradeCount} normal hit${upgradeCount > 1 ? 's' : ''} to critical hit${upgradeCount > 1 ? 's' : ''}`);
         }
       }
     }
