@@ -335,20 +335,77 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
   }
 
   const rollDiceWithRending = (weapon: WeaponStats, model: Model): DieResult[] => {
-    const results = Array(weapon.ATK).fill(0).map(() => {
+    // Roll attack dice
+    const attackDice = Array.from({ length: weapon.ATK }, () => {
       const value = Math.floor(Math.random() * 6) + 1;
+      const isCritical = value === 6;
+      const isHit = value >= parseInt(weapon.HTV);
       return {
         value,
-        isHit: value >= parseInt(weapon.HTV),
-        isCritical: value === 6,
-        isSelected: false,
-        isBlockDie: false,
+        isHit,
+        isCritical,
         isUsed: false,
+        isBlockDie: false,
         isUpgradedByCritical: false
-      };
+      } as DieResult;
     });
 
-    return results;
+    // Roll block dice based on armor rules
+    let blockDiceCount = 0;
+    if (model.stats.SR?.includes('Heavy Armor')) {
+      blockDiceCount = 2;
+    } else if (model.stats.SR?.includes('Medium Armor')) {
+      blockDiceCount = 1;
+    }
+    
+    // Add an extra block die if the model has the Shield rule
+    if (model.stats.SR?.includes('Shield')) {
+      blockDiceCount += 1;
+    }
+
+    const blockDice = Array.from({ length: blockDiceCount }, () => {
+      const value = Math.floor(Math.random() * 6) + 1;
+      const isCritical = value === 6;
+      // If model has Shield rule, ensure the block die is always successful
+      const isHit = model.stats.SR?.includes('Shield') ? true : (value >= model.stats.SAV || isCritical);
+      return {
+        value,
+        isHit,
+        isCritical,
+        isUsed: false,
+        isBlockDie: true,
+        isUpgradedByCritical: false
+      } as DieResult;
+    });
+
+    const allDice = [...attackDice, ...blockDice];
+
+    // Apply Rending rule if weapon has it
+    const rulesArray = typeof weapon.rules === 'string' 
+      ? weapon.rules.split(',').map((rule: string) => rule.trim())
+      : Array.isArray(weapon.rules) 
+        ? weapon.rules 
+        : [];
+
+    if (rulesArray.includes('Rending')) {
+      const criticalHits = allDice.filter(die => !die.isBlockDie && die.isCritical).length;
+      const normalHits = allDice.filter(die => !die.isBlockDie && die.isHit && !die.isCritical);
+      
+      if (criticalHits > 0 && normalHits.length > 0) {
+        // Upgrade the first normal hit to a critical hit
+        const firstNormalHitIndex = allDice.findIndex(die => !die.isBlockDie && die.isHit && !die.isCritical);
+        if (firstNormalHitIndex !== -1) {
+          allDice[firstNormalHitIndex] = {
+            ...allDice[firstNormalHitIndex],
+            isCritical: true,
+            isUpgradedByCritical: true
+          };
+          addToCombatLog(`Rending rule: Upgraded one normal hit to a critical hit`);
+        }
+      }
+    }
+
+    return allDice;
   };
 
   const handleDiceRoll = () => {
