@@ -89,11 +89,11 @@ export type WeaponType = 'close' | 'range';
 // Waffen-Statistiken
 export interface WeaponStats {
   name: string;   // Name der Waffe
-  RNG: string;   // Range in inches
+  RNG: number;   // Range in inches
   ATK: number;   // Attack Dice
-  DMG: string;   // Normal Damage
-  HTV: string;   // Hit Value
-  CRT: string;   // Critical Damage
-  weaponType: string;
-  rules: string[];  // Weapon rules like Armor Piercing
+  DMG: number;   // Normal Damage
+  HTV: number;   // Hit Value
+  CRT: number;   // Critical Damage
+  weaponType: WeaponType;
+  rules: string[] | string;  // Weapon rules like Armor Piercing
 }

@@ -211,10 +211,10 @@ const WeaponRules = styled.div`
 `;
 
 const WeaponInfo: React.FC<{ weapon: WeaponStats }> = ({ weapon }) => {
-  const renderWeaponRules = (rules: string | undefined) => {
+  const renderWeaponRules = (rules: string | string[] | undefined) => {
     if (!rules) return null;
     
-    const rulesList = rules.split(',').map(rule => rule.trim());
+    const rulesList = Array.isArray(rules) ? rules : rules.split(',').map(rule => rule.trim());
     
     return (
       <WeaponRules>
@@ -312,13 +312,6 @@ interface ModelStats {
   SR: string[];
 }
 
-interface WeaponStats {
-  RNG: string;
-  ATK: number;
-  DMG: string;
-  rules: string[];  // Add rules array to weapon stats
-}
-
 export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
   attacker,
   defender,
@@ -381,7 +374,7 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
     
     setIsRolling(true);
     setTimeout(() => {
-      const hitResults = rollDice(attackerWeapon.ATK).map(die => ({
+      const initialResults = rollDice(attackerWeapon.ATK).map(die => ({
         value: die.value,
         isHit: die.value >= attackerWeapon.HTV,
         isCritical: die.value === 6,
@@ -392,6 +385,31 @@ export const RangedCombatScreen: React.FC<RangedCombatScreenProps> = ({
         isBlocked: false,
         isUsed: false
       }));
+
+      // Apply Ravaging rule if applicable
+      let hitResults = [...initialResults];
+      if (attackerWeapon.rules?.includes('Ravaging')) {
+        const hasCriticalHit = initialResults.some(die => die.isCritical);
+        if (hasCriticalHit) {
+          // Find normal hits that can be upgraded
+          const normalHits = initialResults.filter(die => die.isHit && !die.isCritical);
+          const upgradeCount = Math.min(2, normalHits.length);
+          
+          if (upgradeCount > 0) {
+            hitResults = initialResults.map((die, index) => {
+              // Find the first two normal hits to upgrade
+              if (die.isHit && !die.isCritical && upgradeCount > 0) {
+                const shouldUpgrade = normalHits.indexOf(die) < upgradeCount;
+                if (shouldUpgrade) {
+                  return { ...die, isCritical: true };
+                }
+              }
+              return die;
+            });
+            addToCombatLog(`Ravaging rule: Upgraded ${upgradeCount} normal hit${upgradeCount > 1 ? 's' : ''} to critical hit${upgradeCount > 1 ? 's' : ''}`);
+          }
+        }
+      }
 
       setAttackerDice(hitResults);
       setPhase('save');

@@ -273,9 +273,9 @@ export const RangedTestScreen: React.FC = () => {
     }
   };
 
-  const handleModelSelect = (modelName: string, isAttacker: boolean) => {
+  const handleModelSelect = (modelId: string, isAttacker: boolean) => {
     const model = (isAttacker ? availableAttackers : availableDefenders)
-      .find(m => m.name === modelName);
+      .find(m => m.id === modelId);
     if (model) {
       if (isAttacker) {
         setSelectedAttacker({ ...model });
@@ -309,12 +309,12 @@ export const RangedTestScreen: React.FC = () => {
               {attackerFaction && (
                 <SelectionBox>
                   <ModelSelect
-                    value={selectedAttacker?.name || ''}
+                    value={selectedAttacker?.id || ''}
                     onChange={(e) => handleModelSelect(e.target.value, true)}
                   >
                     <option value="">Select a fighter...</option>
                     {attackersByFaction[attackerFaction].map(model => (
-                      <option key={model.name} value={model.name}>
+                      <option key={model.id} value={model.id}>
                         {model.name}
                       </option>
                     ))}
@@ -339,12 +339,12 @@ export const RangedTestScreen: React.FC = () => {
               {defenderFaction && (
                 <SelectionBox>
                   <ModelSelect
-                    value={selectedDefender?.name || ''}
+                    value={selectedDefender?.id || ''}
                     onChange={(e) => handleModelSelect(e.target.value, false)}
                   >
                     <option value="">Select a fighter...</option>
                     {defendersByFaction[defenderFaction].map(model => (
-                      <option key={model.name} value={model.name}>
+                      <option key={model.id} value={model.id}>
                         {model.name}
                       </option>
                     ))}
@@ -366,8 +366,8 @@ export const RangedTestScreen: React.FC = () => {
             defender={selectedDefender!}
             attackerWeapon={selectedAttackerWeapon}
             defenderWeapon={selectedDefenderWeapon}
-            onAttackerWeaponSelect={setSelectedAttackerWeapon}
-            onDefenderWeaponSelect={setSelectedDefenderWeapon}
+            onAttackerWeaponSelect={(weapon: WeaponStats) => setSelectedAttackerWeapon(weapon)}
+            onDefenderWeaponSelect={(weapon: WeaponStats) => setSelectedDefenderWeapon(weapon)}
             onWinnerDeclared={setWinner}
             onEndCombat={handleEndCombat}
           />
