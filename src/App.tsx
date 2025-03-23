@@ -5,7 +5,6 @@ import BattleScreen from './screens/BattleScreen'
 import MapScreen from './screens/MapScreen'
 import CombatTestScreen from './screens/CombatTestScreen'
 import { RangedTestScreen } from './screens/RangedTestScreen'
-import StyleGuideComponent from '../grimheim-style-guide/style-guide'
 
 const AppContainer = styled.div`
   width: 100vw;
@@ -368,7 +367,149 @@ const MainScreen = () => (
 const StyleGuide: React.FC = () => {
   return (
     <MainContent>
-      <StyleGuideComponent />
+      <Title>Grimheim Style Guide</Title>
+      <Subtitle>Design system and component library for the Grimheim Combat Simulator</Subtitle>
+      
+      <CardGrid>
+        <Card to="#colors" onClick={(e) => { e.preventDefault(); }}>
+          <IconCircle>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="13.5" cy="6.5" r="2.5"></circle>
+              <circle cx="17.5" cy="10.5" r="2.5"></circle>
+              <circle cx="8.5" cy="7.5" r="2.5"></circle>
+              <circle cx="6.5" cy="12.5" r="2.5"></circle>
+              <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path>
+            </svg>
+          </IconCircle>
+          <CardTitle>Color System</CardTitle>
+          <CardDescription>Primary, secondary, and accent colors used throughout the application</CardDescription>
+        </Card>
+        
+        <Card to="#typography" onClick={(e) => { e.preventDefault(); }}>
+          <IconCircle>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="4 7 4 4 20 4 20 7"></polyline>
+              <line x1="9" y1="20" x2="15" y2="20"></line>
+              <line x1="12" y1="4" x2="12" y2="20"></line>
+            </svg>
+          </IconCircle>
+          <CardTitle>Typography</CardTitle>
+          <CardDescription>Font families, sizes, and weights for consistent text styling</CardDescription>
+        </Card>
+        
+        <Card to="#components" onClick={(e) => { e.preventDefault(); }}>
+          <IconCircle>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="21" x2="9" y2="9"></line>
+            </svg>
+          </IconCircle>
+          <CardTitle>UI Components</CardTitle>
+          <CardDescription>Buttons, cards, form elements and other reusable components</CardDescription>
+        </Card>
+        
+        <Card to="#effects" onClick={(e) => { e.preventDefault(); }}>
+          <IconCircle>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5.52 19c.64-2.2 1.84-3 3.22-3h6.52c1.38 0 2.58.8 3.22 3"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+              <circle cx="12" cy="12" r="10"></circle>
+            </svg>
+          </IconCircle>
+          <CardTitle>Visual Effects</CardTitle>
+          <CardDescription>Animations, transitions, and interactive state changes</CardDescription>
+        </Card>
+      </CardGrid>
+      
+      <div style={{ textAlign: 'left', marginTop: '3rem', width: '100%' }}>
+        <h2 id="colors" style={{ color: 'var(--primary-red)', fontFamily: "'IM Fell English', serif", fontSize: '2rem', marginBottom: '1rem' }}>Color System</h2>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ width: '80px', height: '80px', backgroundColor: '#dc2626', borderRadius: '8px', marginBottom: '0.5rem' }}></div>
+            <span style={{ color: 'var(--foreground)', fontSize: '0.875rem' }}>Primary</span>
+            <span style={{ color: 'var(--muted-foreground)', fontSize: '0.75rem' }}>#dc2626</span>
+          </div>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ width: '80px', height: '80px', backgroundColor: '#0f0f0f', borderRadius: '8px', marginBottom: '0.5rem' }}></div>
+            <span style={{ color: 'var(--foreground)', fontSize: '0.875rem' }}>Background</span>
+            <span style={{ color: 'var(--muted-foreground)', fontSize: '0.75rem' }}>#0f0f0f</span>
+          </div>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ width: '80px', height: '80px', backgroundColor: '#27272a', borderRadius: '8px', marginBottom: '0.5rem' }}></div>
+            <span style={{ color: 'var(--foreground)', fontSize: '0.875rem' }}>Secondary</span>
+            <span style={{ color: 'var(--muted-foreground)', fontSize: '0.75rem' }}>#27272a</span>
+          </div>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ width: '80px', height: '80px', backgroundColor: '#f59e0b', borderRadius: '8px', marginBottom: '0.5rem' }}></div>
+            <span style={{ color: 'var(--foreground)', fontSize: '0.875rem' }}>Gold</span>
+            <span style={{ color: 'var(--muted-foreground)', fontSize: '0.75rem' }}>#f59e0b</span>
+          </div>
+        </div>
+        
+        <h2 id="typography" style={{ color: 'var(--primary-red)', fontFamily: "'IM Fell English', serif", fontSize: '2rem', marginBottom: '1rem', marginTop: '2rem' }}>Typography</h2>
+        
+        <div style={{ marginBottom: '2rem' }}>
+          <h1 style={{ fontFamily: "'IM Fell English', serif", color: 'var(--primary-red)', fontSize: '2.5rem', marginBottom: '0.5rem' }}>Heading 1</h1>
+          <h2 style={{ fontFamily: "'IM Fell English', serif", color: 'var(--primary-red)', fontSize: '2rem', marginBottom: '0.5rem' }}>Heading 2</h2>
+          <h3 style={{ fontFamily: "'IM Fell English', serif", color: 'var(--foreground)', fontSize: '1.5rem', marginBottom: '0.5rem' }}>Heading 3</h3>
+          <h4 style={{ fontFamily: "'IM Fell English', serif", color: 'var(--foreground)', fontSize: '1.25rem', marginBottom: '0.5rem' }}>Heading 4</h4>
+          <p style={{ fontFamily: "'Inter', sans-serif", color: 'var(--foreground)', fontSize: '1rem', marginBottom: '0.5rem' }}>Body text in Inter font</p>
+          <p style={{ fontFamily: "'Inter', sans-serif", color: 'var(--muted-foreground)', fontSize: '0.875rem' }}>Small text in muted color</p>
+        </div>
+        
+        <h2 id="components" style={{ color: 'var(--primary-red)', fontFamily: "'IM Fell English', serif", fontSize: '2rem', marginBottom: '1rem', marginTop: '2rem' }}>UI Components</h2>
+        
+        <div style={{ marginBottom: '2rem' }}>
+          <h3 style={{ fontFamily: "'IM Fell English', serif", color: 'var(--foreground)', fontSize: '1.5rem', marginBottom: '1rem' }}>Buttons</h3>
+          
+          <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+            <button style={{ background: 'var(--primary-red)', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: 'var(--radius)', fontFamily: "'Inter', sans-serif", cursor: 'pointer' }}>Primary Button</button>
+            
+            <button style={{ background: 'var(--secondary)', color: 'var(--foreground)', border: 'none', padding: '0.5rem 1rem', borderRadius: 'var(--radius)', fontFamily: "'Inter', sans-serif", cursor: 'pointer' }}>Secondary Button</button>
+            
+            <button style={{ background: 'transparent', color: 'var(--foreground)', border: '1px solid var(--primary-red)', padding: '0.5rem 1rem', borderRadius: 'var(--radius)', fontFamily: "'Inter', sans-serif", cursor: 'pointer' }}>Outline Button</button>
+          </div>
+          
+          <h3 style={{ fontFamily: "'IM Fell English', serif", color: 'var(--foreground)', fontSize: '1.5rem', marginBottom: '1rem', marginTop: '1.5rem' }}>Cards</h3>
+          
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <div style={{ background: 'var(--card)', padding: '1.5rem', borderRadius: 'var(--radius)', width: '250px' }}>
+              <h4 style={{ fontFamily: "'IM Fell English', serif", color: 'var(--primary-red)', fontSize: '1.25rem', marginBottom: '0.5rem' }}>Card Title</h4>
+              <p style={{ color: 'var(--muted-foreground)', fontSize: '0.875rem' }}>This is a sample card component with title and description text.</p>
+            </div>
+          </div>
+        </div>
+        
+        <h2 id="effects" style={{ color: 'var(--primary-red)', fontFamily: "'IM Fell English', serif", fontSize: '2rem', marginBottom: '1rem', marginTop: '2rem' }}>Visual Effects</h2>
+        
+        <div>
+          <p style={{ color: 'var(--foreground)', marginBottom: '1rem' }}>Hover over elements to see animations and transitions.</p>
+          
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <div style={{ background: 'var(--card)', padding: '1.5rem', borderRadius: 'var(--radius)', transition: 'transform 0.2s, box-shadow 0.2s', cursor: 'pointer' }} 
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px)';
+                  e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}>
+              <h4 style={{ fontFamily: "'IM Fell English', serif", color: 'var(--primary-red)', fontSize: '1.25rem', marginBottom: '0.5rem' }}>Hover Effect</h4>
+              <p style={{ color: 'var(--muted-foreground)', fontSize: '0.875rem' }}>This card demonstrates elevation on hover.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <Footer>
+        Grimheim Combat Simulator © 2025
+      </Footer>
     </MainContent>
   );
 };
