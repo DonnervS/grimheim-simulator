@@ -44,11 +44,6 @@ const TestContainer = styled.div`
 
   &::-webkit-scrollbar-thumb {
     background: var(--primary-red);
-    border-radius: 2px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: rgba(220, 38, 38, 0.8);
   }
 `;
 
@@ -57,11 +52,8 @@ const CombatContainer = styled.div`
   max-width: 1200px;
   min-height: calc(100vh - 4rem);
   background: var(--card);
-  border-radius: 2px;
-  border: 1px solid var(--primary-red);
   overflow: visible;
   margin-bottom: 2rem;
-  box-shadow: 0 0 20px rgba(220, 38, 38, 0.1);
 `;
 
 const SelectionContainer = styled.div`
