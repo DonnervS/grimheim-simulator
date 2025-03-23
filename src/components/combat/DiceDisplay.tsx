@@ -1,139 +1,86 @@
 import React from 'react';
-import styled, { keyframes, css } from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
-const pulse = keyframes`
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(138, 138, 255, 0.4);
-  }
-  50% {
-    transform: scale(1.05);
-    box-shadow: 0 0 0 10px rgba(138, 138, 255, 0);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(138, 138, 255, 0);
-  }
-`;
-
-const blockPulse = keyframes`
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
-  }
-  50% {
-    transform: scale(1.05);
-    box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
-  }
+const rollDice = keyframes`
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 `;
 
 const DiceContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 1.25rem;
   width: 100%;
 `;
 
 const DiceBox = styled.div<{ $isActive: boolean }>`
-  background: rgba(26, 26, 46, 0.9);
-  border: 2px solid ${props => props.$isActive ? '#8a8aff' : '#4a4a8a'};
-  border-radius: 8px;
-  padding: 15px;
-  transition: all 0.2s ease;
-
-  ${props => props.$isActive && css`
-    box-shadow: 0 0 10px #8a8aff;
-    transform: scale(1.02);
-  `}
+  background: var(--card);
+  border: 1px solid ${props => props.$isActive ? 'var(--primary-red)' : 'var(--border)'};
+  border-radius: 2px;
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+  box-shadow: ${props => props.$isActive ? '0 0 20px rgba(220, 38, 38, 0.2)' : 'none'};
+  transform: ${props => props.$isActive ? 'translateY(-2px)' : 'none'};
 `;
 
 const DiceBoxHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #4a4a8a;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
 `;
 
 const PlayerName = styled.div<{ $isActive: boolean }>`
-  font-family: 'Press Start 2P', cursive;
-  font-size: 0.9em;
-  color: ${props => props.$isActive ? '#8a8aff' : '#6a6a8a'};
+  font-family: 'IM Fell English', serif;
+  font-size: 1.25rem;
+  color: ${props => props.$isActive ? 'var(--primary-red)' : 'var(--muted-foreground)'};
+  text-shadow: ${props => props.$isActive ? '0 0 10px rgba(220, 38, 38, 0.3)' : 'none'};
 `;
 
 const DiceStats = styled.div`
-  font-size: 0.8em;
-  color: #6a6a8a;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
 `;
 
 const DiceGrid = styled.div`
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
-  padding: 10px;
-  margin: -5px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(48px, 1fr));
+  gap: 1rem;
+  justify-items: center;
+  padding: 0.75rem;
 `;
 
-const Die = styled.div<{ 
-  $result: 'miss' | 'hit' | 'critical' | 'block'; 
-  $isUsable: boolean; 
-  $isUsed: boolean;
-  $isBlockable: boolean;
-  $isBlockMode: boolean;
-  $isBlockDie: boolean;
-  $isUpgradedCritical: boolean;
-}>`
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
+const Dice = styled.div<{ $isHit?: boolean; $isCrit?: boolean; $isBlock?: boolean; $isRolling?: boolean }>`
+  width: 48px;
+  height: 48px;
+  background: ${props => {
+    if (props.$isCrit) return 'rgba(220, 38, 38, 0.4)';
+    if (props.$isHit) return 'rgba(220, 38, 38, 0.2)';
+    if (props.$isBlock) return 'rgba(37, 99, 235, 0.2)';
+    return 'var(--card)';
+  }};
+  border: 1px solid ${props => {
+    if (props.$isCrit) return 'var(--blood-red)';
+    if (props.$isHit) return 'var(--primary-red)';
+    if (props.$isBlock) return 'var(--info)';
+    return 'var(--border)';
+  }};
+  border-radius: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2em;
-  font-weight: bold;
-  color: white;
-  cursor: ${props => ((props.$isUsable && props.$result !== 'miss') || props.$isBlockable) && !props.$isUsed ? 'pointer' : 'default'};
-  opacity: ${props => {
-    if (props.$isUsed) return 0.5;
-    if (props.$result === 'miss') return 0.5;
-    return 1;
-  }};
-  background: ${props => {
-    if (props.$isBlockable && !props.$isUsed) return '#40E0D0';
-    if (props.$isBlockDie) {
-      if (props.$result === 'critical') return '#40E0D0';
-      if (props.$result === 'hit') return '#40E0D0';
-      return '#40E0D0';
-    }
-    switch (props.$result) {
-      case 'miss': return '#666';
-      case 'hit': return '#4a4aff';
-      case 'critical': return props.$isUpgradedCritical ? '#9400D3' : '#8a2be2';
-    }
-  }};
-  transition: all 0.2s ease;
-  margin: 5px;
-  
-  ${props => props.$isBlockable && !props.$isUsed && css`
-    border: 2px solid #40E0D0;
-    &:hover {
-      transform: scale(1.1);
-      animation: ${blockPulse} 1.5s infinite;
-    }
-  `}
-  
-  ${props => props.$isUsable && !props.$isUsed && !props.$isBlockMode && props.$result !== 'miss' && css`
-    &:hover {
-      transform: scale(1.1);
-      animation: ${props.$isBlockDie ? blockPulse : pulse} 1.5s infinite;
-    }
-  `}
+  font-size: 1.5rem;
+  color: ${props => props.$isCrit ? 'var(--blood-red)' : 'var(--primary-light)'};
+  transition: all 0.3s ease;
+  cursor: pointer;
+  animation: ${props => props.$isRolling ? `${rollDice} 0.6s ease-in-out` : 'none'};
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
+  }
 `;
 
 export interface DieResult {
@@ -183,15 +130,12 @@ const DiceDisplay: React.FC<DiceDisplayProps> = ({
         </DiceBoxHeader>
         <DiceGrid>
           {attackerDice.map((die, index) => (
-            <Die
+            <Dice
               key={index}
-              $result={die.isCritical ? 'critical' : die.isHit ? 'hit' : 'miss'}
-              $isUsable={(isAttackerTurn && !die.isUsed && ((die.isHit && !die.isCritical) || die.isCritical || die.isUpgradedByCritical))}
-              $isUsed={die.isUsed}
-              $isBlockMode={isBlockMode || false}
-              $isBlockable={(!isAttackerTurn && blockableDice.includes(index)) || false}
-              $isBlockDie={die.isBlockDie}
-              $isUpgradedCritical={Boolean(die.isUpgradedByCritical)}
+              $isHit={die.isHit}
+              $isCrit={die.isCritical}
+              $isBlock={!isAttackerTurn && blockableDice.includes(index)}
+              $isRolling={false}
               onClick={() => {
                 if (!die.isUsed && onDieClick && ((isAttackerTurn && ((die.isHit && !die.isCritical) || die.isCritical || die.isUpgradedByCritical)) || (!isAttackerTurn && blockableDice.includes(index)))) {
                   onDieClick(index, true);
@@ -199,7 +143,7 @@ const DiceDisplay: React.FC<DiceDisplayProps> = ({
               }}
             >
               {die.value}
-            </Die>
+            </Dice>
           ))}
         </DiceGrid>
       </DiceBox>
@@ -211,15 +155,12 @@ const DiceDisplay: React.FC<DiceDisplayProps> = ({
         </DiceBoxHeader>
         <DiceGrid>
           {defenderDice.map((die, index) => (
-            <Die
+            <Dice
               key={index}
-              $result={die.isCritical ? 'critical' : die.isHit ? 'hit' : 'miss'}
-              $isUsable={(!isAttackerTurn && !die.isUsed && ((die.isHit && !die.isCritical) || die.isCritical || die.isUpgradedByCritical))}
-              $isUsed={die.isUsed}
-              $isBlockMode={isBlockMode || false}
-              $isBlockable={(isAttackerTurn && blockableDice.includes(index)) || false}
-              $isBlockDie={die.isBlockDie}
-              $isUpgradedCritical={Boolean(die.isUpgradedByCritical)}
+              $isHit={die.isHit}
+              $isCrit={die.isCritical}
+              $isBlock={isAttackerTurn && blockableDice.includes(index)}
+              $isRolling={false}
               onClick={() => {
                 if (!die.isUsed && onDieClick && ((!isAttackerTurn && ((die.isHit && !die.isCritical) || die.isCritical || die.isUpgradedByCritical)) || (isAttackerTurn && blockableDice.includes(index)))) {
                   onDieClick(index, false);
@@ -227,7 +168,7 @@ const DiceDisplay: React.FC<DiceDisplayProps> = ({
               }}
             >
               {die.value}
-            </Die>
+            </Dice>
           ))}
         </DiceGrid>
       </DiceBox>

@@ -9,71 +9,111 @@ import Tooltip from '../ui/Tooltip'
 import { weaponRuleDescriptions } from '../../data/ruleDescriptions'
 
 const CombatContainer = styled.div`
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
   height: 100%;
-  background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4a 100%);
-  display: grid;
-  grid-template-rows: auto 200px;
-  gap: 10px;
-  padding: 20px;
-  position: relative;
-  overflow: hidden;
-`
+  overflow-y: auto;
+`;
 
 const BattleArea = styled.div`
   display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
-  gap: 20px;
-  align-items: start;
-  position: relative;
-`
-
-const DiceArea = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  padding: 20px;
-  background: rgba(42, 42, 74, 0.8);
-  border-radius: 8px;
-  border: 2px solid #4a4a8a;
-  width: 100%;
-`
-
-const TurnIndicator = styled.div`
-  color: #8a8aff;
-  font-family: 'Press Start 2P', cursive;
-  font-size: 1.2em;
-  text-align: center;
-  margin-bottom: 20px;
-`
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+`;
 
 const FighterColumn = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 20px;
   align-items: center;
-  position: relative;
-`
+  gap: 1rem;
+`;
 
-const FighterLabel = styled.div`
-  color: #8a8aff;
-  font-family: 'Press Start 2P', cursive;
-  font-size: 0.8em;
-  margin-bottom: 10px;
-`
+const FighterLabel = styled.h2`
+  color: var(--primary-red);
+  font-size: 1.5rem;
+  text-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
+  margin: 0;
+`;
+
+const DiceArea = styled.div`
+  background: var(--card);
+  border: 1px solid var(--primary-red);
+  border-radius: 2px;
+  padding: 1.25rem;
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.1);
+  width: 100%;
+`;
+
+const TurnIndicator = styled.div`
+  color: var(--primary-red);
+  font-size: 1.5rem;
+  text-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
+  text-align: center;
+  margin-bottom: 1rem;
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+`;
+
+const ActionButton = styled.button`
+  background: var(--accent);
+  color: var(--primary-light);
+  border: 1px solid var(--primary-red);
+  border-radius: 2px;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(220, 38, 38, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
+const BackButton = styled(ActionButton)`
+  background: var(--muted);
+`;
+
+const BlockOnlyButton = styled(ActionButton)`
+  background: var(--info);
+`;
+
+const RollButton = styled(ActionButton)`
+  background: var(--success);
+`;
+
+const SkipButton = styled(ActionButton)`
+  background: var(--warning);
+`;
 
 const WeaponRuleItem = styled.span`
   cursor: help;
-  border-bottom: 1px dotted #8a8aff;
+  border-bottom: 1px dotted var(--primary);
   margin-right: 4px;
   display: inline-block;
-  background-color: rgba(74, 74, 138, 0.3);
-  padding: 1px 4px;
-  border-radius: 3px;
+  background-color: rgba(220, 38, 38, 0.1);
+  padding: 2px 6px;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  color: var(--foreground);
+  transition: all 0.2s ease;
+
   &:hover {
-    color: #8a8aff;
-    background-color: rgba(74, 74, 138, 0.5);
+    color: var(--primary);
+    background-color: rgba(220, 38, 38, 0.2);
+    transform: translateY(-1px);
   }
 `;
 
@@ -176,86 +216,6 @@ const WeaponRules = styled.div`
   border-top: 1px solid #4a4a8a;
 `
 
-const BlockOnlyButton = styled.button`
-  padding: 10px 20px;
-  background: #40E0D0;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  font-size: 1em;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover:not(:disabled) {
-    transform: scale(1.05);
-    background: #48D1CC;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const BackButton = styled.button`
-  padding: 8px 16px;
-  background: #666;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  font-size: 0.9em;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-right: 10px;
-
-  &:hover {
-    transform: scale(1.05);
-    background: #777;
-  }
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  align-items: center;
-`;
-
-const RollButton = styled.button`
-  padding: 12px 24px;
-  background: #8a8aff;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  font-size: 1em;
-  font-family: 'Press Start 2P', cursive;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    transform: scale(1.05);
-    background: #9a9aff;
-  }
-`;
-
-const SkipButton = styled.button`
-  padding: 10px 20px;
-  background: #666;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  font-family: 'Press Start 2P', cursive;
-  font-size: 0.8em;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-left: 10px;
-
-  &:hover {
-    transform: scale(1.05);
-    background: #777;
-  }
-`;
-
 interface CombatScreenProps {
   attacker: Model;
   defender: Model;
@@ -339,7 +299,7 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
     const attackDice = Array.from({ length: weapon.ATK }, () => {
       const value = Math.floor(Math.random() * 6) + 1;
       const isCritical = value === 6;
-      const isHit = value >= parseInt(weapon.HTV);
+      const isHit = value >= weapon.HTV;
       return {
         value,
         isHit,
@@ -786,7 +746,7 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
   const calculateDamage = (dice: DieResult[], weapon: WeaponStats, target: Model): number => {
     return dice.reduce((total: number, die: DieResult) => {
       if (!die.isBlockDie && !die.isUsed) {
-        return total + (die.isCritical ? parseInt(weapon.CRT) : parseInt(weapon.DMG));
+        return total + (die.isCritical ? weapon.CRT : weapon.DMG);
       }
       return total;
     }, 0);
@@ -1004,6 +964,23 @@ export const CombatScreen: React.FC<CombatScreenProps> = ({
     setIsBlockMode(false);
     setBlockableDice([]);
     setBlockingDieIndex(null);
+  };
+
+  const handleDamage = (damage: number, isAttacker: boolean) => {
+    const model = isAttacker ? attacker : defender;
+    const newWounds = Math.max(0, model.currentWounds - damage);
+    const message = `${model.name} takes ${String(damage)} damage! Wounds remaining: ${String(newWounds)}`;
+    addToCombatLog(message);
+    
+    if (newWounds <= 0) {
+      const winner = isAttacker ? defender : attacker;
+      handleCombatEnd(winner);
+    }
+  };
+
+  const handleCombatEnd = (winner: Model) => {
+    addToCombatLog(`${winner.name} is victorious!`);
+    onWinnerDeclared(winner);
   };
 
   return (

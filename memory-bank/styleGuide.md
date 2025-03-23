@@ -1,297 +1,305 @@
-# Grimheim Combat Simulator Style Guide
+# Grimheim Style Guide
 
-## Visual Design System
+Dieses Dokument definiert die visuelle Sprache der Grimheim Web-Applikation und bietet eine konsistente Designsprache für alle UI-Komponenten und Interaktionen.
 
-### Colors
-```css
-/* Primary Colors */
---primary-bg: #1a1a2e;          /* Dark blue background */
---secondary-bg: #2a2a4a;        /* Lighter blue background */
---accent-color: #8a8aff;        /* Bright blue accent */
---text-primary: #e6e6fa;        /* Light lavender text */
---text-secondary: #b0b0d0;      /* Muted lavender text */
+## Design-Philosophie
 
-/* UI Elements */
---border-color: #4a4a8a;        /* Border blue */
---hover-color: #6a6aaa;         /* Hover state blue */
---active-color: #7a7aba;        /* Active state blue */
---disabled-color: #3a3a5a;      /* Disabled state */
+Grimheim kombiniert eine dunkle mittelalterliche Ästhetik mit modernen UI-Praktiken. Das Design soll:
 
-/* Status Colors */
---success-color: #50fa7b;       /* Green for success */
---warning-color: #ffb86c;       /* Orange for warnings */
---error-color: #ff5555;         /* Red for errors */
---info-color: #8be9fd;         /* Cyan for information */
+- Eine düstere, atmosphärische Ästhetik mit einer dunklen Farbpalette vermitteln
+- Lesbarkeit und Zugänglichkeit in allen Situationen sicherstellen
+- Eine konsistente visuelle Hierarchie durch Größe, Gewicht und Farbe etablieren
+- Responsiv sein und auf allen Geräten gut funktionieren
+- Durch subtile Animationen und Effekte die Benutzererfahrung verbessern
 
-/* Combat Colors */
---hit-color: #ff79c6;          /* Pink for hits */
---crit-color: #ff5555;         /* Red for crits */
---save-color: #50fa7b;         /* Green for saves */
---block-color: #8be9fd;        /* Cyan for blocks */
+## Farbpalette
+
+### Primäre Farben
+
+| Name | Wert | Verwendung |
+|------|------|------------|
+| **Primary Red** | `#dc2626` | Hauptakzentfarbe, wichtige UI-Elemente, Call-to-Actions |
+| **Background Dark** | `#0f0f0f` | Haupthintergrundfarbe |
+| **Foreground Light** | `#fafafa` | Haupttextfarbe |
+
+### Sekundäre Farben
+
+| Name | Wert | Verwendung |
+|------|------|------------|
+| **Secondary** | `#27272a` | Sekundäre UI-Elemente |
+| **Accent** | `#18181b` | Akzentbereiche, Hintergründe für Buttons im Ruhezustand |
+| **Gold Accent** | `#f59e0b` | Besondere Hervorhebungen, Premium-Features |
+| **Muted** | `#171717` | Gedämpfte UI-Elemente |
+| **Card** | `#1c1c1c` | Kartenhintergründe und Container |
+
+### Status-Farben
+
+| Name | Wert | Verwendung |
+|------|------|------------|
+| **Success** | `#16a34a` | Erfolgsmeldungen, positive Aktionen |
+| **Warning** | `#ca8a04` | Warnungen, wichtige Hinweise |
+| **Danger** | `#b91c1c` | Fehler, kritische Aktionen |
+| **Info** | `#2563eb` | Informationsmeldungen |
+
+### Erweiterte Farbpalette
+
+| Name | Wert | Verwendung |
+|------|------|------------|
+| **Blood Red** | `#991b1b` | Dunklere Akzente, Schadenseffekte |
+| **Bone** | `#fffbeb` | Helle Hervorhebungen, Skelettteile |
+| **Ash Gray** | `#374151` | Gedämpfte UI-Bereiche |
+| **Shadow** | `#111827` | Tiefe Schatten, dunkle Hintergründe |
+| **Poison** | `#22c55e` | Gifteffekte |
+| **Ice** | `#22d3ee` | Eiseffekte |
+| **Fire** | `#f97316` | Feuereffekte |
+| **Curse** | `#7e22ce` | Flucheffekte |
+
+## Typografie
+
+### Schriftarten
+
+- **Überschriften**: 'IM Fell English' - Historisch inspirierte Schriftart für thematische Konsistenz
+- **Fließtext**: Systemschrift (Sans-Serif) für optimale Lesbarkeit
+
+### Typografie-Hierarchie
+
+| Element | Schriftart | Größe | Gewicht | Farbe | Verwendung |
+|---------|------------|-------|---------|-------|------------|
+| **H1** | IM Fell English | 2.5rem (40px) | Normal | Primary Red | Hauptseitentitel |
+| **H2** | IM Fell English | 2rem (32px) | Normal | Primary Red | Sektionsüberschriften |
+| **H3** | IM Fell English | 1.5rem (24px) | Normal | Primary Red | Kartenüberschriften, Untersektionen |
+| **H4** | IM Fell English | 1.25rem (20px) | Normal | Primary Red | Kleinere Überschriften |
+| **Large Body** | System Font | 1.125rem (18px) | Normal | Foreground Light | Hervorgehobener Text |
+| **Body** | System Font | 1rem (16px) | Normal | Foreground Light | Normaler Fließtext |
+| **Small** | System Font | 0.875rem (14px) | Normal | Foreground Light | Beschriftungen, kleine Texte |
+| **Xsmall** | System Font | 0.75rem (12px) | Normal | Muted | Fußnoten, rechtliche Hinweise |
+
+### Texteffekte
+
+- **Text-Schatten für Überschriften**: `text-shadow: 0 0 10px rgba(220, 38, 38, 0.3);`
+- **Zitate**: Linksseitiger Rahmen in Primary Red, kursiv
+
+## Komponenten
+
+### Karten (Cards)
+
+- **Hintergrund**: Card (`#1c1c1c`)
+- **Rahmen**: 1px solid Primary Red
+- **Eckenradius**: 2px
+- **Schatten**: `box-shadow: 0 0 20px rgba(220, 38, 38, 0.1);`
+- **Padding**: 1.25rem (20px)
+
+```html
+<div class="card">
+  <h3 class="card-title">Kartentitel</h3>
+  <div class="card-content">Karteninhalt</div>
+</div>
 ```
-
-### Typography
-```css
-/* Font Families */
---primary-font: 'Press Start 2P', cursive;  /* Main retro font */
---secondary-font: 'Roboto Mono', monospace; /* Secondary monospace font */
-
-/* Font Sizes */
---text-xs: 0.75rem;    /* 12px */
---text-sm: 0.875rem;   /* 14px */
---text-base: 1rem;     /* 16px */
---text-lg: 1.125rem;   /* 18px */
---text-xl: 1.25rem;    /* 20px */
---text-2xl: 1.5rem;    /* 24px */
-
-/* Line Heights */
---leading-none: 1;
---leading-tight: 1.25;
---leading-normal: 1.5;
---leading-relaxed: 1.75;
-```
-
-### Spacing
-```css
-/* Spacing Scale */
---space-1: 0.25rem;    /* 4px */
---space-2: 0.5rem;     /* 8px */
---space-3: 0.75rem;    /* 12px */
---space-4: 1rem;       /* 16px */
---space-5: 1.25rem;    /* 20px */
---space-6: 1.5rem;     /* 24px */
---space-8: 2rem;       /* 32px */
---space-10: 2.5rem;    /* 40px */
-```
-
-### Layout
-```css
-/* Container Sizes */
---container-sm: 640px;
---container-md: 768px;
---container-lg: 1024px;
---container-xl: 1200px;
-
-/* Border Radius */
---radius-sm: 0.125rem;  /* 2px */
---radius-md: 0.25rem;   /* 4px */
---radius-lg: 0.5rem;    /* 8px */
---radius-xl: 1rem;      /* 16px */
-```
-
-## Component Styles
 
 ### Buttons
-```css
-.button {
-  font-family: var(--primary-font);
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-md);
-  border: 2px solid var(--border-color);
-  background: var(--secondary-bg);
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
 
-.button:hover {
-  background: var(--hover-color);
-}
+#### Standard Button
+- **Hintergrund**: Accent (`#18181b`)
+- **Text**: Foreground Light
+- **Rahmen**: Keiner im Normalzustand
+- **Eckenradius**: 2px
+- **Padding**: 0.75rem 1.5rem (12px 24px)
+- **Transition**: all 0.3s ease
+- **Hover-Effekt**: 
+  - Background: rgba(220, 38, 38, 0.1)
+  - Transform: translateY(-2px)
+  - Box-shadow: 0 0 20px rgba(220, 38, 38, 0.2)
+  - Overlay Selection Effect: Roter Overlay mit Deckkraft-Animation
 
-.button:active {
-  background: var(--active-color);
-}
+#### Primary Button
+- Wie Standard Button, aber mit Background: Primary Red
 
-.button:disabled {
-  background: var(--disabled-color);
-  cursor: not-allowed;
-}
-```
+#### Disabled Button
+- Opacity: 0.5
+- Cursor: not-allowed
 
-### Cards
-```css
-.card {
-  background: var(--secondary-bg);
-  border: 2px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
-  margin: var(--space-2);
-}
+### Formularelemente
 
-.model-card {
-  min-width: 300px;
-  max-width: 350px;
-}
+#### Input-Felder
+- **Hintergrund**: Accent (`#18181b`)
+- **Text**: Foreground Light
+- **Rahmen**: 1px solid Primary Red
+- **Eckenradius**: 2px
+- **Padding**: 0.75rem (12px)
+- **Fokus-Effekt**: Box-shadow: 0 0 20px rgba(220, 38, 38, 0.2)
 
-.weapon-card {
-  width: 100%;
-  max-width: 400px;
-}
-```
+#### Select-Felder
+- Wie Input-Felder
+- Custom Dropdown-Icon: SVG-Pfeil in Weiß
+- Padding-Right: 2.5rem für das Icon
 
-### Combat Elements
-```css
-.dice {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--primary-font);
-  font-size: var(--text-xl);
-  cursor: pointer;
-}
+#### Switches
+- Angepasste Styling mit Primary Red als aktive Farbe
 
-.dice.hit { background: var(--hit-color); }
-.dice.crit { background: var(--crit-color); }
-.dice.save { background: var(--save-color); }
-.dice.block { background: var(--block-color); }
-```
+## Effekte
 
-## Animation Guidelines
+### Schatten-Effekte
+- **Standard-Schatten**: `box-shadow: 0 0 20px rgba(220, 38, 38, 0.1);`
+- **Hover-Schatten**: `box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);`
+- **Hervorgehobener Schatten**: `box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);`
+
+### Glüh-Effekte
+- **Rot glühend**: Animation zwischen `0 0 10px 2px rgba(220, 38, 38, 0.3)` und `0 0 15px 5px rgba(220, 38, 38, 0.5)`
+- **Gold glühend**: Animation zwischen `0 0 10px 2px rgba(245, 158, 11, 0.3)` und `0 0 15px 5px rgba(245, 158, 11, 0.5)`
+
+### Hover-Effekte
+- **Standard-Hover**: 
+  - Transform: translateY(-2px)
+  - Erhöhter Schatten
+  - Subtile Hintergrundfarbenänderung
 
 ### Transitions
-```css
-/* Default Transitions */
---transition-fast: 150ms ease;
---transition-normal: 250ms ease;
---transition-slow: 350ms ease;
+- **Standard-Transition**: `transition: all 0.3s ease;`
+- **Schnelle Transition**: `transition: all 0.2s ease;`
 
-/* Usage Examples */
-.button {
-  transition: all var(--transition-normal);
-}
+## Würfel-Design
 
-.card {
-  transition: transform var(--transition-fast);
-}
+### Standard-Würfel
+- **Hintergrund**: Accent oder Secondary
+- **Rahmen**: 1px solid Primary Red
+- **Eckenradius**: 2px
+- **Größe**: 2.5rem (40px) Standard, 1.75rem (28px) klein
+- **Text**: Zentriert, Foreground Light
 
-.dice {
-  transition: 
-    transform var(--transition-fast),
-    background-color var(--transition-normal);
-}
-```
+### Würfel-Status
+- **Treffer**: Grün glühend
+- **Kritischer Treffer**: Gold glühend
+- **Block**: Blau glühend
+- **Verfehlt**: Normaler Zustand
 
-### Animations
-```css
-@keyframes dice-roll {
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(90deg); }
-  50% { transform: rotate(180deg); }
-  75% { transform: rotate(270deg); }
-  100% { transform: rotate(360deg); }
-}
+### Würfel-Animation
+- **Würfelwurf**: 3D-Rotation mit `transform: rotateX() rotateY()` über 0.5s
+- **Ergebnis-Highlighting**: Pulsierender Glow-Effekt
 
-@keyframes highlight {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
+## Icons
 
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-```
+### Icon-System
+- SVG-Icons aus der Lucide-Icon-Bibliothek
+- Standard-Größe: 1rem (16px)
+- Farbe: Foreground Light oder Primary Red für Hervorhebungen
 
-## Responsive Design
+### Icon-Varianten
+- **Standard**: Outline-Style, 1.5px Linienstärke
+- **Klein**: 0.875rem (14px)
+- **Groß**: 1.25rem (20px)
+- **Interaktive Icons**: Hover-Effekt wie bei Buttons
+
+## Layout
+
+### Container
+- **Maximale Breite**: 1200px
+- **Padding**: 2rem (32px)
+- **Margin**: auto (zentriert)
+
+### Grid-Layout
+- Flexibles Grid-System basierend auf CSS Grid
+- Standard-Gap: 1.25rem (20px)
+- Responsives Verhalten mit verschiedenen Spaltenanzahlen:
+  - Mobile: 1 Spalte
+  - Tablet: 2 Spalten
+  - Desktop: 3-4 Spalten
+
+### Flex-Layout
+- Für einfachere Layouts und Komponenten
+- Standard-Gap: 1rem (16px)
+- Verschiedene Ausrichtungen mit justify-content und align-items
+
+## Scrollbars
+
+- **Breite**: 8px
+- **Hintergrund**: Primary Dark
+- **Daumen**: Primary Red
+- **Eckenradius**: 2px
+- **Hover-Effekt**: Leicht hellere Farbe
+
+## Media Queries
 
 ### Breakpoints
-```css
-/* Breakpoint Variables */
---screen-sm: 640px;
---screen-md: 768px;
---screen-lg: 1024px;
---screen-xl: 1200px;
 
-/* Media Query Mixins */
-@media (min-width: 640px) {
-  /* Small devices */
-}
+- **Mobile**: < 640px
+- **Tablet**: 640px - 1023px
+- **Desktop**: 1024px - 1279px
+- **Large Desktop**: >= 1280px
 
-@media (min-width: 768px) {
-  /* Medium devices */
-}
+### Responsive Anpassungen
 
-@media (min-width: 1024px) {
-  /* Large devices */
-}
+- **Container**: Unterschiedliche maximale Breiten
+- **Typografie**: Kleinere Schriftgrößen auf mobilen Geräten
+- **Grid-Layout**: Weniger Spalten auf kleineren Bildschirmen
 
-@media (min-width: 1200px) {
-  /* Extra large devices */
-}
-```
+## Animationen
 
-### Grid System
-```css
-.grid {
-  display: grid;
-  gap: var(--space-4);
-}
+### Animation-Timing
+- **Standard**: 0.3s ease
+- **Schnell**: 0.2s ease
+- **Langsam**: 0.5s ease-in-out
 
-/* Grid Templates */
-.grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
-.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
-.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
-.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+### Animation-Arten
+- **Fade**: Opacity-Übergang
+- **Slide**: TranslateX/Y-Übergang
+- **Scale**: Transform-Scale-Übergang
+- **Glow**: Box-Shadow-Übergang
 
-/* Responsive Grid */
-@media (min-width: 768px) {
-  .md\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
-  .md\:grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
-}
-```
+## Status-Effekte
 
-## Accessibility Guidelines
+### Status-Anzeigen
+- **Health (Leben)**: Grün bis Rot Farbverlauf je nach Zustand
+- **Status-Badges**: Kleine Badges mit entsprechenden Farben und Icons
 
-### Focus States
-```css
-/* Focus Styles */
-:focus {
-  outline: 2px solid var(--accent-color);
-  outline-offset: 2px;
-}
+### Status-Icons
+- **Poison**: Grün, Tropfen-Icon
+- **Fire**: Orange, Flammen-Icon
+- **Stun**: Gelb, Blitz-Icon
+- **Bleed**: Rot, Blut-Icon
 
-/* Focus-visible (for better UX) */
-:focus:not(:focus-visible) {
-  outline: none;
-}
+## Inhalts-Styling
 
-:focus-visible {
-  outline: 2px solid var(--accent-color);
-  outline-offset: 2px;
-}
-```
+### Listen
+- **Ungeordnete Listen**: Benutzerdefinierte rote Bullet-Points
+- **Geordnete Listen**: Rote Ziffern
+- **Beschreibungslisten**: Hervorgehobene Begriffe in Primary Red
 
-### ARIA Labels
-```html
-<!-- Button Examples -->
-<button aria-label="Roll Dice">Roll</button>
-<button aria-label="End Turn" aria-disabled="true">End Turn</button>
+### Tabellen
+- **Kopfzeile**: Hintergrund in Secondary, Text in Primary Red
+- **Zeilen**: Alternierende Hintergründe für bessere Lesbarkeit
+- **Ränder**: Subtile Trennlinien zwischen Zeilen
 
-<!-- Interactive Elements -->
-<div role="button" aria-pressed="false">Select Die</div>
-<div role="alert" aria-live="polite">Combat Result</div>
-```
+### Tooltips
+- **Hintergrund**: Card oder leicht transparentes Schwarz
+- **Text**: Foreground Light
+- **Rahmen**: 1px solid Primary Red
+- **Eckenradius**: 2px
+- **Schatten**: Standard-Schatten
+- **Position**: Erscheint über dem Element, mit Pfeil zum Referenzelement
 
 ## Best Practices
 
-### Component Structure
-1. Use styled-components with consistent naming
-2. Maintain component hierarchy
-3. Keep components focused and single-responsibility
-4. Document props and state
+### Abstände
+- Verwende konsistente Abstände basierend auf einer 4px-Basis (0.25rem)
+- Standard-Abstand zwischen Komponenten: 1.25rem (20px)
+- Innere Abstände (Padding): 1.25rem (20px) für Container, 0.75rem (12px) für kleinere Elemente
 
-### Styling Rules
-1. Use CSS variables for consistency
-2. Maintain responsive design principles
-3. Follow accessibility guidelines
-4. Keep animations subtle and purposeful
+### Animationen
+- Verwende Animationen sparsam und gezielt
+- Halte Animationen kurz (0.2s-0.3s)
+- Stelle sicher, dass Animationen auf die reduced-motion Medieneigenschaft reagieren
 
-### Code Organization
-1. Group related styles together
-2. Use consistent naming conventions
-3. Document complex styles
-4. Maintain separation of concerns 
+### Ränder
+- Verwende einheitliche Rahmenbreite (1px)
+- Primary Red für Hervorhebungen
+- Subtile Rahmen für Abgrenzungen (rgba-Werte mit geringer Deckkraft)
+
+### Interaktivität
+- Sorge für klares visuelles Feedback bei Interaktionen
+- Verwende Hover- und Focus-Zustände konsistent
+- Stelle sicher, dass interaktive Elemente ausreichend groß für Touch-Interaktion sind (min. 44px)
+
+### Responsive Design
+- Mobile-First-Ansatz
+- Teste auf verschiedenen Geräten und Bildschirmgrößen
+- Verwende relative Einheiten (rem, %) statt absoluter Einheiten (px)
