@@ -4,47 +4,82 @@ import styled from 'styled-components';
 const DiceContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--space-2);
   justify-content: center;
+  margin: var(--space-3) 0;
 `;
 
 const DiceButton = styled.button<{ isHit: boolean; isUsed: boolean; isBlockable: boolean; isActive: boolean }>`
-  width: 50px;
-  height: 50px;
-  border-radius: 8px;
-  border: 2px solid #4a4a8a;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 2px;
+  border: 2px solid var(--primary-border);
   background: ${props =>
     props.isUsed
-      ? '#666'
+      ? 'var(--muted)'
       : props.isBlockable
-      ? '#4CAF50'
+      ? 'var(--success)'
       : props.isHit
-      ? '#8a8aff'
-      : '#444'};
-  color: white;
-  font-size: 1.2em;
+      ? 'var(--secondary-blue)'
+      : 'var(--primary-dark)'};
+  color: var(--primary-light);
+  font-size: 1.25rem;
+  font-family: 'IM Fell English', serif;
   cursor: ${props => (props.isActive && !props.isUsed ? 'pointer' : 'not-allowed')};
   opacity: ${props => (props.isUsed ? 0.5 : 1)};
-  transition: all 0.2s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+  position: relative;
+  overflow: hidden;
 
   &:hover {
-    transform: ${props => (props.isActive && !props.isUsed ? 'scale(1.1)' : 'none')};
+    transform: ${props => (props.isActive && !props.isUsed ? 'translateY(-2px)' : 'none')};
+    box-shadow: ${props => (props.isActive && !props.isUsed ? '0 0 15px rgba(255, 255, 255, 0.1)' : 'none')};
+  }
+
+  &:after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover:after {
+    opacity: ${props => (props.isActive && !props.isUsed ? 1 : 0)};
   }
 `;
 
 const RollButton = styled.button`
-  padding: 10px 20px;
-  background: #8a8aff;
+  padding: 0.75rem 1.5rem;
+  background: var(--secondary-blue);
   border: none;
-  border-radius: 4px;
-  color: white;
-  font-size: 1em;
+  border-radius: 2px;
+  color: var(--primary-light);
+  font-size: 1rem;
+  font-family: 'IM Fell English', serif;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  min-width: 120px;
 
   &:hover {
-    transform: scale(1.05);
-    background: #7a7aef;
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(138, 138, 255, 0.2);
+  }
+
+  &:after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover:after {
+    opacity: 1;
   }
 `;
 

@@ -17,18 +17,19 @@ const TooltipText = styled.div<{
   ${props => props.$position === 'top' ? 'bottom: 135%;' : 'top: 135%;'}
   left: 50%;
   transform: translateX(calc(-50% + ${props => props.$xOffset}px));
-  background: rgba(26, 26, 46, 0.95);
-  color: #e6e6fa;
-  font-size: 0.85em;
-  padding: 12px 16px;
-  border-radius: 4px;
-  border: 1px solid #4a4a8a;
+  background: var(--card);
+  color: var(--primary-light);
+  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+  padding: var(--space-3) var(--space-4);
+  border-radius: 2px;
+  border: 1px solid var(--primary-red);
   width: max-content;
   max-width: 350px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.1);
   text-align: left;
   opacity: ${props => props.$visible ? 1 : 0};
-  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  transition: opacity 0.3s ease, transform 0.3s ease;
   
   &::after {
     content: "";
@@ -39,8 +40,8 @@ const TooltipText = styled.div<{
     border-width: 5px;
     border-style: solid;
     border-color: ${props => props.$position === 'top' 
-      ? '#4a4a8a transparent transparent transparent' 
-      : 'transparent transparent #4a4a8a transparent'};
+      ? 'var(--primary-red) transparent transparent transparent' 
+      : 'transparent transparent var(--primary-red) transparent'};
   }
 `;
 
