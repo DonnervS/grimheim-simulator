@@ -44,6 +44,7 @@ const TestContainer = styled.div`
 
   &::-webkit-scrollbar-thumb {
     background: var(--primary-red);
+    border-radius: 2px;
   }
 `;
 
@@ -52,6 +53,7 @@ const CombatContainer = styled.div`
   max-width: 1200px;
   min-height: calc(100vh - 4rem);
   background: var(--card);
+  border-radius: 2px;
   overflow: visible;
   margin-bottom: 2rem;
 `;
@@ -71,6 +73,7 @@ const FactionButton = styled.button<{ $isSelected: boolean }>`
   background: ${props => props.$isSelected ? '#3D0F0F' : 'var(--accent)'};
   color: var(--primary-light);
   padding: 1rem 2rem;
+  border-radius: 2px;
   cursor: pointer;
   font-family: 'IM Fell English', serif;
   font-size: 1.25rem;
@@ -97,6 +100,7 @@ const ModelSelect = styled.select`
   background: var(--accent);
   color: var(--primary-light);
   border: none;
+  border-radius: 2px;
   padding: 0.75rem;
   font-family: 'IM Fell English', serif;
   font-size: 1rem;
@@ -124,6 +128,7 @@ const ModelSelect = styled.select`
 
 const SelectionBox = styled.div`
   background: var(--card);
+  border-radius: 2px;
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
@@ -136,6 +141,7 @@ const StartButton = styled.button`
   background: var(--primary-red);
   color: var(--primary-light);
   padding: 1rem 2rem;
+  border-radius: 2px;
   cursor: pointer;
   font-family: 'IM Fell English', serif;
   font-size: 1.25rem;
