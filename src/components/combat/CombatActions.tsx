@@ -23,17 +23,22 @@ const ActionsContainer = styled.div`
 `;
 
 const ActionButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   background: var(--accent);
   color: var(--primary-light);
-  padding: 0.75rem 1.5rem;
   border-radius: 2px;
+  padding: 0.625rem 1rem;
   font-family: 'IM Fell English', serif;
   font-size: 1rem;
   position: relative;
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  min-width: 120px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
   border: none;
+  min-width: 120px;
+  min-height: 2.5rem;
 
   &:hover:not(:disabled) {
     transform: translateY(-2px);
@@ -61,10 +66,18 @@ const ActionButton = styled.button`
 
 const AttackButton = styled(ActionButton)`
   background: var(--primary-red);
+  
+  &:hover:not(:disabled) {
+    background: rgba(220, 38, 38, 0.9);
+  }
 `;
 
 const BlockButton = styled(ActionButton)`
   background: var(--secondary-blue);
+  
+  &:hover:not(:disabled) {
+    background: rgba(59, 130, 246, 0.9);
+  }
 `;
 
 export const CombatActions: React.FC<CombatActionsProps> = ({

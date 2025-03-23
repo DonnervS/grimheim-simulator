@@ -1,131 +1,181 @@
-import React, { useState, ReactNode, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 
-const TooltipContainer = styled.div`
-  position: relative;
-  display: inline-block;
-`;
-
-const TooltipText = styled.div<{ 
-  $visible: boolean; 
-  $position: 'top' | 'bottom';
-  $xOffset: number;
-}>`
-  visibility: ${props => props.$visible ? 'visible' : 'hidden'};
-  position: absolute;
-  z-index: 1000;
-  ${props => props.$position === 'top' ? 'bottom: 135%;' : 'top: 135%;'}
-  left: 50%;
-  transform: translateX(calc(-50% + ${props => props.$xOffset}px));
-  background: var(--card);
-  color: var(--primary-light);
-  font-size: 0.9rem;
-  font-family: 'Inter', sans-serif;
-  padding: var(--space-3) var(--space-4);
-  border-radius: 2px;
-  border: 1px solid var(--primary-red);
-  width: max-content;
-  max-width: 350px;
-  box-shadow: 0 0 20px rgba(220, 38, 38, 0.1);
-  text-align: left;
-  opacity: ${props => props.$visible ? 1 : 0};
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  
-  &::after {
-    content: "";
-    position: absolute;
-    ${props => props.$position === 'top' ? 'top: 100%;' : 'bottom: 100%;'}
-    left: calc(50% - ${props => props.$xOffset}px);
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: ${props => props.$position === 'top' 
-      ? 'var(--primary-red) transparent transparent transparent' 
-      : 'transparent transparent var(--primary-red) transparent'};
-  }
-`;
+type TooltipPosition = 'top' | 'bottom' | 'left' | 'right';
 
 interface TooltipProps {
   text: string;
-  children: ReactNode;
+  children: React.ReactNode;
   className?: string;
-  position?: 'top' | 'bottom' | 'auto';
+  position?: TooltipPosition;
 }
 
-const Tooltip: React.FC<TooltipProps> = ({ 
-  text, 
-  children, 
-  className,
-  position = 'auto'
+const TooltipWrapper = styled.div`
+  position: relative;
+  display: inline-flex;
+  max-width: 100%;
+`;
+
+const TooltipTrigger = styled.div`
+  display: inline-flex;
+`;
+
+const TooltipContent = styled.div<{
+  position: TooltipPosition;
+  isVisible: boolean;
+  finalPosition: TooltipPosition;
+}>`
+  position: absolute;
+  z-index: 50;
+  ${({ position, finalPosition }) => {
+    switch (finalPosition) {
+      case 'top':
+        return `
+          bottom: 100%;
+          left: 50%;
+          transform: translateX(-50%);
+          margin-bottom: 0.5rem;
+        `;
+      case 'bottom':
+        return `
+          top: 100%;
+          left: 50%;
+          transform: translateX(-50%);
+          margin-top: 0.5rem;
+        `;
+      case 'left':
+        return `
+          right: 100%;
+          top: 50%;
+          transform: translateY(-50%);
+          margin-right: 0.5rem;
+        `;
+      case 'right':
+        return `
+          left: 100%;
+          top: 50%;
+          transform: translateY(-50%);
+          margin-left: 0.5rem;
+        `;
+      default:
+        return '';
+    }
+  }}
+  
+  background: var(--card);
+  color: var(--primary-light);
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 2px;
+  border: 1px solid var(--primary-red);
+  width: max-content;
+  max-width: 20rem;
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
+  
+  opacity: ${({ isVisible }) => (isVisible ? 1 : 0)};
+  visibility: ${({ isVisible }) => (isVisible ? 'visible' : 'hidden')};
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    ${({ finalPosition }) => {
+      switch (finalPosition) {
+        case 'top':
+          return `
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid var(--primary-red);
+          `;
+        case 'bottom':
+          return `
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 5px solid var(--primary-red);
+          `;
+        case 'left':
+          return `
+            right: -5px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-left: 5px solid var(--primary-red);
+          `;
+        case 'right':
+          return `
+            left: -5px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-right: 5px solid var(--primary-red);
+          `;
+        default:
+          return '';
+      }
+    }}
+  }
+`;
+
+const Tooltip: React.FC<TooltipProps> = ({
+  text,
+  children,
+  className = '',
+  position = 'top',
 }) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [tooltipPosition, setTooltipPosition] = useState<'top' | 'bottom'>('top');
-  const [xOffset, setXOffset] = useState(0);
+  const [finalPosition, setFinalPosition] = useState<TooltipPosition>(position);
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isVisible && tooltipRef.current && containerRef.current) {
+    if (isVisible && tooltipRef.current && contentRef.current) {
       const tooltipRect = tooltipRef.current.getBoundingClientRect();
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const viewportWidth = window.innerWidth;
+      const contentRect = contentRef.current.getBoundingClientRect();
       
-      // Vertikale Positionierung
-      if (position !== 'auto') {
-        setTooltipPosition(position);
-      } else {
-        // Berechnen, wie viel Platz oberhalb und unterhalb des Elements ist
-        const spaceAbove = containerRect.top;
-        const spaceBelow = viewportHeight - containerRect.bottom;
-        
-        if (spaceAbove < tooltipRect.height + 30) {
-          setTooltipPosition('bottom');
-        } else if (spaceBelow < tooltipRect.height + 30) {
-          setTooltipPosition('top');
-        } else {
-          setTooltipPosition('top');
-        }
+      let newPosition: TooltipPosition = position;
+      
+      // Check if tooltip is overflowing viewport and adjust position if needed
+      if (position === 'top' && contentRect.top < 0) {
+        newPosition = 'bottom';
+      } else if (position === 'bottom' && contentRect.bottom > window.innerHeight) {
+        newPosition = 'top';
+      } else if (position === 'left' && contentRect.left < 0) {
+        newPosition = 'right';
+      } else if (position === 'right' && contentRect.right > window.innerWidth) {
+        newPosition = 'left';
       }
       
-      // Horizontale Positionierung - Verhindern, dass der Tooltip über den Rand hinausragt
-      const tooltipLeft = containerRect.left + (containerRect.width / 2) - (tooltipRect.width / 2);
-      const tooltipRight = tooltipLeft + tooltipRect.width;
-      
-      let offsetX = 0;
-      
-      // Wenn der Tooltip links abgeschnitten wäre
-      if (tooltipLeft < 20) {
-        offsetX = 20 - tooltipLeft;
-      }
-      // Wenn der Tooltip rechts abgeschnitten wäre
-      else if (tooltipRight > viewportWidth - 20) {
-        offsetX = viewportWidth - 20 - tooltipRight;
-      }
-      
-      setXOffset(offsetX);
+      setFinalPosition(newPosition);
     }
   }, [isVisible, position]);
 
   return (
-    <TooltipContainer 
+    <TooltipWrapper
       className={className}
+      ref={tooltipRef}
       onMouseEnter={() => setIsVisible(true)}
       onMouseLeave={() => setIsVisible(false)}
-      onTouchStart={() => setIsVisible(true)}
-      onTouchEnd={() => setIsVisible(false)}
-      ref={containerRef}
+      onFocus={() => setIsVisible(true)}
+      onBlur={() => setIsVisible(false)}
     >
-      {children}
-      <TooltipText 
-        $visible={isVisible} 
-        $position={tooltipPosition}
-        $xOffset={xOffset}
-        ref={tooltipRef}
+      <TooltipTrigger>{children}</TooltipTrigger>
+      <TooltipContent
+        ref={contentRef}
+        position={position}
+        finalPosition={finalPosition}
+        isVisible={isVisible}
       >
         {text}
-      </TooltipText>
-    </TooltipContainer>
+      </TooltipContent>
+    </TooltipWrapper>
   );
 };
 

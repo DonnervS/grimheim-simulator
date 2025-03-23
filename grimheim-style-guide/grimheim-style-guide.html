@@ -1,0 +1,1982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grimheim Style Guide</title>
+  <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Include Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      /* Colors */
+      --background: #0f0f0f;
+      --foreground: #fafafa;
+      --card: #1c1c1c;
+      --card-foreground: #fafafa;
+      --primary: #dc2626;
+      --primary-foreground: #fafafa;
+      --secondary: #27272a;
+      --secondary-foreground: #fafafa;
+      --muted: #171717;
+      --muted-foreground: #a3a3a3;
+      --accent: #18181b;
+      --accent-foreground: #fafafa;
+      --gold: #f59e0b;
+      --gold-foreground: #171717;
+      --destructive: #ef4444;
+      --destructive-foreground: #fafafa;
+      --border: #333333;
+      --input: #333333;
+      --ring: #dc2626;
+      --radius: 0.5rem;
+
+      /* Status Colors */
+      --success: #16a34a;
+      --warning: #ca8a04;
+      --danger: #b91c1c;
+      --info: #2563eb;
+
+      /* Extended Colors */
+      --blood-red: #991b1b;
+      --bone: #fffbeb;
+      --ash-gray: #374151;
+      --shadow: #111827;
+      --poison: #22c55e;
+      --ice: #22d3ee;
+      --fire: #f97316;
+      --curse: #7e22ce;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--background);
+      color: var(--foreground);
+      line-height: 1.5;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 2rem;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'IM Fell English', serif;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: var(--primary);
+    }
+
+    h2 {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-top: 2rem;
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+    }
+
+    .subtitle {
+      font-size: 1.25rem;
+      color: var(--muted-foreground);
+    }
+
+    .card {
+      background-color: var(--card);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .section {
+      margin-bottom: 3rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    .color-card {
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .color-display {
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+    }
+
+    .color-info {
+      background-color: var(--card);
+      padding: 0.5rem;
+      font-size: 0.875rem;
+      font-family: monospace;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius);
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .button-primary {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+      border: none;
+    }
+
+    .button-primary:hover {
+      background-color: #b91c1c;
+    }
+
+    .button-secondary {
+      background-color: var(--secondary);
+      color: var(--secondary-foreground);
+      border: none;
+    }
+
+    .button-secondary:hover {
+      background-color: #3f3f46;
+    }
+
+    .button-outline {
+      background-color: transparent;
+      color: var(--foreground);
+      border: 1px solid var(--border);
+    }
+
+    .button-outline:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .button-destructive {
+      background-color: var(--destructive);
+      color: var(--destructive-foreground);
+      border: none;
+    }
+
+    .button-destructive:hover {
+      background-color: #b91c1c;
+    }
+
+    .button-gold {
+      background-color: transparent;
+      color: var(--gold);
+      border: 1px solid var(--gold);
+    }
+
+    .button-gold:hover {
+      background-color: rgba(245, 158, 11, 0.1);
+    }
+
+    .button-sm {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    .button-lg {
+      padding: 0.75rem 1.5rem;
+      font-size: 1.125rem;
+    }
+
+    .button-icon {
+      padding: 0.5rem;
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 9999px;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .badge-default {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+    }
+
+    .badge-secondary {
+      background-color: var(--secondary);
+      color: var(--secondary-foreground);
+    }
+
+    .badge-outline {
+      background-color: transparent;
+      border: 1px solid var(--border);
+      color: var(--foreground);
+    }
+
+    .badge-destructive {
+      background-color: var(--destructive);
+      color: var(--destructive-foreground);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      border-radius: 9999px;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .status-badge-stunned {
+      background-color: #ca8a04;
+      color: white;
+    }
+
+    .status-badge-poisoned {
+      background-color: #16a34a;
+      color: white;
+    }
+
+    .status-badge-frozen {
+      background-color: #0891b2;
+      color: white;
+    }
+
+    .status-badge-burning {
+      background-color: #ea580c;
+      color: white;
+    }
+
+    .status-badge-cursed {
+      background-color: #7e22ce;
+      color: white;
+    }
+
+    .dice {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 4rem;
+      height: 4rem;
+      border-radius: 0.5rem;
+      font-weight: bold;
+      font-size: 1.5rem;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .dice-miss {
+      background-color: #4b5563;
+      color: white;
+    }
+
+    .dice-hit {
+      background-color: #dc2626;
+      color: white;
+    }
+
+    .dice-critical {
+      background-color: #f59e0b;
+      color: black;
+    }
+
+    .dice-block {
+      background-color: #2563eb;
+      color: white;
+    }
+
+    .dice-shield {
+      background-color: #0891b2;
+      color: white;
+    }
+
+    .dice-armor {
+      background-color: #6b7280;
+      color: white;
+    }
+
+    .dice-critical-block {
+      background-color: #7e22ce;
+      color: white;
+    }
+
+    .dice-small {
+      width: 2.5rem;
+      height: 2.5rem;
+      font-size: 1rem;
+    }
+
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 1rem;
+    }
+
+    .icon-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: var(--secondary);
+      padding: 1rem;
+      border-radius: var(--radius);
+      text-align: center;
+    }
+
+    .icon-card span {
+      margin-top: 0.5rem;
+      font-size: 0.75rem;
+    }
+
+    .icon-card i-lucide {
+      width: 24px;
+      height: 24px;
+      color: var(--foreground);
+    }
+
+    .stat-card {
+      background-color: var(--secondary);
+      padding: 1rem;
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .stat-description {
+      font-size: 0.75rem;
+      color: var(--muted-foreground);
+    }
+
+    .stat-value {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+
+    .stat-name {
+      font-family: 'IM Fell English', serif;
+      font-size: 1.25rem;
+    }
+
+    .stat-number {
+      font-weight: bold;
+      font-size: 1.5rem;
+    }
+
+    .model-stat .stat-name {
+      color: var(--gold);
+    }
+
+    .weapon-stat .stat-name {
+      color: var(--primary);
+    }
+
+    .separator {
+      height: 1px;
+      background-color: var(--border);
+      margin: 2rem 0;
+    }
+
+    .flex {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .info-box {
+      border-radius: var(--radius);
+      padding: 1rem;
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .info-box-blue {
+      background-color: rgba(30, 58, 138, 0.5);
+      border: 1px solid #1e40af;
+    }
+
+    .info-box-red {
+      background-color: rgba(153, 27, 27, 0.5);
+      border: 1px solid #991b1b;
+    }
+
+    .info-box-yellow {
+      background-color: rgba(161, 98, 7, 0.5);
+      border: 1px solid #a16207;
+    }
+
+    .info-box-green {
+      background-color: rgba(22, 101, 52, 0.5);
+      border: 1px solid #166534;
+    }
+
+    .info-box-title {
+      font-family: 'IM Fell English', serif;
+      margin-bottom: 0.25rem;
+    }
+
+    .info-box-blue .info-box-title {
+      color: #93c5fd;
+    }
+
+    .info-box-red .info-box-title {
+      color: #fca5a5;
+    }
+
+    .info-box-yellow .info-box-title {
+      color: #fcd34d;
+    }
+
+    .info-box-green .info-box-title {
+      color: #86efac;
+    }
+
+    .info-box-content {
+      font-size: 0.875rem;
+    }
+
+    .info-box-blue .info-box-content {
+      color: #bfdbfe;
+    }
+
+    .info-box-red .info-box-content {
+      color: #fecaca;
+    }
+
+    .info-box-yellow .info-box-content {
+      color: #fef3c7;
+    }
+
+    .info-box-green .info-box-content {
+      color: #d1fae5;
+    }
+
+    .quote {
+      border-left: 4px solid var(--primary);
+      padding-left: 1rem;
+      font-style: italic;
+      margin-bottom: 1.5rem;
+    }
+
+    .quote-text {
+      font-family: 'IM Fell English', serif;
+      font-size: 1.125rem;
+    }
+
+    .quote-author {
+      font-size: 0.875rem;
+      color: var(--muted-foreground);
+      margin-top: 0.5rem;
+    }
+
+    /* Lists and Tables */
+    .list {
+      margin-left: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .list li {
+      margin-bottom: 0.5rem;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      text-align: left;
+      padding: 0.75rem;
+      background-color: var(--secondary);
+      font-weight: 600;
+    }
+
+    td {
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    tr:hover {
+      background-color: rgba(255, 255, 255, 0.03);
+    }
+
+    caption {
+      margin-top: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--muted-foreground);
+      text-align: left;
+    }
+
+    /* Image with Caption */
+    .image-container {
+      margin-bottom: 1.5rem;
+    }
+
+    .image-wrapper {
+      position: relative;
+      width: 100%;
+      height: 0;
+      padding-bottom: 56.25%; /* 16:9 aspect ratio */
+      background-color: var(--muted);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .image-wrapper img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .image-caption {
+      margin-top: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--muted-foreground);
+      text-align: center;
+      font-style: italic;
+    }
+
+    /* Hover and Glow Effects */
+    .hover-basic {
+      background-color: var(--secondary);
+      padding: 1rem;
+      border-radius: var(--radius);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .hover-basic:hover {
+      background-color: rgba(39, 39, 42, 0.8);
+    }
+
+    .hover-scale {
+      background-color: var(--secondary);
+      padding: 1rem;
+      border-radius: var(--radius);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .hover-scale:hover {
+      transform: scale(1.05);
+    }
+
+    .hover-shadow {
+      background-color: var(--secondary);
+      padding: 1rem;
+      border-radius: var(--radius);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .hover-shadow:hover {
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+
+    .glow-red {
+      background-color: var(--secondary);
+      padding: 1rem;
+      border-radius: var(--radius);
+      box-shadow: 0 0 10px 2px rgba(220, 38, 38, 0.2);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .glow-red:hover {
+      box-shadow: 0 0 15px 3px rgba(220, 38, 38, 0.4);
+    }
+
+    .glow-blue {
+      background-color: var(--secondary);
+      padding: 1rem;
+      border-radius: var(--radius);
+      box-shadow: 0 0 10px 2px rgba(37, 99, 235, 0.2);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .glow-blue:hover {
+      box-shadow: 0 0 15px 3px rgba(37, 99, 235, 0.4);
+    }
+
+    .selection-border {
+      position: relative;
+      background-color: var(--secondary);
+      padding: 1rem;
+      border-radius: var(--radius);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .selection-border::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 2px solid transparent;
+      border-radius: var(--radius);
+      transition: all 0.3s ease;
+    }
+
+    .selection-border:hover::after {
+      border-color: var(--primary);
+    }
+
+    .selection-overlay {
+      position: relative;
+      background-color: var(--secondary);
+      padding: 1rem;
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .selection-overlay::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-color: rgba(220, 38, 38, 0);
+      transition: all 0.3s ease;
+    }
+
+    .selection-overlay:hover::after {
+      background-color: rgba(220, 38, 38, 0.1);
+    }
+
+    /* Content Blocks */
+    .content-block {
+      background-color: var(--secondary);
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      margin-bottom: 1.5rem;
+    }
+
+    .content-block-title {
+      font-family: 'IM Fell English', serif;
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .content-block-subtitle {
+      font-size: 0.875rem;
+      color: var(--muted-foreground);
+      margin-top: 0.5rem;
+    }
+
+    .lore-quote {
+      font-style: italic;
+      color: var(--muted-foreground);
+      margin-bottom: 1rem;
+    }
+
+    .rule-label {
+      font-weight: 600;
+    }
+
+    /* Wound Markers */
+    .wound-marker {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background-color: var(--secondary);
+      padding: 0.75rem;
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+    }
+
+    .wound-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .wound-critical {
+      background-color: #b91c1c;
+    }
+
+    .wound-severe {
+      background-color: #ea580c;
+    }
+
+    .wound-light {
+      background-color: #ca8a04;
+    }
+
+    .wound-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .wound-location {
+      font-weight: 500;
+    }
+
+    .wound-severity {
+      font-size: 0.875rem;
+      color: var(--muted-foreground);
+    }
+
+    /* Tooltip */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+
+    .tooltip .tooltip-content {
+      visibility: hidden;
+      width: 200px;
+      background-color: var(--card);
+      color: var(--card-foreground);
+      text-align: left;
+      border-radius: var(--radius);
+      padding: 0.75rem;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      pointer-events: none;
+    }
+
+    .tooltip .tooltip-content::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: var(--card) transparent transparent transparent;
+    }
+
+    .tooltip:hover .tooltip-content {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .tooltip-header {
+      background-color: var(--secondary);
+      margin: -0.75rem;
+      margin-bottom: 0.75rem;
+      padding: 0.5rem 0.75rem;
+      border-top-left-radius: var(--radius);
+      border-top-right-radius: var(--radius);
+      font-family: 'IM Fell English', serif;
+    }
+
+    /* Tabs */
+    .tabs {
+      margin-bottom: 2rem;
+    }
+
+    .tab-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+
+    .tab {
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      background-color: transparent;
+      color: var(--muted-foreground);
+      border: none;
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .tab:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      color: var(--foreground);
+    }
+
+    .tab.active {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Lucide icon styling */
+    i-lucide {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: middle;
+    }
+
+    .button i-lucide {
+      margin-right: 0.5rem;
+    }
+
+    .button-icon i-lucide {
+      margin-right: 0;
+    }
+
+    .status-badge i-lucide {
+      width: 14px;
+      height: 14px;
+    }
+
+    .info-box i-lucide {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .wound-icon i-lucide {
+      width: 20px;
+      height: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+
+      .icon-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Grimheim</h1>
+      <p class="subtitle">Style Guide & Design System</p>
+    </header>
+
+    <div class="tabs">
+      <div class="tab-list">
+        <button class="tab active" onclick="openTab(event, 'colors')">Colors</button>
+        <button class="tab" onclick="openTab(event, 'typography')">Typography</button>
+        <button class="tab" onclick="openTab(event, 'components')">Components</button>
+        <button class="tab" onclick="openTab(event, 'status')">Status Effects</button>
+        <button class="tab" onclick="openTab(event, 'dice')">Dice</button>
+        <button class="tab" onclick="openTab(event, 'layout')">Layout</button>
+        <button class="tab" onclick="openTab(event, 'icons')">Icons</button>
+        <button class="tab" onclick="openTab(event, 'effects')">Effects</button>
+        <button class="tab" onclick="openTab(event, 'content')">Content</button>
+      </div>
+
+      <div id="colors" class="tab-content active">
+        <div class="section">
+          <h2>Primary Colors</h2>
+          
+          <div class="grid">
+            <div class="color-card">
+              <div class="color-display" style="background-color: var(--primary); color: var(--primary-foreground);">
+                Primary (Red)
+              </div>
+              <div class="color-info">#dc2626</div>
+            </div>
+            <div class="color-card">
+              <div class="color-display" style="background-color: var(--background); color: var(--foreground);">
+                Background (Dark)
+              </div>
+              <div class="color-info">#0f0f0f</div>
+            </div>
+            <div class="color-card">
+              <div class="color-display" style="background-color: var(--foreground); color: var(--background);">
+                Foreground (Light)
+              </div>
+              <div class="color-info">#fafafa</div>
+            </div>
+          </div>
+
+          <h3>Secondary Colors</h3>
+          <div class="grid">
+            <div class="color-card">
+              <div class="color-display" style="background-color: var(--secondary); color: var(--secondary-foreground);">
+                Secondary
+              </div>
+              <div class="color-info">#27272a</div>
+            </div>
+            <div class="color-card">
+              <div class="color-display" style="background-color: var(--accent); color: var(--accent-foreground);">
+                Accent
+              </div>
+              <div class="color-info">#18181b</div>
+            </div>
+            <div class="color-card">
+              <div class="color-display" style="background-color: var(--gold); color: var(--gold-foreground);">
+                Gold Accent
+              </div>
+              <div class="color-info">#f59e0b</div>
+            </div>
+            <div class="color-card">
+              <div class="color-display" style="background-color: var(--muted); color: var(--muted-foreground);">
+                Muted
+              </div>
+              <div class="color-info">#171717</div>
+            </div>
+          </div>
+
+          <h3>Status Colors</h3>
+          <div class="grid">
+            <div class="color-card">
+              <div class="color-display" style="background-color: var(--success); color: white;">
+                Success
+              </div>
+              <div class="color-info">#16a34a</div>
+            </div>
+            <div class="color-card">
+              <div class="color-display" style="background-color: var(--warning); color: white;">
+                Warning
+              </div>
+              <div class="color-info">#ca8a04</div>
+            </div>
+            <div class="color-card">
+              <div class="color-display" style="background-color: var(--danger); color: white;">
+                Danger
+              </div>
+              <div class="color-info">#b91c1c</div>
+            </div>
+            <div class="color-card">
+              <div class="color-display" style="background-color: var(--info); color: white;">
+                Info
+              </div>
+              <div class="color-info">#2563eb</div>
+            </div>
+          </div>
+
+          <h3>Extended Color Palette</h3>
+          <div class="grid">
+            <div class="color-card">
+              <div class="color-display" style="background-color: var(--blood-red); color: white;">
+                Blood Red
+              </div>
+              <div class="color-info">#991b1b</div>
+            </div>
+            <div class="color-card">
+              <div class="color-display" style="background-color: var(--bone); color: black;">
+                Bone
+              </div>
+              <div class="color-info">#fffbeb</div>
+            </div>
+            <div class="color-card">
+              <div class="color-display" style="background-color: var(--ash-gray); color: white;">
+                Ash Gray
+              </div>
+              <div class="color-info">#374151</div>
+            </div>
+            <div class="color-card">
+              <div class="color-display" style="background-color: var(--shadow); color: white;">
+                Shadow
+              </div>
+              <div class="color-info">#111827</div>
+            </div>
+            <div class="color-card">
+              <div class="color-display" style="background-color: var(--poison); color: white;">
+                Poison
+              </div>
+              <div class="color-info">#22c55e</div>
+            </div>
+            <div class="color-card">
+              <div class="color-display" style="background-color: var(--ice); color: black;">
+                Ice
+              </div>
+              <div class="color-info">#22d3ee</div>
+            </div>
+            <div class="color-card">
+              <div class="color-display" style="background-color: var(--fire); color: white;">
+                Fire
+              </div>
+              <div class="color-info">#f97316</div>
+            </div>
+            <div class="color-card">
+              <div class="color-display" style="background-color: var(--curse); color: white;">
+                Curse
+              </div>
+              <div class="color-info">#7e22ce</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="typography" class="tab-content">
+        <div class="section">
+          <h2>Headings</h2>
+          
+          <div class="card">
+            <h1 style="margin-top: 0;">Heading 1 - IM Fell English</h1>
+            <p class="subtitle">Used for main page titles and hero sections</p>
+            
+            <div class="separator"></div>
+            
+            <h2 style="margin-top: 0;">Heading 2 - IM Fell English</h2>
+            <p class="subtitle">Used for section titles and major content divisions</p>
+            
+            <div class="separator"></div>
+            
+            <h3 style="margin-top: 0;">Heading 3 - IM Fell English</h3>
+            <p class="subtitle">Used for subsection titles and card headers</p>
+            
+            <div class="separator"></div>
+            
+            <h4>Heading 4 - IM Fell English</h4>
+            <p class="subtitle">Used for minor section titles and list headers</p>
+          </div>
+
+          <h3>Body Text</h3>
+          <div class="card">
+            <p style="font-size: 1.125rem;">Large Body Text - Inter</p>
+            <p class="subtitle">Used for important paragraphs and highlighted content</p>
+            
+            <div class="separator"></div>
+            
+            <p>Regular Body Text - Inter</p>
+            <p class="subtitle">Used for standard paragraphs and most content</p>
+            
+            <div class="separator"></div>
+            
+            <p style="font-size: 0.875rem;">Small Text - Inter</p>
+            <p class="subtitle">Used for captions, footnotes, and secondary information</p>
+            
+            <div class="separator"></div>
+            
+            <p style="font-size: 0.75rem;">Extra Small Text - Inter</p>
+            <p class="subtitle">Used for legal text, credits, and very minor information</p>
+          </div>
+
+          <h3>Quotes</h3>
+          <div class="card">
+            <div class="quote">
+              <p class="quote-text">"In the grim darkness of Grimheim, there is only war. The weak perish, and the strong survive to fight another day."</p>
+              <p class="quote-author">— Warlord Thorgrim, <cite>Chronicles of the Fallen</cite></p>
+            </div>
+            
+            <div class="quote">
+              <p class="quote-text">"The gods favor the bold, but fortune favors the prepared. Ready your weapons, sharpen your blades, and trust in your warband."</p>
+              <p class="quote-author">— Battle Sage Erika</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="components" class="tab-content">
+        <div class="section">
+          <h2>Buttons</h2>
+          
+          <div class="card">
+            <h3>Primary Buttons</h3>
+            <div>
+              <button class="button button-primary">Default</button>
+              <button class="button button-primary" disabled>Disabled</button>
+              <button class="button button-primary button-sm">Small</button>
+              <button class="button button-primary button-lg">Large</button>
+            </div>
+            
+            <h3>Secondary Buttons</h3>
+            <div>
+              <button class="button button-secondary">Default</button>
+              <button class="button button-secondary" disabled>Disabled</button>
+              <button class="button button-secondary button-sm">Small</button>
+              <button class="button button-secondary button-lg">Large</button>
+            </div>
+            
+            <h3>Outline Buttons</h3>
+            <div>
+              <button class="button button-outline">Default</button>
+              <button class="button button-outline" disabled>Disabled</button>
+              <button class="button button-outline button-sm">Small</button>
+              <button class="button button-outline button-lg">Large</button>
+            </div>
+            
+            <h3>Destructive Buttons</h3>
+            <div>
+              <button class="button button-destructive">Default</button>
+              <button class="button button-destructive" disabled>Disabled</button>
+              <button class="button button-destructive button-sm">Small</button>
+              <button class="button button-destructive button-lg">Large</button>
+            </div>
+          </div>
+
+          <h3>Action Buttons</h3>
+          <div class="card">
+            <button class="button button-primary">
+              <i-lucide name="edit" size="16"></i-lucide> Edit
+            </button>
+            <button class="button button-secondary">
+              <i-lucide name="eye" size="16"></i-lucide> View
+            </button>
+            <button class="button button-outline">
+              <i-lucide name="printer" size="16"></i-lucide> Print
+            </button>
+            <button class="button button-destructive">
+              <i-lucide name="x" size="16"></i-lucide> Delete
+            </button>
+          </div>
+
+          <h3>Table Action Buttons</h3>
+          <div class="card">
+            <button class="button button-outline button-icon">
+              <i-lucide name="edit" size="16"></i-lucide>
+            </button>
+            <button class="button button-outline button-icon">
+              <i-lucide name="eye" size="16"></i-lucide>
+            </button>
+            <button class="button button-outline button-icon">
+              <i-lucide name="printer" size="16"></i-lucide>
+            </button>
+            <button class="button button-outline button-icon" style="color: var(--destructive);">
+              <i-lucide name="x" size="16"></i-lucide>
+            </button>
+            <button class="button button-outline button-icon">
+              <i-lucide name="check" size="16"></i-lucide>
+            </button>
+            <button class="button button-secondary button-icon">
+              <i-lucide name="sword" size="16"></i-lucide>
+            </button>
+            <button class="button button-primary button-icon">
+              <i-lucide name="shield" size="16"></i-lucide>
+            </button>
+          </div>
+
+          <h3>Weapon Buttons</h3>
+          <div class="card">
+            <button class="button button-secondary">
+              <i-lucide name="sword" size="16"></i-lucide> Close Combat
+            </button>
+            <button class="button button-secondary">
+              <i-lucide name="crosshair" size="16"></i-lucide> Ranged Weapon
+            </button>
+            <button class="button button-gold">
+              <i-lucide name="bomb" size="16"></i-lucide> Special Weapon
+            </button>
+          </div>
+
+          <h3>Cards</h3>
+          <div class="grid">
+            <div class="card">
+              <h3 style="margin-top: 0;">Warband Card</h3>
+              <p class="subtitle">A card displaying warband information</p>
+              <p>This card contains information about a player's warband, including units, equipment, and abilities.</p>
+            </div>
+            <div class="card">
+              <h3 style="margin-top: 0;">Unit Card</h3>
+              <p class="subtitle">A card displaying unit information</p>
+              <p>This card contains detailed information about a specific unit, including stats, equipment, and special rules.</p>
+            </div>
+          </div>
+
+          <h3>Badges</h3>
+          <div class="card">
+            <h4>Standard Badges</h4>
+            <div>
+              <span class="badge badge-default">Default</span>
+              <span class="badge badge-secondary">Secondary</span>
+              <span class="badge badge-outline">Outline</span>
+              <span class="badge badge-destructive">Destructive</span>
+            </div>
+          </div>
+
+          <h3>Lists and Tables</h3>
+          <div class="grid">
+            <div class="card">
+              <h3 style="margin-top: 0;">Ordered List</h3>
+              <ol class="list">
+                <li>Initiative Phase: Determine turn order</li>
+                <li>Movement Phase: Move units across the battlefield</li>
+                <li>Shooting Phase: Ranged attacks and spells</li>
+                <li>Charge Phase: Declare and resolve charges</li>
+                <li>Combat Phase: Resolve melee combat</li>
+                <li>Morale Phase: Test for broken units</li>
+              </ol>
+            </div>
+            <div class="card">
+              <h3 style="margin-top: 0;">Unordered List</h3>
+              <ul class="list">
+                <li>Humans: Versatile warriors with balanced stats</li>
+                <li>Dwarves: Tough and resilient, but slow</li>
+                <li>Elves: Fast and skilled, but fragile</li>
+                <li>Orcs: Strong in combat, poor discipline</li>
+                <li>Undead: Immune to psychology, weak to holy damage</li>
+                <li>Demons: Powerful but unstable presence</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 style="margin-top: 0;">Weapon Stats Table</h3>
+            <div class="table-container">
+              <table>
+                <caption>Comprehensive weapon statistics for Grimheim</caption>
+                <thead>
+                  <tr>
+                    <th>Weapon</th>
+                    <th>Range</th>
+                    <th>Strength</th>
+                    <th>Damage</th>
+                    <th>Special Rules</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Longsword</td>
+                    <td>Melee</td>
+                    <td>User</td>
+                    <td>1</td>
+                    <td>Parry</td>
+                  </tr>
+                  <tr>
+                    <td>Battle Axe</td>
+                    <td>Melee</td>
+                    <td>User+1</td>
+                    <td>1</td>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <td>Warhammer</td>
+                    <td>Melee</td>
+                    <td>User</td>
+                    <td>1</td>
+                    <td>Armor Piercing (1)</td>
+                  </tr>
+                  <tr>
+                    <td>Shortbow</td>
+                    <td>16"</td>
+                    <td>3</td>
+                    <td>1</td>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <td>Crossbow</td>
+                    <td>24"</td>
+                    <td>4</td>
+                    <td>1</td>
+                    <td>Move or Fire</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <h3>Image with Caption</h3>
+          <div class="card">
+            <div class="image-container">
+              <div class="image-wrapper">
+                <img src="https://placehold.co/800x450/171717/dc2626?text=Battle+Scene" alt="Battle scene from Grimheim">
+              </div>
+              <p class="image-caption">The Battle of Blackfire Pass - a decisive conflict that changed the fate of Grimheim forever</p>
+            </div>
+          </div>
+
+          <h3>Info Boxes</h3>
+          <div class="card">
+            <div class="info-box info-box-blue">
+              <i-lucide name="alert-circle" size="20"></i-lucide>
+              <div>
+                <h4 class="info-box-title">Information</h4>
+                <p class="info-box-content">Units with the Scout ability can deploy anywhere on the battlefield that is more than 9" away from enemy units.</p>
+              </div>
+            </div>
+            
+            <div class="info-box info-box-red">
+              <i-lucide name="alert-triangle" size="20"></i-lucide>
+              <div>
+                <h4 class="info-box-title">Warning</h4>
+                <p class="info-box-content">Berserker units must always charge the nearest enemy if possible, even if it would be tactically disadvantageous.</p>
+              </div>
+            </div>
+            
+            <div class="info-box info-box-yellow">
+              <i-lucide name="alert-triangle" size="20"></i-lucide>
+              <div>
+                <h4 class="info-box-title">Caution</h4>
+                <p class="info-box-content">Spellcasters risk Perils of the Warp when rolling doubles on casting attempts. Roll on the Mishap table immediately.</p>
+              </div>
+            </div>
+            
+            <div class="info-box info-box-green">
+              <i-lucide name="lightbulb" size="20"></i-lucide>
+              <div>
+                <h4 class="info-box-title">Tip</h4>
+                <p class="info-box-content">Positioning is key. Units gain +1 to hit rolls when attacking enemies from the flank or rear.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="status" class="tab-content">
+        <div class="section">
+          <h2>Status Effect Tags</h2>
+          
+          <div class="card">
+            <div class="flex">
+              <div>
+                <span class="status-badge status-badge-stunned">
+                  <i-lucide name="zap" size="14"></i-lucide> Stunned
+                </span>
+                <p class="subtitle">Unit loses its next activation</p>
+              </div>
+              <div>
+                <span class="status-badge status-badge-poisoned">
+                  <i-lucide name="droplets" size="14"></i-lucide> Poisoned
+                </span>
+                <p class="subtitle">Unit takes 1 damage at start of turn</p>
+              </div>
+              <div>
+                <span class="status-badge status-badge-frozen">
+                  <i-lucide name="snowflake" size="14"></i-lucide> Frozen
+                </span>
+                <p class="subtitle">Movement reduced by half</p>
+              </div>
+              <div>
+                <span class="status-badge status-badge-burning">
+                  <i-lucide name="flame" size="14"></i-lucide> Burning
+                </span>
+                <p class="subtitle">Unit takes D3 damage at end of turn</p>
+              </div>
+              <div>
+                <span class="status-badge status-badge-cursed">
+                  <i-lucide name="skull" size="14"></i-lucide> Cursed
+                </span>
+                <p class="subtitle">All dice rolls -1</p>
+              </div>
+            </div>
+          </div>
+
+          <h3>Wound Markers</h3>
+          <div class="card">
+            <div class="wound-marker">
+              <div class="wound-icon wound-critical">
+                <i-lucide name="skull" size="20"></i-lucide>
+              </div>
+              <div class="wound-info">
+                <div class="wound-location">Head Wound</div>
+                <div class="wound-severity">Critical Damage</div>
+              </div>
+            </div>
+            <div class="wound-marker">
+              <div class="wound-icon wound-severe">
+                <i-lucide name="sword" size="20"></i-lucide>
+              </div>
+              <div class="wound-info">
+                <div class="wound-location">Arm Wound</div>
+                <div class="wound-severity">Severe Damage</div>
+              </div>
+            </div>
+            <div class="wound-marker">
+              <div class="wound-icon wound-light">
+                <i-lucide name="footprints" size="20"></i-lucide>
+              </div>
+              <div class="wound-info">
+                <div class="wound-location">Leg Wound</div>
+                <div class="wound-severity">Light Damage</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="dice" class="tab-content">
+        <div class="section">
+          <h2>Dice Colors</h2>
+          
+          <div class="card">
+            <div class="flex">
+              <div>
+                <div class="dice dice-miss">1</div>
+                <p class="subtitle">Miss</p>
+              </div>
+              <div>
+                <div class="dice dice-hit">4</div>
+                <p class="subtitle">Hit</p>
+              </div>
+              <div>
+                <div class="dice dice-critical">6</div>
+                <p class="subtitle">Critical</p>
+              </div>
+              <div>
+                <div class="dice dice-block">5</div>
+                <p class="subtitle">Block</p>
+              </div>
+              <div>
+                <div class="dice dice-shield">3</div>
+                <p class="subtitle">Shield</p>
+              </div>
+              <div>
+                <div class="dice dice-armor">2</div>
+                <p class="subtitle">Armor</p>
+              </div>
+            </div>
+          </div>
+
+          <h3>Dice Combinations</h3>
+          <div class="grid">
+            <div class="card">
+              <h4 style="margin-top: 0;">Attack Roll</h4>
+              <div class="flex">
+                <div class="dice dice-small dice-hit">4</div>
+                <div class="dice dice-small dice-hit">5</div>
+                <div class="dice dice-small dice-critical">6</div>
+                <div class="dice dice-small dice-miss">2</div>
+              </div>
+              <p class="subtitle">2 Hits, 1 Critical, 1 Miss</p>
+            </div>
+            
+            <div class="card">
+              <h4 style="margin-top: 0;">Defense Roll</h4>
+              <div class="flex">
+                <div class="dice dice-small dice-block">3</div>
+                <div class="dice dice-small dice-shield">4</div>
+                <div class="dice dice-small dice-miss">1</div>
+                <div class="dice dice-small dice-critical-block">6</div>
+              </div>
+              <p class="subtitle">1 Block, 1 Shield, 1 Miss, 1 Critical Block</p>
+            </div>
+            
+            <div class="card">
+              <h4 style="margin-top: 0;">Armor Roll</h4>
+              <div class="flex">
+                <div class="dice dice-small dice-armor">5</div>
+                <div class="dice dice-small dice-armor">6</div>
+                <div class="dice dice-small dice-miss">2</div>
+                <div class="dice dice-small dice-critical">6</div>
+              </div>
+              <p class="subtitle">2 Successes, 1 Failure, 1 Critical</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="layout" class="tab-content">
+        <div class="section">
+          <h2>Spacing System</h2>
+          
+          <div class="card">
+            <h3 style="margin-top: 0;">Spacing Scale</h3>
+            <div>
+              <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                <div style="width: 4rem;">xs (4px)</div>
+                <div style="background-color: var(--primary); height: 1rem; width: 4px; border-radius: 2px;"></div>
+                <div class="subtitle">p-1</div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                <div style="width: 4rem;">sm (8px)</div>
+                <div style="background-color: var(--primary); height: 1rem; width: 8px; border-radius: 2px;"></div>
+                <div class="subtitle">p-2</div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                <div style="width: 4rem;">md (16px)</div>
+                <div style="background-color: var(--primary); height: 1rem; width: 16px; border-radius: 2px;"></div>
+                <div class="subtitle">p-4</div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                <div style="width: 4rem;">lg (24px)</div>
+                <div style="background-color: var(--primary); height: 1rem; width: 24px; border-radius: 2px;"></div>
+                <div class="subtitle">p-6</div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                <div style="width: 4rem;">xl (32px)</div>
+                <div style="background-color: var(--primary); height: 1rem; width: 32px; border-radius: 2px;"></div>
+                <div class="subtitle">p-8</div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 4rem;">2xl (48px)</div>
+                <div style="background-color: var(--primary); height: 1rem; width: 48px; border-radius: 2px;"></div>
+                <div class="subtitle">p-12</div>
+              </div>
+            </div>
+          </div>
+
+          <h3>Responsive Breakpoints</h3>
+          <div class="grid">
+            <div class="card">
+              <h4 style="margin-top: 0;">Mobile</h4>
+              <p>Up to 639px</p>
+              <p class="subtitle">Single column layouts, stacked components</p>
+            </div>
+            <div class="card">
+              <h4 style="margin-top: 0;">Tablet</h4>
+              <p>640px - 1023px</p>
+              <p class="subtitle">Two column layouts, side navigation</p>
+            </div>
+            <div class="card">
+              <h4 style="margin-top: 0;">Desktop</h4>
+              <p>1024px - 1279px</p>
+              <p class="subtitle">Multi-column layouts, full navigation</p>
+            </div>
+            <div class="card">
+              <h4 style="margin-top: 0;">Large Desktop</h4>
+              <p>1280px and above</p>
+              <p class="subtitle">Expanded layouts, additional content areas</p>
+            </div>
+          </div>
+
+          <h3>Grid System</h3>
+          <div class="card">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1rem;">
+              <div style="background-color: var(--secondary); height: 5rem; border-radius: var(--radius); display: flex; align-items: center; justify-content: center;">
+                Column 1
+              </div>
+              <div style="background-color: var(--secondary); height: 5rem; border-radius: var(--radius); display: flex; align-items: center; justify-content: center;">
+                Column 2
+              </div>
+              <div style="background-color: var(--secondary); height: 5rem; border-radius: var(--radius); display: flex; align-items: center; justify-content: center;">
+                Column 3
+              </div>
+              <div style="background-color: var(--secondary); height: 5rem; border-radius: var(--radius); display: flex; align-items: center; justify-content: center;">
+                Column 4
+              </div>
+            </div>
+            <p class="subtitle">The grid system uses CSS Grid for responsive layouts. Default gap is 16px (gap-4) but can be adjusted as needed.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="icons" class="tab-content">
+        <div class="section">
+          <h2>UI Icons</h2>
+          
+          <div class="card">
+            <div class="icon-grid">
+              <div class="icon-card">
+                <i-lucide name="menu" size="24"></i-lucide>
+                <span>Menu</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="x" size="24"></i-lucide>
+                <span>Close</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="chevron-right" size="24"></i-lucide>
+                <span>Chevron</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="check" size="24"></i-lucide>
+                <span>Check</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="moon" size="24"></i-lucide>
+                <span>Dark Mode</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="sun" size="24"></i-lucide>
+                <span>Light Mode</span>
+              </div>
+            </div>
+          </div>
+
+          <h3>Game Icons</h3>
+          <div class="card">
+            <div class="icon-grid">
+              <div class="icon-card">
+                <i-lucide name="skull" size="24"></i-lucide>
+                <span>Skull</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="shield" size="24"></i-lucide>
+                <span>Shield</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="sword" size="24"></i-lucide>
+                <span>Sword</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="users" size="24"></i-lucide>
+                <span>Warband</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="book" size="24"></i-lucide>
+                <span>Rules</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="dice-6" size="24"></i-lucide>
+                <span>Dice</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="crosshair" size="24"></i-lucide>
+                <span>Ranged Attack</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="swords" size="24"></i-lucide>
+                <span>Close Combat</span>
+              </div>
+            </div>
+          </div>
+
+          <h3>Action Icons</h3>
+          <div class="card">
+            <div class="icon-grid">
+              <div class="icon-card">
+                <i-lucide name="move" size="24"></i-lucide>
+                <span>MOVE</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="crosshair" size="24"></i-lucide>
+                <span>SHOOT</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="arrow-big-right" size="24"></i-lucide>
+                <span>CHARGE</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="swords" size="24"></i-lucide>
+                <span>FIGHT</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="arrow-down" size="24"></i-lucide>
+                <span>FALL BACK</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="eye" size="24" style="opacity: 0.5;"></i-lucide>
+                <span>HIDE</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="x" size="24"></i-lucide>
+                <span>PASS</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="hand" size="24"></i-lucide>
+                <span>INTERACT</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="backpack" size="24"></i-lucide>
+                <span>LOOT</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="footprints" size="24"></i-lucide>
+                <span>RUN</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="refresh-cw" size="24"></i-lucide>
+                <span>RECOVER</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="target" size="24"></i-lucide>
+                <span>OVERWATCH</span>
+              </div>
+            </div>
+          </div>
+
+          <h3>Terrain & Fate Dice Icons</h3>
+          <div class="card">
+            <div class="icon-grid">
+              <div class="icon-card">
+                <i-lucide name="mountain" size="24"></i-lucide>
+                <span>Mountain</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="trees" size="24"></i-lucide>
+                <span>Forest</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="cloud" size="24"></i-lucide>
+                <span>Fog</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="waves" size="24"></i-lucide>
+                <span>Water</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="boxes" size="24"></i-lucide>
+                <span>Ruins</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="dices" size="24"></i-lucide>
+                <span>Fate Dice</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="sparkles" size="24"></i-lucide>
+                <span>Magic</span>
+              </div>
+              <div class="icon-card">
+                <i-lucide name="radiation" size="24"></i-lucide>
+                <span>Hazard</span>
+              </div>
+            </div>
+          </div>
+
+          <h3>Model Stats</h3>
+          <div class="card">
+            <div class="grid">
+              <div class="stat-card model-stat">
+                <div class="stat-description">Action Points</div>
+                <div class="stat-value">
+                  <span class="stat-name">AP</span>
+                  <span class="stat-number">2</span>
+                </div>
+              </div>
+              <div class="stat-card model-stat">
+                <div class="stat-description">Movement</div>
+                <div class="stat-value">
+                  <span class="stat-name">MOV</span>
+                  <span class="stat-number">4"</span>
+                </div>
+              </div>
+              <div class="stat-card model-stat">
+                <div class="stat-description">Defense</div>
+                <div class="stat-value">
+                  <span class="stat-name">DEF</span>
+                  <span class="stat-number">3</span>
+                </div>
+              </div>
+              <div class="stat-card model-stat">
+                <div class="stat-description">Save</div>
+                <div class="stat-value">
+                  <span class="stat-name">SAV</span>
+                  <span class="stat-number">4+</span>
+                </div>
+              </div>
+              <div class="stat-card model-stat">
+                <div class="stat-description">Wounds</div>
+                <div class="stat-value">
+                  <span class="stat-name">WND</span>
+                  <span class="stat-number">10</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h3>Weapon Stats</h3>
+          <div class="card">
+            <div class="grid">
+              <div class="stat-card weapon-stat">
+                <div class="stat-description">Range</div>
+                <div class="stat-value">
+                  <span class="stat-name">RNG</span>
+                  <span class="stat-number">6"</span>
+                </div>
+              </div>
+              <div class="stat-card weapon-stat">
+                <div class="stat-description">Attacks</div>
+                <div class="stat-value">
+                  <span class="stat-name">ATK</span>
+                  <span class="stat-number">3</span>
+                </div>
+              </div>
+              <div class="stat-card weapon-stat">
+                <div class="stat-description">Hit Value</div>
+                <div class="stat-value">
+                  <span class="stat-name">HTV</span>
+                  <span class="stat-number">4+</span>
+                </div>
+              </div>
+              <div class="stat-card weapon-stat">
+                <div class="stat-description">Damage</div>
+                <div class="stat-value">
+                  <span class="stat-name">DMG</span>
+                  <span class="stat-number">2</span>
+                </div>
+              </div>
+              <div class="stat-card weapon-stat">
+                <div class="stat-description">Critical</div>
+                <div class="stat-value">
+                  <span class="stat-name">CRT</span>
+                  <span class="stat-number">4</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="effects" class="tab-content">
+        <div class="section">
+          <h2>Tooltip Effect</h2>
+          
+          <div class="card">
+            <div class="flex">
+              <div class="tooltip">
+                <button class="button button-outline">Hover Me</button>
+                <div class="tooltip-content">
+                  <p>Basic tooltip with information</p>
+                </div>
+              </div>
+
+              <div class="tooltip">
+                <button class="button button-outline">
+                  <i-lucide name="sword" size="16"></i-lucide> Weapon Stats
+                </button>
+                <div class="tooltip-content">
+                  <div>
+                    <p style="font-weight: bold;">Runic Longsword</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem; font-size: 0.875rem; margin-top: 0.5rem;">
+                      <span>Damage:</span>
+                      <span>1d6+2</span>
+                      <span>Range:</span>
+                      <span>Melee</span>
+                      <span>Type:</span>
+                      <span>Slashing</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tooltip">
+                <button class="button button-outline">
+                  <i-lucide name="scroll" size="16"></i-lucide> Ability Info
+                </button>
+                <div class="tooltip-content" style="padding: 0;">
+                  <div class="tooltip-header">Berserker Rage</div>
+                  <div style="padding: 0.75rem;">
+                    <p style="font-size: 0.875rem;">+2 to Attack, -1 to Defense</p>
+                    <p style="font-size: 0.75rem; color: var(--muted-foreground); margin-top: 0.25rem;">Activates when unit is below 50% health</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h3>Hover & Glow Effects</h3>
+          <div class="card">
+            <div class="grid">
+              <div>
+                <h4>Hover Effects</h4>
+                <div class="flex">
+                  <div class="hover-basic">Basic Hover</div>
+                  <div class="hover-scale">Scale Hover</div>
+                  <div class="hover-shadow">Shadow Hover</div>
+                </div>
+              </div>
+
+              <div>
+                <h4>Glow Effects</h4>
+                <div class="flex">
+                  <div class="glow-red">Red Glow</div>
+                  <div class="glow-blue">Blue Glow</div>
+                </div>
+              </div>
+
+              <div>
+                <h4>Selection Effects</h4>
+                <div class="flex">
+                  <div class="selection-border">Border Selection</div>
+                  <div class="selection-overlay">Overlay Selection</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="content" class="tab-content">
+        <div class="section">
+          <h2>Content Blocks</h2>
+          
+          <div class="card">
+            <div class="content-block">
+              <h3 class="content-block-title">Charging</h3>
+              <p>A unit may charge an enemy unit if it is within charge range (Movement characteristic + D6 inches). The charging unit moves into base contact with the target and gains +1 Attack in the subsequent Combat phase.</p>
+              <p class="content-block-subtitle">Units that charged cannot be selected to fight again in the same turn.</p>
+            </div>
+
+            <div class="content-block">
+              <h3 class="content-block-title">The Ashen Wastes</h3>
+              <p class="lore-quote">"Beyond the Blackfire Mountains lie the desolate plains known as the Ashen Wastes. No living thing grows there, and the ground is covered in a fine gray dust that swirls in the toxic winds."</p>
+              <p>The Ashen Wastes were created during the Cataclysm, when the great city of Dorn was consumed by dark magic. Now it serves as a battleground for warbands seeking ancient artifacts buried beneath the ash.</p>
+            </div>
+
+            <div class="content-block">
+              <h3 class="content-block-title">Relic Hunt</h3>
+              <div>
+                <p><span class="rule-label">Setup:</span> Place D3+2 objective markers across the battlefield, at least 6" from any edge.</p>
+                <p><span class="rule-label">Victory Conditions:</span> Control more objective markers than your opponent at the end of battle round 5.</p>
+                <p><span class="rule-label">Special Rules:</span> A unit controls an objective if it is within 3" of it and no enemy units are within 3" of the same objective.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>Grimheim Style Guide - Created for the Grimheim tabletop skirmisher game companion app</p>
+    </footer>
+  </div>
+
+  <script>
+    function openTab(evt, tabName) {
+      // Declare all variables
+      var i, tabContent, tabLinks;
+
+      // Get all elements with class="tab-content" and hide them
+      tabContent = document.getElementsByClassName("tab-content");
+      for (i = 0; i < tabContent.length; i++) {
+        tabContent[i].style.display = "none";
+      }
+
+      // Get all elements with class="tab" and remove the class "active"
+      tabLinks = document.getElementsByClassName("tab");
+      for (i = 0; i < tabLinks.length; i++) {
+        tabLinks[i].className = tabLinks[i].className.replace(" active", "");
+      }
+
+      // Show the current tab, and add an "active" class to the button that opened the tab
+      document.getElementById(tabName).style.display = "block";
+      evt.currentTarget.className += " active";
+    }
+
+    // Initialize Lucide icons
+    lucide.createIcons();
+  </script>
+</body>
+</html>
+

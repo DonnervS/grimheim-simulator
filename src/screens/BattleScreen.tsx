@@ -6,62 +6,77 @@ const BattleContainer = styled.div`
   display: grid;
   grid-template-columns: 250px 1fr 250px;
   grid-template-rows: 1fr 150px;
-  gap: 10px;
-  padding: 10px;
+  gap: 2rem;
+  padding: 2rem;
 `
 
 const BattleView = styled.div`
   grid-column: 2;
   grid-row: 1;
-  background-color: #2a2a4a;
-  border: 2px solid #4a4a8a;
-  border-radius: 8px;
+  background: var(--card);
+  border: 1px solid var(--primary-red);
+  border-radius: 2px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.1);
 `
 
 const SidePanel = styled.div`
-  background-color: #2a2a4a;
-  border: 2px solid #4a4a8a;
-  border-radius: 8px;
-  padding: 10px;
+  background: var(--card);
+  border: 1px solid var(--primary-red);
+  border-radius: 2px;
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 1rem;
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.1);
 `
 
 const ModelCard = styled.div`
-  background-color: #3a3a6a;
-  border: 1px solid #5a5aaa;
-  border-radius: 4px;
-  padding: 8px;
-  font-size: 12px;
+  background: var(--accent);
+  border: 1px solid var(--primary-red);
+  border-radius: 2px;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
+  }
 `
 
 const ActionBar = styled.div`
   grid-column: 1 / -1;
   grid-row: 2;
-  background-color: #2a2a4a;
-  border: 2px solid #4a4a8a;
-  border-radius: 8px;
-  padding: 10px;
+  background: var(--card);
+  border: 1px solid var(--primary-red);
+  border-radius: 2px;
+  padding: 1.25rem;
   display: flex;
-  gap: 10px;
+  gap: 1rem;
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.1);
 `
 
 const ActionButton = styled.button`
-  background-color: #4a4a8a;
-  color: #e6e6fa;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
+  background: var(--accent);
+  color: var(--primary-light);
+  border: 1px solid var(--primary-red);
+  border-radius: 2px;
+  padding: 0.75rem 1.5rem;
   cursor: pointer;
-  font-family: 'Press Start 2P', cursive;
-  font-size: 12px;
-  transition: background-color 0.2s;
+  font-size: 1rem;
+  transition: all 0.3s ease;
 
   &:hover {
-    background-color: #6a6aaa;
+    background: rgba(220, 38, 38, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `
 

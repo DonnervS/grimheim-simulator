@@ -12,90 +12,130 @@ interface ModelSelectionProps {
 const SelectionContainer = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--space-5);
-  padding: var(--space-5);
+  gap: 2rem;
   width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
 `;
 
-const Title = styled.h2`
+const Title = styled.h1`
   color: var(--primary-red);
-  font-size: 1.5rem;
+  font-size: 3.5rem;
   font-family: 'IM Fell English', serif;
-  text-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
-  margin: 0;
+  text-align: center;
+  margin-bottom: 0.5rem;
   font-weight: normal;
 `;
 
-const ModelList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  width: 100%;
-  max-width: 400px;
+const Subtitle = styled.p`
+  color: var(--primary-light);
+  font-size: 1.2rem;
+  text-align: center;
+  font-weight: 300;
+  margin-bottom: 3rem;
 `;
 
-const ModelButton = styled.button<{ isSelected: boolean }>`
+const TabContainer = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-3) var(--space-4);
-  background: ${props => props.isSelected ? 'rgba(220, 38, 38, 0.1)' : 'var(--accent)'};
-  border: 1px solid var(--primary-red);
-  border-radius: 2px;
-  color: var(--primary-light);
-  cursor: pointer;
   width: 100%;
-  font-family: 'IM Fell English', serif;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
-  position: relative;
-  overflow: hidden;
+  margin-bottom: 2rem;
+`;
+
+const Tab = styled.button<{ $active?: boolean }>`
+  flex: 1;
+  padding: 1rem;
+  background: ${props => props.$active ? 'var(--primary-red)' : '#171717'};
+  color: var(--primary-light);
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
-  }
-
-  &:after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(220, 38, 38, 0.1);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  &:hover:after {
-    opacity: 1;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
+    background-color: ${props => props.$active ? 'var(--primary-red)' : 'rgba(220, 38, 38, 0.8)'};
   }
 `;
 
-const ModelInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-1);
+const SelectionCard = styled.div`
+  background: #171717;
+  padding: 2rem;
+  margin-bottom: 2rem;
 `;
 
-const ModelName = styled.span`
-  color: var(--primary-red);
-  font-size: 1.25rem;
-  font-family: 'IM Fell English', serif;
-  text-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
-`;
-
-const ModelStats = styled.span`
-  font-size: 0.875rem;
-  font-family: 'Inter', sans-serif;
+const SectionTitle = styled.h3`
   color: var(--primary-light);
-  opacity: 0.9;
+  font-size: 1.5rem;
+  font-family: 'IM Fell English', serif;
+  margin-bottom: 1.5rem;
+  font-weight: normal;
+`;
+
+const FactionContainer = styled.div`
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+`;
+
+enum Faction {
+  Primordial = "Primordial",
+  Beasts = "Beasts",
+  Imperial = "Imperial",
+  Undead = "Undead"
+}
+
+const FactionButton = styled.button<{ $active?: boolean }>`
+  padding: 0.75rem 1.5rem;
+  background: ${props => props.$active ? 'var(--primary-red)' : '#171717'};
+  color: var(--primary-light);
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: ${props => props.$active ? 'var(--primary-red)' : 'rgba(220, 38, 38, 0.8)'};
+  }
+`;
+
+const SelectDropdown = styled.select`
+  width: 100%;
+  padding: 1rem;
+  background: #171717;
+  color: var(--primary-light);
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem top 50%;
+  background-size: 1em auto;
+  padding-right: 2.5rem;
+`;
+
+const ActionButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+`;
+
+const ActionButton = styled.button`
+  background: var(--primary-red);
+  color: var(--primary-light);
+  border: none;
+  padding: 0.85rem 2.5rem;
+  font-family: 'IM Fell English', serif;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #b91c1c;
+  }
 `;
 
 const ModelSelection: React.FC<ModelSelectionProps> = ({
@@ -104,26 +144,47 @@ const ModelSelection: React.FC<ModelSelectionProps> = ({
   onModelSelect,
   selectedModel
 }) => {
+  // In einer echten Implementierung würden diese Zustände verwaltet werden
+  const activeFaction = Faction.Primordial;
+  
   return (
     <SelectionContainer>
-      <Title>Spieler {playerNumber} - Modell auswählen</Title>
-      <ModelList>
-        {warband.map((model, index) => (
-          <ModelButton
-            key={index}
-            isSelected={selectedModel?.name === model.name}
-            onClick={() => onModelSelect(model)}
-          >
-            <ModelInfo>
-              <ModelName>{model.name}</ModelName>
-              <ModelStats>
-                W: {model.stats.WND} | M: {model.stats.MOV}" | 
-                DEF: {model.stats.DEF} | AP: {model.stats.AP}
-              </ModelStats>
-            </ModelInfo>
-          </ModelButton>
-        ))}
-      </ModelList>
+      <div>
+        <Title>Grimheim Combat Simulator</Title>
+        <Subtitle>A companion app for the Grimheim tabletop skirmisher game</Subtitle>
+      </div>
+      
+      <TabContainer>
+        <Tab $active={playerNumber === 1}>Attacker</Tab>
+        <Tab $active={playerNumber === 2}>Defender</Tab>
+      </TabContainer>
+      
+      <SelectionCard>
+        <SectionTitle>Faction</SectionTitle>
+        <FactionContainer>
+          <FactionButton $active={activeFaction === Faction.Primordial}>Primordial</FactionButton>
+          <FactionButton $active={activeFaction === Faction.Beasts}>Beasts</FactionButton>
+          <FactionButton $active={activeFaction === Faction.Imperial}>Imperial</FactionButton>
+          <FactionButton $active={activeFaction === Faction.Undead}>Undead</FactionButton>
+        </FactionContainer>
+      
+        <SectionTitle>Character</SectionTitle>
+        <SelectDropdown value={selectedModel?.name || ''} onChange={(e) => {
+          const selected = warband.find(model => model.name === e.target.value);
+          if (selected) onModelSelect(selected);
+        }}>
+          <option value="" disabled>Select a character</option>
+          {warband.map((model, index) => (
+            <option key={index} value={model.name}>
+              {model.name} - W: {model.stats.WND} | M: {model.stats.MOV} | DEF: {model.stats.DEF} | AP: {model.stats.AP}
+            </option>
+          ))}
+        </SelectDropdown>
+      </SelectionCard>
+      
+      <ActionButtonContainer>
+        <ActionButton>Start Combat</ActionButton>
+      </ActionButtonContainer>
     </SelectionContainer>
   );
 };

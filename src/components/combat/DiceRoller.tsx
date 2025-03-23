@@ -12,8 +12,11 @@ const DiceContainer = styled.div`
 const DiceButton = styled.button<{ isHit: boolean; isUsed: boolean; isBlockable: boolean; isActive: boolean }>`
   width: 3.5rem;
   height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 2px;
-  border: 2px solid var(--primary-border);
+  border: 1px solid var(--primary-red);
   background: ${props =>
     props.isUsed
       ? 'var(--muted)'
@@ -21,19 +24,20 @@ const DiceButton = styled.button<{ isHit: boolean; isUsed: boolean; isBlockable:
       ? 'var(--success)'
       : props.isHit
       ? 'var(--secondary-blue)'
-      : 'var(--primary-dark)'};
+      : 'var(--accent)'};
   color: var(--primary-light);
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-family: 'IM Fell English', serif;
   cursor: ${props => (props.isActive && !props.isUsed ? 'pointer' : 'not-allowed')};
   opacity: ${props => (props.isUsed ? 0.5 : 1)};
-  transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+  transition: all 0.3s ease;
   position: relative;
-  overflow: hidden;
+  box-shadow: ${props => (props.isHit ? '0 0 15px rgba(59, 130, 246, 0.3)' : 'none')};
+  box-shadow: ${props => (props.isBlockable ? '0 0 15px rgba(34, 197, 94, 0.3)' : '')};
 
   &:hover {
     transform: ${props => (props.isActive && !props.isUsed ? 'translateY(-2px)' : 'none')};
-    box-shadow: ${props => (props.isActive && !props.isUsed ? '0 0 15px rgba(255, 255, 255, 0.1)' : 'none')};
+    box-shadow: ${props => (props.isActive && !props.isUsed ? '0 0 15px rgba(255, 255, 255, 0.2)' : '')};
   }
 
   &:after {
@@ -51,7 +55,11 @@ const DiceButton = styled.button<{ isHit: boolean; isUsed: boolean; isBlockable:
 `;
 
 const RollButton = styled.button`
-  padding: 0.75rem 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
   background: var(--secondary-blue);
   border: none;
   border-radius: 2px;
@@ -59,14 +67,16 @@ const RollButton = styled.button`
   font-size: 1rem;
   font-family: 'IM Fell English', serif;
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
   position: relative;
   overflow: hidden;
   min-width: 120px;
+  min-height: 2.5rem;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 0 20px rgba(138, 138, 255, 0.2);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    background: rgba(59, 130, 246, 0.9);
   }
 
   &:after {

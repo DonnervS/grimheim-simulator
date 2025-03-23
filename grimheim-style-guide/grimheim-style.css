@@ -1,0 +1,100 @@
+:root {
+  /* Colors */
+  --background: #0f0f0f;
+  --foreground: #fafafa;
+  --card: #1c1c1c;
+  --card-foreground: #fafafa;
+  --primary: #dc2626;
+  --primary-foreground: #fafafa;
+  --secondary: #27272a;
+  --secondary-foreground: #fafafa;
+  --muted: #171717;
+  --muted-foreground: #a3a3a3;
+  --accent: #18181b;
+  --accent-foreground: #fafafa;
+  --gold: #f59e0b;
+  --gold-foreground: #171717;
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+  --border: #333333;
+  --input: #333333;
+  --ring: #dc2626;
+  --radius: 0.5rem;
+
+  /* Status Colors */
+  --success: #16a34a;
+  --warning: #ca8a04;
+  --danger: #b91c1c;
+  --info: #2563eb;
+
+  /* Extended Colors */
+  --blood-red: #991b1b;
+  --bone: #fffbeb;
+  --ash-gray: #374151;
+  --shadow: #111827;
+  --poison: #22c55e;
+  --ice: #22d3ee;
+  --fire: #f97316;
+  --curse: #7e22ce;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  line-height: 1.5;
+  padding: 2rem;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+header {
+  margin-bottom: 2rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "IM Fell English", serif;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  font-size: 2.5rem;
+  color: var(--primary);
+}
+
+h2 {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-top: 2rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  color: var(--muted-foreground);
+}
+
+/* Rest of the CSS would go here */
+

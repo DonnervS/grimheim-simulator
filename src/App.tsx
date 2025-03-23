@@ -5,6 +5,7 @@ import BattleScreen from './screens/BattleScreen'
 import MapScreen from './screens/MapScreen'
 import CombatTestScreen from './screens/CombatTestScreen'
 import { RangedTestScreen } from './screens/RangedTestScreen'
+import StyleGuideComponent from '../grimheim-style-guide/style-guide'
 
 const AppContainer = styled.div`
   width: 100vw;
@@ -167,10 +168,8 @@ const Card = styled(Link)`
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: var(--secondary);
+    background-color: var(--card);
     text-decoration: none;
-    transform: translateY(-4px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   }
 `
 
@@ -186,7 +185,7 @@ const IconCircle = styled.div`
   transition: box-shadow 0.3s ease;
 
   ${Card}:hover & {
-    box-shadow: 0 0 15px 5px rgba(220, 38, 38, 0.3);
+    box-shadow: none;
   }
 `
 
@@ -367,10 +366,11 @@ const MainScreen = () => (
 );
 
 const StyleGuide: React.FC = () => {
-  useEffect(() => {
-    window.location.href = '/grimheim-style-guide.html';
-  }, []);
-  return null;
+  return (
+    <MainContent>
+      <StyleGuideComponent />
+    </MainContent>
+  );
 };
 
 function App() {
