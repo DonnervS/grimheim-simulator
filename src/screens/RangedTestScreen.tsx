@@ -77,37 +77,14 @@ const SelectionContainer = styled.div`
 `;
 
 const FactionButton = styled.button<{ $isSelected: boolean }>`
-  background: var(--accent);
+  background: ${props => props.$isSelected ? '#3D0F0F' : 'var(--accent)'};
   color: var(--primary-light);
   padding: 1rem 2rem;
-  border-radius: 2px;
   cursor: pointer;
   font-family: 'IM Fell English', serif;
   font-size: 1.25rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
   min-width: 200px;
-  position: relative;
-  overflow: hidden;
   border: none;
-
-  &:after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(220, 38, 38, 0.1);
-    opacity: ${props => props.$isSelected ? 1 : 0};
-    transition: opacity 0.3s ease;
-  }
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
-
-    &:after {
-      opacity: 1;
-    }
-  }
 `;
 
 const FactionGrid = styled.div`
@@ -128,8 +105,7 @@ const SelectionStep = styled.div`
 const ModelSelect = styled.select`
   background: var(--accent);
   color: var(--primary-light);
-  border: 1px solid var(--primary-red);
-  border-radius: 2px;
+  border: none;
   padding: 0.75rem;
   font-family: 'IM Fell English', serif;
   font-size: 1rem;
@@ -147,7 +123,6 @@ const ModelSelect = styled.select`
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
   }
 
   option {
@@ -158,58 +133,27 @@ const ModelSelect = styled.select`
 
 const SelectionBox = styled.div`
   background: var(--card);
-  border: 1px solid var(--primary-red);
-  border-radius: 2px;
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
   width: 100%;
-  box-shadow: 0 0 20px rgba(220, 38, 38, 0.1);
 `;
 
 const StartButton = styled.button`
-  background: var(--accent);
+  background: var(--primary-red);
   color: var(--primary-light);
   padding: 1rem 2rem;
-  border-radius: 2px;
   cursor: pointer;
   font-family: 'IM Fell English', serif;
   font-size: 1.25rem;
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
   margin-top: 1.25rem;
   border: none;
-
-  &:after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(220, 38, 38, 0.1);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
-
-    &:after {
-      opacity: 1;
-    }
-  }
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-
-    &:after {
-      opacity: 0;
-    }
   }
 `;
 
@@ -220,7 +164,6 @@ const Title = styled.h2`
   text-align: center;
   font-weight: normal;
   letter-spacing: 0.05em;
-  text-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
 `;
 
 const SubTitle = styled.h3`
