@@ -24,45 +24,45 @@ import {
 const TestContainer = styled.div`
   width: 100vw;
   height: 100vh;
-  background: #1a1a2e;
+  background: var(--primary-dark);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
-  color: #e6e6fa;
-  font-family: 'Press Start 2P', cursive;
+  padding: 2rem;
+  color: var(--primary-light);
+  font-family: 'IM Fell English', serif;
   overflow-y: auto;
   overflow-x: hidden;
 
   /* Customize scrollbar */
   &::-webkit-scrollbar {
-    width: 12px;
+    width: 8px;
   }
 
   &::-webkit-scrollbar-track {
-    background: #1a1a2e;
+    background: var(--primary-dark);
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #4a4a8a;
-    border-radius: 6px;
-    border: 3px solid #1a1a2e;
+    background: var(--primary-red);
+    border-radius: 2px;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: #6a6aaa;
+    background: rgba(220, 38, 38, 0.8);
   }
 `;
 
 const CombatContainer = styled.div`
   width: 100%;
   max-width: 1200px;
-  min-height: calc(100vh - 40px);
-  background: rgba(42, 42, 74, 0.8);
-  border-radius: 8px;
-  border: 2px solid #4a4a8a;
+  min-height: calc(100vh - 4rem);
+  background: var(--card);
+  border-radius: 2px;
+  border: 1px solid var(--primary-red);
   overflow: visible;
-  margin-bottom: 20px;
+  margin-bottom: 2rem;
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.1);
 `;
 
 const SelectionContainer = styled.div`
@@ -71,32 +71,48 @@ const SelectionContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 40px;
-  margin-bottom: 20px;
-  padding: 20px;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding: 2rem;
 `;
 
 const FactionButton = styled.button<{ $isSelected: boolean }>`
-  background: ${props => props.$isSelected ? '#8a8aff' : '#4a4a8a'};
-  color: #e6e6fa;
-  border: none;
-  border-radius: 8px;
-  padding: 15px 30px;
-  font-family: 'Press Start 2P', cursive;
-  font-size: 14px;
+  background: var(--accent);
+  color: var(--primary-light);
+  padding: 1rem 2rem;
+  border-radius: 2px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  font-family: 'IM Fell English', serif;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
   min-width: 200px;
+  position: relative;
+  overflow: hidden;
+  border: none;
+
+  &:after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(220, 38, 38, 0.1);
+    opacity: ${props => props.$isSelected ? 1 : 0};
+    transition: opacity 0.3s ease;
+  }
 
   &:hover {
-    transform: scale(1.05);
-    background: ${props => props.$isSelected ? '#9a9aff' : '#5a5a9a'};
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
+
+    &:after {
+      opacity: 1;
+    }
   }
 `;
 
 const FactionGrid = styled.div`
   display: flex;
-  gap: 20px;
+  gap: 1.25rem;
   justify-content: center;
   flex-wrap: wrap;
 `;
@@ -105,92 +121,125 @@ const SelectionStep = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 1.25rem;
   width: 100%;
 `;
 
 const ModelSelect = styled.select`
-  background: #4a4a8a;
-  color: #e6e6fa;
-  border: 2px solid #8a8aff;
-  border-radius: 4px;
-  padding: 12px;
-  font-family: 'Press Start 2P', cursive;
-  font-size: 12px;
+  background: var(--accent);
+  color: var(--primary-light);
+  border: 1px solid var(--primary-red);
+  border-radius: 2px;
+  padding: 0.75rem;
+  font-family: 'IM Fell English', serif;
+  font-size: 1rem;
   cursor: pointer;
   width: 300px;
   appearance: none;
   position: relative;
   text-align: center;
 
-  /* Custom arrow */
-  background-image: linear-gradient(45deg, transparent 50%, #e6e6fa 50%),
-                    linear-gradient(135deg, #e6e6fa 50%, transparent 50%);
-  background-position: calc(100% - 20px) calc(1em + 2px),
-                       calc(100% - 15px) calc(1em + 2px);
-  background-size: 5px 5px,
-                  5px 5px;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
+  background-position: right 0.7em top 50%;
+  background-size: 1em auto;
+  padding-right: 2.5rem;
 
   &:focus {
     outline: none;
-    border-color: #9a9aff;
-    box-shadow: 0 0 10px rgba(138, 138, 255, 0.3);
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
   }
 
   option {
-    background: #2a2a4a;
-    padding: 12px;
+    background: var(--accent);
+    padding: 0.75rem;
   }
 `;
 
 const SelectionBox = styled.div`
-  background: rgba(42, 42, 74, 0.8);
-  border: 2px solid #4a4a8a;
-  border-radius: 8px;
-  padding: 20px;
+  background: var(--card);
+  border: 1px solid var(--primary-red);
+  border-radius: 2px;
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 15px;
+  gap: 1rem;
   width: 100%;
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.1);
 `;
 
 const StartButton = styled.button`
-  background: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 15px 30px;
-  font-family: 'Press Start 2P', cursive;
-  font-size: 14px;
+  background: var(--accent);
+  color: var(--primary-light);
+  padding: 1rem 2rem;
+  border-radius: 2px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  margin-top: 20px;
+  font-family: 'IM Fell English', serif;
+  font-size: 1.25rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-top: 1.25rem;
+  border: none;
+
+  &:after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(220, 38, 38, 0.1);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
 
   &:hover {
-    transform: scale(1.05);
-    background: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
+
+    &:after {
+      opacity: 1;
+    }
   }
 
   &:disabled {
-    background: #666;
+    opacity: 0.5;
     cursor: not-allowed;
     transform: none;
+    box-shadow: none;
+
+    &:after {
+      opacity: 0;
+    }
   }
 `;
 
 const Title = styled.h2`
-  color: #8a8aff;
-  margin-bottom: 10px;
+  color: var(--primary-red);
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
   text-align: center;
+  font-weight: normal;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
 `;
 
 const SubTitle = styled.h3`
-  color: #e6e6fa;
-  font-size: 14px;
-  margin-bottom: 20px;
+  color: var(--primary-light);
+  font-size: 1.25rem;
+  margin-bottom: 1.25rem;
   text-align: center;
+  font-weight: normal;
+  letter-spacing: 0.05em;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+`;
+
+const ActionButton = styled(StartButton)`
+  min-width: 200px;
 `;
 
 export const RangedTestScreen: React.FC = () => {

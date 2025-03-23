@@ -7,59 +7,64 @@ const MapContainer = styled.div`
   display: grid;
   grid-template-columns: 200px 1fr 200px;
   grid-template-rows: 1fr 100px;
-  gap: 10px;
-  padding: 10px;
+  gap: 1.25rem;
+  padding: 1.25rem;
 `
 
 const MapView = styled.div`
   grid-column: 2;
   grid-row: 1;
-  background-color: #2a2a4a;
-  border: 2px solid #4a4a8a;
-  border-radius: 8px;
+  background: var(--card);
+  border: 1px solid var(--primary-red);
+  border-radius: 2px;
   position: relative;
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.1);
 `
 
 const SidePanel = styled.div`
-  background-color: #2a2a4a;
-  border: 2px solid #4a4a8a;
-  border-radius: 8px;
-  padding: 10px;
+  background: var(--card);
+  border: 1px solid var(--primary-red);
+  border-radius: 2px;
+  padding: 1.25rem;
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.1);
 `
 
 const ActionBar = styled.div`
   grid-column: 1 / -1;
   grid-row: 2;
-  background-color: #2a2a4a;
-  border: 2px solid #4a4a8a;
-  border-radius: 8px;
-  padding: 10px;
+  background: var(--card);
+  border: 1px solid var(--primary-red);
+  border-radius: 2px;
+  padding: 1.25rem;
   display: flex;
-  gap: 10px;
+  gap: 1rem;
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.1);
 `
 
 const ActionButton = styled.button`
-  background-color: #4a4a8a;
-  color: #e6e6fa;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
+  background: var(--accent);
+  color: var(--primary-light);
+  border: 1px solid var(--primary-red);
+  border-radius: 2px;
+  padding: 0.75rem 1.5rem;
   cursor: pointer;
-  font-family: 'Press Start 2P', cursive;
-  font-size: 12px;
-  transition: background-color 0.2s;
+  font-family: 'IM Fell English', serif;
+  font-size: 1rem;
+  transition: all 0.3s ease;
 
   &:hover {
-    background-color: #6a6aaa;
+    background: rgba(220, 38, 38, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
   }
 `
 
 const TestButton = styled(ActionButton)`
   margin-left: auto;
-  background-color: #2a4a8a;
+  background: var(--secondary-blue);
   
   &:hover {
-    background-color: #3a5aaa;
+    background: rgba(59, 130, 246, 0.1);
   }
 `
 
